@@ -90,6 +90,9 @@ vi ~/.zshrc
 ```bash
 export PATH="$HOME/.rbenv/shims:$PATH"
 ```
+
+Apply configuration changes
+
 ```bash
 source ~/.zshrc
 ```
