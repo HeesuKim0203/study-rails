@@ -1,0 +1,68 @@
+<h1>Item list</h1>
+<% @items.each do |item| %>
+    <hr>
+    <% if item.image.attached? %>
+      <%= image_tag url_for(item.image), style: "max-width: 200px;" %>
+    <% end %>
+    <br>
+    <%= item.product_name %>
+    <br>
+    <%= item.company_name %>
+    <br>
+    <%= item.desc %>
+    <br>
+
+    <%= link_to 'Delete', '#', data: { id: item.id }, class: 'delete-item' %>
+    
+<% end %>
+<hr>
+
+<h1>New Item</h1>
+
+<%= form_with model: @item, local: true, html: { multipart: true } do |f| %>
+    <%= f.label :image, "image : "%>
+    <%= f.file_field :image %>
+    <br>
+    
+    <%= f.label :product_name, "Product name : "%>
+    <%= f.text_field :product_name %>
+    <br>
+
+    <%= f.label :company_name, "Company name : "%>
+    <%= f.text_field :company_name %>
+    <br>
+
+    <%= f.label :desc, "Description : "%>
+    <%= f.text_area :desc %>
+    <br>
+
+    <%= f.submit "Create" %>
+
+<% end %>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-item').forEach(function(link) {
+      link.addEventListener('click', function(event) {
+        event.preventDefault();
+        const itemId = event.target.dataset.id;
+        
+        fetch(`/items/${itemId}`, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+        }).then(response => {
+          if (response.ok) {
+            window.location.href = '<%= item_index_path %>';
+          } else {
+            alert('Failed to delete the item.');
+          }
+        });
+      });
+    });
+  });
+</script>
