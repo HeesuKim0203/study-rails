@@ -1,6 +1,6 @@
 import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { HOME_URL } from '../utils/text'
+import { HOME_URL } from '../utils/constants'
 import Home from './Home'
 
 const Router = () => {

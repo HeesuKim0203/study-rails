@@ -1,12 +1,11 @@
 
-import React, { ChangeEvent, useState } from 'react'
-import { MdAdd, MdFilterList, MdSearch } from 'react-icons/md'
+import React, { useState } from 'react'
+import { MdAdd, MdSearch } from 'react-icons/md'
 import {
     Container,
     ContentsBase,
     MarginBase,
     Button,
-    SelectBox,
     Paragraph,
     WithSideContent,
     ListTable,
@@ -15,28 +14,17 @@ import {
     Pagination,
     Pager,
     Digits,
-    FormControl,
-    FormControlGroup,
-    TextField,
-    DigitsInput,
-    DateInput,
-    ColumnBase,
     SectionTitle,
     VisuallyHidden,
     SearchField,
-    FormActions,
-    FloatingMessageBlock,
+    TableHeader,
   } from '@freee_jp/vibes'
-
-export type Order = 'asc' | 'desc' | 'init'
-
-type ListElm = {
-    title: string
-    user: string
-    amount: number
-    status: string
-    date: string
-}
+import AddData from './AddData'
+import { DEFAULT_PAGE, DEFAULT_ROWS, LIST_TABLE_HEADER, ORDER, ROWS_OPTION } from '../utils/constants'
+import { ListElm, Order } from '../utils/type'
+import * as XLSX from 'xlsx'
+import moment from 'moment'
+import { getFileNameDate } from '../utils/util'
 
 // Todo : Data -> BackEnd
 const useData = () => {
@@ -111,18 +99,88 @@ const useData = () => {
             status: '申請中',
             date: '2020-10-21',
         },
+        {
+            title: '打ち合わせ費用',
+            user: 'フリー太郎',
+            amount: 100000,
+            status: '申請中',
+            date: '2020-10-01',
+        },
+        {
+            title: '書籍購入費',
+            user: 'user.email@example.com',
+            amount: 123000,
+            status: '申請中',
+            date: '2020-09-23',
+        },
+        {
+            title: '交通費',
+            user: '佐々木大輔',
+            amount: 2000,
+            status: '精算済',
+            date: '2020-10-11',
+        },
+        {
+            title: 'UFO撮影ロケ',
+            user: '五反田花子',
+            amount: 3000000,
+            status: '却下',
+            date: '2020-09-12',
+        },
+        {
+            title: 'ツチノコ捜索費',
+            user: '三田次郎',
+            amount: 1000000,
+            status: '申請中',
+            date: '2020-11-01',
+        },
+        {
+            title: 'オフィス備品',
+            user: 'フリー太郎',
+            amount: 48000,
+            status: '精算済',
+            date: '2020-09-12',
+        },
+        {
+            title: '書籍購入費',
+            user: 'user.email@example.com',
+            amount: 2800,
+            status: '申請中',
+            date: '2020-10-12',
+        },
+        {
+            title: 'ネコのエサ代',
+            user: '三田次郎',
+            amount: 3000,
+            status: '申請中',
+            date: '2020-10-27',
+        },
+        {
+            title: '駐車場代',
+            user: 'フリー太郎',
+            amount: 4000,
+            status: '申請中',
+            date: '2020-10-05',
+        },
+        {
+            title: 'PC用品',
+            user: '五反田花子',
+            amount: 800000,
+            status: '申請中',
+            date: '2020-10-21',
+        },
     ]
 
     const [sortKey, setSortKey] = useState<keyof ListElm>('date')
-    const [sortOrder, setSortOrder] = useState<Order>('desc')
+    const [sortOrder, setSortOrder] = useState<Order>(ORDER.DESC)
     const [statuses, setStatuses] = useState<boolean[]>(
         Array(data.length).fill(false)
     )
 
     const nextOrder: { [key in Order]: Order } = {
-        asc: 'desc',
-        desc: 'init',
-        init: 'asc',
+        asc: ORDER.DESC,
+        desc: ORDER.INIT,
+        init: ORDER.ASC,
     }
 
     const sort = (newKey: keyof ListElm) => {
@@ -130,7 +188,7 @@ const useData = () => {
             setSortOrder((prev) => nextOrder[prev])
         } else {
             setSortKey(newKey)
-            setSortOrder('asc')
+            setSortOrder(ORDER.ASC)
         }
         // ソートしたときはチェックボックスの状態をリセット
         setStatuses(Array(data.length).fill(false))
@@ -147,7 +205,7 @@ const useData = () => {
     }
 
     const sortedData =
-        sortOrder === 'init'
+        sortOrder === ORDER.INIT
         ? data
         : data
             .slice()
@@ -184,19 +242,42 @@ const Home = () => {
       changeRowStatus,
     } = useData()
 
-    const [message, setMessage] = useState('')
-    const [error, setError] = useState(false)
+    const [addDataDisplay, setAddDataDisplay] = useState(false) 
+    const [rowOption, setRowOption] = useState(DEFAULT_ROWS)
+    const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE)
+    const [search, setSearch] = useState('')
 
-    const [title, setTitle] = useState('')
-    const [userName, setUserName] = useState('')
-    const [amount, setAmount] = useState(0)
+    // Todo : Server Data Record count
+    const [pageCount, setPageCount] = useState(10)
 
-    const [newDataDisplay, setNewDataDisplay] = useState(false) 
+    const exportToJson = () => {
+        // Todo : Total Data request
+        // const data = response()...
+        const json = JSON.stringify(sortedData)
+        
+        const formattedDate = getFileNameDate()
+        const fileName = `backup_${formattedDate}.json`
+        const blob = new Blob([json], { type: 'application/json' })
+        const href = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = href
+        link.download = fileName
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+    }
 
-    const onChange = (
-        event: ChangeEvent<HTMLInputElement>, 
-        setState: React.Dispatch<React.SetStateAction<string>>
-    ) => setState(event.currentTarget.value)
+    const exportToExcel = () => {
+        // Todo : Total Data request
+        // const data = response()...
+        const ws = XLSX.utils.json_to_sheet(sortedData)
+
+        const wb = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
+
+        const formattedDate = getFileNameDate()
+        XLSX.writeFile(wb, `backup_${formattedDate}.xlsx`)
+    }
 
     return (
         <Container width='wide'>
@@ -205,85 +286,12 @@ const Home = () => {
                     以下はRailsを学習するために作成したフロントエンドです。 
                 </HeadlineArea>
                 <MarginBase mb={1}>
-                    <Button IconComponent={MdAdd} mr={1} onClick={(_) => setNewDataDisplay(!newDataDisplay)}>
+                    <Button IconComponent={MdAdd} mr={1} onClick={() => setAddDataDisplay(!addDataDisplay)}>
                         新規追加
                     </Button>
                 </MarginBase>
 
-                {newDataDisplay && 
-                    <ColumnBase paddingSize="small" mb={2}>
-                        <FormControlGroup>
-                            <FormControl
-                                mb={1}
-                                mr={1}
-                                label="ユーザ名前"
-                                fieldId="horizontal-form__account"
-                                help="ユーザ名前を入力します。"
-                                required
-                            >
-                                <TextField
-                                    id="submit-error-interaction__name-from"
-                                    error={error}
-                                    value={userName}
-                                    onChange={(e) => onChange(e, setUserName)}
-                                />
-                            </FormControl>
-                            <FormControl
-                                mb={1}
-                                mr={1}
-                                label="タイトル"
-                                required
-                                help="タイトルを書きます。"
-                                fieldId="horizontal-form__partner"
-                            >
-                                <TextField
-                                    id="submit-error-interaction__name-from"
-                                    error={error}
-                                    value={title}
-                                    onChange={(e) => onChange(e, setTitle)}
-                                />
-                            </FormControl>
-                            <FormControl
-                                mb={1}
-                                mr={1}
-                                label="金額"
-                                required
-                                fieldId="horizontal-form__amount"
-                            >
-                                <DigitsInput
-                                    id="submit-error-interaction__amount"
-                                    required
-                                    error={error}
-                                    value={amount}
-                                    onChange={(e) => setAmount(e ? e : 0)}
-                                />
-                            </FormControl>
-                        </FormControlGroup>
-                        <FormActions>
-                            <Button 
-                                appearance="primary"
-                                onClick={() => {
-                                    setMessage('')
-                                    setTimeout(() => {
-                                        if( !userName || !title || !amount ) {
-                                            setError(true)
-                                            setMessage(
-                                                '入力内容にエラーがあります。修正のうえ、再度お試しください'
-                                            )
-                                        }else {
-                                            setError(false)
-                                            setMessage('保存しました')
-                                            setTitle('')
-                                            setUserName('')
-                                            setAmount(0)
-                                        }
-                                    }, 600)
-                                }}
-                            >登録</Button>
-                            {message && <FloatingMessageBlock error={error} success={!error} message={message} />}
-                        </FormActions>
-                    </ColumnBase>
-                }
+                {addDataDisplay && <AddData />}
 
                 <MarginBase mb={2}>
                     <SearchField
@@ -291,8 +299,13 @@ const Home = () => {
                         placeholder='タイトル、ユーザー名、メールアドレスなどで検索'
                         marginRight
                         marginSize='small'
+                        value={search}
+                        onChange={(e) => setSearch(e.currentTarget.value)}
                     />
-                    <Button IconComponent = { MdSearch } mr = { 1 }>
+                    <Button 
+                        IconComponent={MdSearch} 
+                        mr={1}
+                    >
                         検索
                     </Button>
                 </MarginBase>
@@ -306,17 +319,12 @@ const Home = () => {
                     sideContent={
                     <>
                         <Pagination
-                            rowsPerPageOptions={[
-                                { value: '10' },
-                                { value: '20' },
-                                { value: '50' },
-                                { value: '100' },
-                                { value: '200' },
-                            ]}
-                            rowsPerPageValue={20}
-                            currentPage={1}
-                            rowCount={999}
+                            rowsPerPageOptions={ROWS_OPTION.map((option) => ({value : `${option}`}))}
+                            rowsPerPageValue={rowOption}
+                            currentPage={currentPage}
+                            rowCount={pageCount * rowOption}
                             mr={1}
+                            onChange={(e) => setRowOption(Number(e.currentTarget.value))}
                         />
                         <DropdownButton
                             buttonLabel='エクスポート'
@@ -324,10 +332,12 @@ const Home = () => {
                                 {
                                     type: 'selectable',
                                     text: 'CSV形式でエクスポート',
+                                    onClick: () => exportToExcel()
                                 },
                                 {
                                     type: 'selectable',
                                     text: 'JSON形式でエクスポート',
+                                    onClick: () => exportToJson()
                                 },
                                 { type: 'rule' },
                                 {
@@ -352,79 +362,69 @@ const Home = () => {
                     />
                     {statuses.filter((e) => e).length > 0 && (
                         <Paragraph inline>
-                            {statuses.filter((e) => e).length}件を選択中
+                            {statuses.filter((e) => e).length} 件を選択中
                         </Paragraph>
                     )}
                 </WithSideContent>
                 <ListTable
                     mr={-1.5}
                     ml={-1.5}
-                    headers={[
-                        {
-                            value: 'タイトル',
-                            minWidth: 15,
-                            onClick: () => sort('title'),
-                            ordering: (sortKey == 'title' && sortOrder) || 'init',
-                        },
-                        {
-                            value: 'ユーザー',
-                            minWidth: 10,
-                            onClick: () => sort('user'),
-                            ordering: (sortKey == 'user' && sortOrder) || 'init',
-                        },
-                        {
-                            value: '金額',
-                            minWidth: 5,
-                            alignRight: true,
-                            onClick: () => sort('amount'),
-                            ordering: (sortKey == 'amount' && sortOrder) || 'init',
-                        },
-                        {
-                            value: 'ステータス',
-                            onClick: () => sort('status'),
-                            ordering: (sortKey == 'status' && sortOrder) || 'init',
-                        },
-                        {
-                            value: '作成日',
-                            onClick: () => sort('date'),
-                            ordering: (sortKey == 'date' && sortOrder) || 'init',
-                        },
-                        { value: '操作' },
-                    ]}
+                    headers={
+                        LIST_TABLE_HEADER.map(({ 
+                            value,
+                            minWidth,
+                            onClick,
+                            alignRight,
+                            ordering,
+                            sortValue
+                        }): TableHeader => {
+                            let typeCastingsortValue = sortValue as keyof ListElm
+                            let result = { value } as TableHeader
+                            if(minWidth) result.minWidth = minWidth
+                            if(onClick) result.onClick = () => sort(typeCastingsortValue)
+                            if(ordering) result.ordering = (sortKey === typeCastingsortValue && sortOrder) || ORDER.INIT
+                            if(alignRight) result.alignRight = alignRight
+
+                            return result
+                        })
+                    }
                     onChangeHeaderCheckBox={(e) => changeAllStatus(e.target.checked)}
-                    rows={sortedData.map((row, i) => ({
-                        checked: statuses[i],
-                        onChangeCheckBox: (e) => {
-                            changeRowStatus(e.target.checked, i)
-                        },
-                        url: `/path/to/single/${i}`,
-                        cells: [
-                            { value: row.title },
-                            { value: row.user, breakWord: true },
-                            { value: Digits.formalize(row.amount), alignRight: true },
-                            { value: row.status },
-                            { value: row.date },
-                            {
-                            value: (
-                                <>
-                                    <Button mr={0.5} small appearance='tertiary'>
-                                        コピー
-                                    </Button>
-                                    <Button mr={0.5} danger small appearance='tertiary'>
-                                        削除
-                                    </Button>
-                                </>
-                            ),
+                    rows={
+                        sortedData.map((row, i) => ({
+                            checked: statuses[i],
+                            onChangeCheckBox: (e) => {
+                                changeRowStatus(e.target.checked, i)
                             },
-                        ],
-                    }))}
+                            url: `/path/to/single/${i}`,
+                            cells: [
+                                { value: row.title },
+                                { value: row.user, breakWord: true },
+                                { value: Digits.formalize(row.amount), alignRight: true },
+                                { value: row.status },
+                                { value: row.date },
+                                {
+                                    value: (
+                                        <>
+                                            <Button mr={0.5} small appearance='tertiary'>
+                                                コピー
+                                            </Button>
+                                            <Button mr={0.5} danger small appearance='tertiary'>
+                                                削除
+                                            </Button>
+                                        </>
+                                    ),
+                                },
+                            ],
+                        })
+                    )}
                     withCheckBox
                 ></ListTable>
                 <Pager
-                    currentPage={1}
-                    pageCount={99}
-                    onPageChange={() => {
-                    /* 2ページ目以降作ってないので許して */
+                    currentPage={currentPage}
+                    pageCount={pageCount}
+                    onPageChange={(e) => {
+                        // Todo : Server Data <-
+                        setCurrentPage(e)
                     }}
                 />
             </ContentsBase>
