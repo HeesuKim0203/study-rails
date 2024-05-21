@@ -2,7 +2,6 @@
 import React, { useState } from 'react'
 import { MdAdd, MdSearch } from 'react-icons/md'
 import {
-    Container,
     ContentsBase,
     MarginBase,
     Button,
@@ -19,12 +18,12 @@ import {
     SearchField,
     TableHeader,
   } from '@freee_jp/vibes'
-import AddData from './AddData'
-import { DEFAULT_PAGE, DEFAULT_ROWS, LIST_TABLE_HEADER, ORDER, ROWS_OPTION } from '../utils/constants'
-import { ListElm, Order } from '../utils/type'
+// import AddData from '.././AddData'
+import { DEFAULT_PAGE, DEFAULT_ROWS, LIST_TABLE_HEADER, ORDER, ROWS_OPTION } from '../../utils/constants'
+import { ListElm, Order } from '../../utils/type'
 import * as XLSX from 'xlsx'
-import moment from 'moment'
-import { getFileNameDate } from '../utils/util'
+import { getFileNameDate } from '../../utils/util'
+import { Container, Wrapper, Header, Title } from './HomeStyle'
 
 // Todo : Data -> BackEnd
 const useData = () => {
@@ -280,18 +279,12 @@ const Home = () => {
     }
 
     return (
-        <Container width='wide'>
-            <ContentsBase>
-                <HeadlineArea pageTitle='Study Rails'>
-                    以下はRailsを学習するために作成したフロントエンドです。 
-                </HeadlineArea>
-                <MarginBase mb={1}>
-                    <Button IconComponent={MdAdd} mr={1} onClick={() => setAddDataDisplay(!addDataDisplay)}>
-                        新規追加
-                    </Button>
-                </MarginBase>
-
-                {addDataDisplay && <AddData />}
+        <Container>
+            <Wrapper>
+                <Header>
+                    <Title>Study Rails</Title>
+                    <Button appearance='primary'>新規作成</Button>
+                </Header>
 
                 <MarginBase mb={2}>
                     <SearchField
@@ -427,7 +420,7 @@ const Home = () => {
                         setCurrentPage(e)
                     }}
                 />
-            </ContentsBase>
+            </Wrapper>
         </Container>
     )
 }

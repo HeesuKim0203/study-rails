@@ -1,7 +1,18 @@
 
+import { IoDocumentTextOutline } from 'react-icons/io5'
+import { IoCalculatorOutline } from 'react-icons/io5'
+import { LuTruck } from 'react-icons/lu'
+import { BsCart4 } from 'react-icons/bs'
+import { MdOutlineReceiptLong } from 'react-icons/md'
+
 // url
 export const HOME_URL = '/'
 export const CREATE_URL = '/create'
+export const INVOICES_URL = '/invoices'
+export const QUOTATIONS_URL = '/quotations'
+export const DELIVERY_SLIPS_URL = '/delivery_slips'
+export const PURCHASE_ORDERS_URL = '/purchase_orders'
+export const RECEIPTS_URL = '/receipts'
 
 // rows
 export const ROWS_OPTION = [
@@ -54,6 +65,7 @@ export const LIST_TABLE_HEADER = [
         sortValue: ''
     }
 ]
+
 // Order
 
 export const ORDER = {
@@ -61,3 +73,13 @@ export const ORDER = {
     DESC: 'desc',
     INIT: 'init'
 } as const
+
+// Side Menu 
+
+export const SIDE_MENU = [
+    { icon : IoDocumentTextOutline, text: '請求書' },
+    { icon : IoCalculatorOutline, text : '見積書'},
+    { icon : LuTruck, text : '納品書'},
+    { icon : BsCart4, text : '発注書'},
+    { icon : MdOutlineReceiptLong, text : '領収書'},
+]
