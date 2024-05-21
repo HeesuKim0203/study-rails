@@ -1,11 +1,12 @@
 import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { HOME_URL } from '../utils/constants'
+import { CREATE_URL, HOME_URL } from '../utils/constants'
 import Home from './Home'
 import Header from './Header'
 import styled from 'styled-components'
 import SideNavigator from './SideNavigator/SideNavigator'
 import { IconContext } from 'react-icons'
+import Create from './Create'
 
 const Wrapper = styled.div`
     box-sizing: border-box;
@@ -22,7 +23,7 @@ const Main = styled.main`
 
 const Router = () => {
     return (
-        <IconContext.Provider value={{ size: '1.6rem' }} >
+        <IconContext.Provider value={{ size: '1.4rem' }} >
             <BrowserRouter>
                 <Header />
                 <Wrapper>
@@ -30,6 +31,7 @@ const Router = () => {
                     <Main>
                         <Routes>
                             <Route path = { HOME_URL } element = { <Home /> } />
+                            <Route path = { CREATE_URL } element = { <Create /> } />
                         </Routes>
                     </Main>
                 </Wrapper>

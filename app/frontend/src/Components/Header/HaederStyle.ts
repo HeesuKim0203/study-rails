@@ -4,7 +4,7 @@ import styled from 'styled-components'
 const Container = styled.header`
     box-sizing: border-box;
     width: 100%;
-    padding: 0.5rem 1.5rem;
+    padding: 1rem 1.5rem;
     
 
     display: flex;
@@ -17,7 +17,7 @@ const Container = styled.header`
     user-select: none;
 `
 
-const Title = styled.div`
+const Title = styled.h1`
     display: block;
     height: 100%;
     width: auto;
@@ -39,6 +39,8 @@ const UserName = styled.span`
     display: block;
     margin-left: 0.3rem;
     font-weight: 600;
+
+    font-size: 0.8rem;
 `
 
 const Menu = styled.span`

@@ -1,14 +1,14 @@
 
 import React, { useState } from 'react'
-import { MdAdd, MdSearch } from 'react-icons/md'
+import { GoTriangleDown } from 'react-icons/go'
+import { IoIosSettings } from 'react-icons/io'
+import { MdMenuOpen } from 'react-icons/md'
 import {
-    ContentsBase,
     MarginBase,
     Button,
     Paragraph,
     WithSideContent,
     ListTable,
-    HeadlineArea,
     DropdownButton,
     Pagination,
     Pager,
@@ -17,13 +17,36 @@ import {
     VisuallyHidden,
     SearchField,
     TableHeader,
+    Dropdown,
+    OptionButton,
+    IconOnlyButton,
+    TextButton,
   } from '@freee_jp/vibes'
-// import AddData from '.././AddData'
-import { DEFAULT_PAGE, DEFAULT_ROWS, LIST_TABLE_HEADER, ORDER, ROWS_OPTION } from '../../utils/constants'
+import { CREATE_URL, DEFAULT_PAGE, DEFAULT_ROWS, HAEDER_DROPDOWN_LABEL, LIST_TABLE_HEADER, OPTIONS, ORDER, ROWS_OPTION, SIDE_MENU_TITLE } from '../../utils/constants'
 import { ListElm, Order } from '../../utils/type'
-import * as XLSX from 'xlsx'
-import { getFileNameDate } from '../../utils/util'
-import { Container, Wrapper, Header, Title } from './HomeStyle'
+import {
+    Container,
+    Wrapper,
+    Header,
+    Title,
+    ContentWrapper,
+    Content,
+    ContentSideMenu,
+    ContentSideMenuHeader,
+    ContentSideMenuTitle,
+    ContentSideMenuTitleIcon,
+    ContentSideMenuItemWrapper,
+    ContentSideMenuItem,
+    ContentSideMenuItemText,
+    ContentSideMenuItemCounter,
+    ContentHeader,
+    ContentHeaderSideMenuDisplayIcon,
+    ContentHeaderFilterArea,
+    ContentHeaderFilterClear,
+} from './HomeStyle'
+import { IconContext } from 'react-icons'
+import FilterDropDown from '../FilterDropDown'
+import { Link } from 'react-router-dom'
 
 // Todo : Data -> BackEnd
 const useData = () => {
@@ -230,6 +253,19 @@ const useData = () => {
     }
 }
 
+// Todo : Data -> BackEnd
+const filterData = () => {
+    const data = [
+        {text : '全ての請求書'},
+        {text : '送付待ち', reacordNum: 0},
+        {text : '取引登録待ち', reacordNum: 0},
+        {text : '入金待ち', reacordNum: 0},
+        {text : '入金期日超過', reacordNum: 0},
+    ]
+
+    return data
+}
+
 const Home = () => {
     const {
       sort,
@@ -241,7 +277,8 @@ const Home = () => {
       changeRowStatus,
     } = useData()
 
-    const [addDataDisplay, setAddDataDisplay] = useState(false) 
+    const filter = filterData()
+
     const [rowOption, setRowOption] = useState(DEFAULT_ROWS)
     const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE)
     const [search, setSearch] = useState('')
@@ -249,178 +286,150 @@ const Home = () => {
     // Todo : Server Data Record count
     const [pageCount, setPageCount] = useState(10)
 
-    const exportToJson = () => {
-        // Todo : Total Data request
-        // const data = response()...
-        const json = JSON.stringify(sortedData)
-        
-        const formattedDate = getFileNameDate()
-        const fileName = `backup_${formattedDate}.json`
-        const blob = new Blob([json], { type: 'application/json' })
-        const href = URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = href
-        link.download = fileName
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-    }
-
-    const exportToExcel = () => {
-        // Todo : Total Data request
-        // const data = response()...
-        const ws = XLSX.utils.json_to_sheet(sortedData)
-
-        const wb = XLSX.utils.book_new()
-        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
-
-        const formattedDate = getFileNameDate()
-        XLSX.writeFile(wb, `backup_${formattedDate}.xlsx`)
-    }
+    const [filterSelected, setFilterSelected] = useState(0)
+    const [sideMenuDisplay, setSideMenuDisplay] = useState<boolean>(true)
 
     return (
         <Container>
-            <Wrapper>
-                <Header>
-                    <Title>Study Rails</Title>
-                    <Button appearance='primary'>新規作成</Button>
-                </Header>
+                <Wrapper>
+                    <IconContext.Provider value={{ size: '1rem' }} >
+                        <Header>
+                            <Title>請求書</Title>
+                            <Link to={CREATE_URL}>
+                                <Button appearance='primary'>
+                                    新規作成
+                                </Button>
+                            </Link>
+                            <DropdownButton
+                                ml={1}
+                                buttonLabel={HAEDER_DROPDOWN_LABEL}
+                                iconOnly={true}
+                                IconOnlyComponent={GoTriangleDown}
+                                dropdownContents={[
+                                    // ?????
+                                    {
+                                        type: 'selectable',
+                                        text: '請求書作成用CSVインポート',
+                                    }
+                                ]}
+                            />
+                        </Header>
+                    </IconContext.Provider>
 
-                <MarginBase mb={2}>
-                    <SearchField
-                        width='large'
-                        placeholder='タイトル、ユーザー名、メールアドレスなどで検索'
-                        marginRight
-                        marginSize='small'
-                        value={search}
-                        onChange={(e) => setSearch(e.currentTarget.value)}
-                    />
-                    <Button 
-                        IconComponent={MdSearch} 
-                        mr={1}
-                    >
-                        検索
-                    </Button>
-                </MarginBase>
+                    <ContentWrapper>
+                        <ContentSideMenu
+                            display={sideMenuDisplay}
+                        >
+                            <IconContext.Provider value={{ size: '1rem' }} >
+                                <ContentSideMenuHeader>
+                                    <ContentSideMenuTitle>
+                                        {SIDE_MENU_TITLE}
+                                    </ContentSideMenuTitle>
+                                    <ContentSideMenuTitleIcon>
+                                        <IconOnlyButton 
+                                            small={true}
+                                            label='フィルタ設定'
+                                            IconComponent={IoIosSettings}
+                                        />
+                                    </ContentSideMenuTitleIcon>
+                                </ContentSideMenuHeader>
+                                <ContentSideMenuItemWrapper>
+                                        { filter.map(({text, reacordNum}, index) => {
+                                            return (
+                                                <ContentSideMenuItem
+                                                    selected={index === filterSelected}
+                                                    onClick={() => setFilterSelected(index)}
+                                                >
+                                                    <ContentSideMenuItemText>{text}</ContentSideMenuItemText>
+                                                    {reacordNum !== undefined && <ContentSideMenuItemCounter>{reacordNum}</ContentSideMenuItemCounter>}
+                                                </ContentSideMenuItem>
+                                            )
+                                        }) }
+                                    </ContentSideMenuItemWrapper>
+                                </IconContext.Provider>
+                            </ContentSideMenu>
+                        <Content>
+                            <IconContext.Provider value={{ size: '1.4rem' }} >
+                                <ContentHeader>
+                                    <ContentHeaderSideMenuDisplayIcon>
+                                        <IconOnlyButton
+                                            label='フィルタ設定'
+                                            IconComponent={MdMenuOpen}
+                                            onClick={() => setSideMenuDisplay(!sideMenuDisplay)}
+                                        />
+                                    </ContentHeaderSideMenuDisplayIcon>
+                                    <ContentHeaderFilterArea>
+                                        <FilterDropDown
+                                            options={OPTIONS}
+                                            onOptionClick={() => {}}
+                                        >
+                                        </FilterDropDown>
+                                        <ContentHeaderFilterClear>クリア</ContentHeaderFilterClear>
+                                    </ContentHeaderFilterArea>
+                                </ContentHeader>
+                                <ListTable
+                                    headers={
+                                        LIST_TABLE_HEADER.map(({ 
+                                            value,
+                                            minWidth,
+                                            onClick,
+                                            alignRight,
+                                            ordering,
+                                            sortValue
+                                        }): TableHeader => {
+                                            let typeCastingsortValue = sortValue as keyof ListElm
+                                            let result = { value } as TableHeader
+                                            if(minWidth) result.minWidth = minWidth
+                                            if(onClick) result.onClick = () => sort(typeCastingsortValue)
+                                            if(ordering) result.ordering = (sortKey === typeCastingsortValue && sortOrder) || ORDER.INIT
+                                            if(alignRight) result.alignRight = alignRight
 
-                <VisuallyHidden>
-                    {/* 検索条件の見出しを立てているため、一覧部分にも視覚的には見えないかたちで見出しを立てる */}
-                    <SectionTitle>申請の一覧</SectionTitle>
-                </VisuallyHidden>
-                <WithSideContent
-                    mb={1}
-                    sideContent={
-                    <>
-                        <Pagination
-                            rowsPerPageOptions={ROWS_OPTION.map((option) => ({value : `${option}`}))}
-                            rowsPerPageValue={rowOption}
-                            currentPage={currentPage}
-                            rowCount={pageCount * rowOption}
-                            mr={1}
-                            onChange={(e) => setRowOption(Number(e.currentTarget.value))}
-                        />
-                        <DropdownButton
-                            buttonLabel='エクスポート'
-                            dropdownContents={[
-                                {
-                                    type: 'selectable',
-                                    text: 'CSV形式でエクスポート',
-                                    onClick: () => exportToExcel()
-                                },
-                                {
-                                    type: 'selectable',
-                                    text: 'JSON形式でエクスポート',
-                                    onClick: () => exportToJson()
-                                },
-                                { type: 'rule' },
-                                {
-                                    type: 'selectable',
-                                    text: 'エクスポート履歴',
-                                },
-                            ]}
-                        />
-                    </>
-                    }
-                >
-                    <DropdownButton
-                        buttonLabel='一括操作'
-                        dropdownContents={[
-                            {
-                                type: 'selectable',
-                                text: 'ステータスを変更',
-                            },
-                            { type: 'selectable', text: '削除' },
-                        ]}
-                        mr={0.5}
-                    />
-                    {statuses.filter((e) => e).length > 0 && (
-                        <Paragraph inline>
-                            {statuses.filter((e) => e).length} 件を選択中
-                        </Paragraph>
-                    )}
-                </WithSideContent>
-                <ListTable
-                    mr={-1.5}
-                    ml={-1.5}
-                    headers={
-                        LIST_TABLE_HEADER.map(({ 
-                            value,
-                            minWidth,
-                            onClick,
-                            alignRight,
-                            ordering,
-                            sortValue
-                        }): TableHeader => {
-                            let typeCastingsortValue = sortValue as keyof ListElm
-                            let result = { value } as TableHeader
-                            if(minWidth) result.minWidth = minWidth
-                            if(onClick) result.onClick = () => sort(typeCastingsortValue)
-                            if(ordering) result.ordering = (sortKey === typeCastingsortValue && sortOrder) || ORDER.INIT
-                            if(alignRight) result.alignRight = alignRight
-
-                            return result
-                        })
-                    }
-                    onChangeHeaderCheckBox={(e) => changeAllStatus(e.target.checked)}
-                    rows={
-                        sortedData.map((row, i) => ({
-                            checked: statuses[i],
-                            onChangeCheckBox: (e) => {
-                                changeRowStatus(e.target.checked, i)
-                            },
-                            url: `/path/to/single/${i}`,
-                            cells: [
-                                { value: row.title },
-                                { value: row.user, breakWord: true },
-                                { value: Digits.formalize(row.amount), alignRight: true },
-                                { value: row.status },
-                                { value: row.date },
-                                {
-                                    value: (
-                                        <>
-                                            <Button mr={0.5} small appearance='tertiary'>
-                                                コピー
-                                            </Button>
-                                            <Button mr={0.5} danger small appearance='tertiary'>
-                                                削除
-                                            </Button>
-                                        </>
-                                    ),
-                                },
-                            ],
-                        })
-                    )}
-                    withCheckBox
-                ></ListTable>
-                <Pager
-                    currentPage={currentPage}
-                    pageCount={pageCount}
-                    onPageChange={(e) => {
-                        // Todo : Server Data <-
-                        setCurrentPage(e)
-                    }}
-                />
-            </Wrapper>
+                                            return result
+                                        })
+                                    }
+                                    onChangeHeaderCheckBox={(e) => changeAllStatus(e.target.checked)}
+                                    rows={
+                                        sortedData.map((row, i) => ({
+                                            checked: statuses[i],
+                                            onChangeCheckBox: (e) => {
+                                                changeRowStatus(e.target.checked, i)
+                                            },
+                                            url: `/path/to/single/${i}`,
+                                            cells: [
+                                                { value: row.title },
+                                                { value: row.user, breakWord: true },
+                                                { value: Digits.formalize(row.amount), alignRight: true },
+                                                { value: row.status },
+                                                { value: row.date },
+                                                {
+                                                    value: (
+                                                        <>
+                                                            <Button mr={0.5} small appearance='tertiary'>
+                                                                コピー
+                                                            </Button>
+                                                            <Button mr={0.5} danger small appearance='tertiary'>
+                                                                削除
+                                                            </Button>
+                                                        </>
+                                                    ),
+                                                },
+                                            ],
+                                        })
+                                    )}
+                                    withCheckBox
+                                ></ListTable>
+                                <Pager
+                                    currentPage={currentPage}
+                                    pageCount={pageCount}
+                                    onPageChange={(e) => {
+                                        // Todo : Server Data <-
+                                        setCurrentPage(e)
+                                    }}
+                                />
+                             </IconContext.Provider>
+                        </Content>
+                    </ContentWrapper>
+                </Wrapper>
         </Container>
     )
 }

@@ -11,3 +11,7 @@ export type ListElm = {
     status: string
     date: string
 }
+
+export type FilterOptions = {
+    text: string
+}

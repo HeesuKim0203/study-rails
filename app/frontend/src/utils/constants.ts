@@ -83,3 +83,14 @@ export const SIDE_MENU = [
     { icon : BsCart4, text : '発注書'},
     { icon : MdOutlineReceiptLong, text : '領収書'},
 ]
+
+// Home
+export const SIDE_MENU_TITLE = 'フィルタ条件'
+export const HAEDER_DROPDOWN_LABEL = '請求書作成用CSVインポート'
+
+// Filter Options
+export const OPTIONS = [
+    {text: 'Option1'},
+    {text: 'Option2'},
+    {text: 'Option2'}
+]
