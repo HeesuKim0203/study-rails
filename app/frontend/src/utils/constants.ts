@@ -94,3 +94,11 @@ export const OPTIONS = [
     {text: 'Option2'},
     {text: 'Option2'}
 ]
+
+// Icon 
+
+export const ICON_SIZE = {
+    SMALL: '1rem',
+    NORMAL: '1.4rem',
+    LARGE: '1.6rem'
+} as const

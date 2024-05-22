@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { FontArea, TextButton } from '../CommonStyle'
 
 
 // Todo : 10rem Code duplication
@@ -35,6 +36,8 @@ const ContentWrapper = styled.div`
 
 const Content = styled.div`
     display: block;
+
+    width: calc(100% - 10rem);
 `
 
 const ContentSideMenu = styled.div<{
@@ -44,7 +47,7 @@ const ContentSideMenu = styled.div<{
     min-height: calc(-8.56rem + 100vh);
 
     border-right: 1px solid rgb(233, 231, 231);
-    width: ${props => props.display ? '10rem' : '0'};
+    width: ${props => props.display ? 'calc(10rem-1px)' : '0rem'};
     overflow-y: hidden;
     transition: width 0.1s ease 0s;
     word-break: break-all;
@@ -71,12 +74,16 @@ const ContentSideMenuHeader = styled.div`
 
 const ContentSideMenuTitle = styled.h3`
     color: #6f6b62;
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 500;
     padding-left: 1rem;
 `
 
 const ContentSideMenuTitleIcon = styled.div`
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+
     margin-left: 0.5rem;
 `
 
@@ -94,7 +101,9 @@ const ContentSideMenuItem = styled.li<{
     
     padding: 0.3rem 0.8rem;
     margin: 0.4rem 0;
-    font-size: 0.8rem ;
+    
+    font-size: 0.95rem;
+
     ${props => (
         props.selected ? `
             border-left: 5px solid rgb(40, 100, 240);
@@ -131,9 +140,13 @@ const ContentSideMenuItemCounter = styled.span`
 const ContentHeader = styled.div`
     display: flex;
     padding: 1.2rem 0;
+
+    -webkit-box-pack: justify;
+    justify-content: space-between;
 `
 
 const ContentHeaderSideMenuDisplayIcon = styled.div`
+    margin-right: 1rem;
     button {
         border-left:none ;
         border-radius: 0 0.5rem 0.5rem 0 ;
@@ -142,29 +155,32 @@ const ContentHeaderSideMenuDisplayIcon = styled.div`
 
 const ContentHeaderFilterArea = styled.div`
     display: flex;
-    margin-left: 1rem;
 
     -webkit-box-align: center;
     align-items: center;
+
 `
 
-const ContentHeaderFilterClear = styled.span`
-    display: inline-block;
-    font-size: 0.9rem;
-    font-weight: 500;
+const ContentHeaderFilterClear = styled(TextButton)`
     margin-left: 0.8rem;
 
-    padding: 0.4rem 0.5rem; 
-    cursor: pointer;
-
-    border-radius: 0.5rem;
+    width: 5rem;
+    height: 2.5rem;
 
     &:hover {
         color: #1e46aa;
         background-color: #dce8ff;
     }
+
+`
+const ContentHeaderFilterRightArea = styled.div`
+    margin-right: 1rem ;
 `
 
+const ContentButtonFontArea = styled(FontArea)`
+    font-family: "Noto Sans JP", sans-serif;
+    font-size: 1rem;
+`
 
 export {
     Container,
@@ -184,5 +200,7 @@ export {
     ContentHeader,
     ContentHeaderSideMenuDisplayIcon,
     ContentHeaderFilterArea,
-    ContentHeaderFilterClear
+    ContentHeaderFilterClear,
+    ContentHeaderFilterRightArea,
+    ContentButtonFontArea
 }
