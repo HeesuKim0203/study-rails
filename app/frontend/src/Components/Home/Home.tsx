@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react'
+import React, { ElementType, useState } from 'react'
 import { GoTriangleDown } from 'react-icons/go'
 import { IoIosSettings } from 'react-icons/io'
 import { MdMenuOpen } from 'react-icons/md'
@@ -22,7 +22,7 @@ import {
     IconOnlyButton,
     TextButton,
   } from '@freee_jp/vibes'
-import { CREATE_URL, DEFAULT_PAGE, DEFAULT_ROWS, HAEDER_DROPDOWN_LABEL, LIST_TABLE_HEADER, OPTIONS, ORDER, ROWS_OPTION, SIDE_MENU_TITLE } from '../../utils/constants'
+import { CREATE_URL, DEFAULT_PAGE, DEFAULT_ROWS, HAEDER_DROPDOWN_LABEL, ICON_SIZE, LIST_TABLE_HEADER, OPTIONS, ORDER, ROWS_OPTION, SIDE_MENU_TITLE } from '../../utils/constants'
 import { ListElm, Order } from '../../utils/type'
 import {
     Container,
@@ -43,10 +43,13 @@ import {
     ContentHeaderSideMenuDisplayIcon,
     ContentHeaderFilterArea,
     ContentHeaderFilterClear,
+    ContentHeaderFilterRightArea,
+    ContentButtonFontArea,
 } from './HomeStyle'
 import { IconContext } from 'react-icons'
 import FilterDropDown from '../FilterDropDown'
 import { Link } from 'react-router-dom'
+import Icon from '../Icon'
 
 // Todo : Data -> BackEnd
 const useData = () => {
@@ -292,7 +295,7 @@ const Home = () => {
     return (
         <Container>
                 <Wrapper>
-                    <IconContext.Provider value={{ size: '1rem' }} >
+                    <IconContext.Provider value={{ size: ICON_SIZE.SMALL }} >
                         <Header>
                             <Title>請求書</Title>
                             <Link to={CREATE_URL}>
@@ -320,7 +323,7 @@ const Home = () => {
                         <ContentSideMenu
                             display={sideMenuDisplay}
                         >
-                            <IconContext.Provider value={{ size: '1rem' }} >
+                            <IconContext.Provider value={{ size: ICON_SIZE.SMALL }} >
                                 <ContentSideMenuHeader>
                                     <ContentSideMenuTitle>
                                         {SIDE_MENU_TITLE}
@@ -349,23 +352,39 @@ const Home = () => {
                                 </IconContext.Provider>
                             </ContentSideMenu>
                         <Content>
-                            <IconContext.Provider value={{ size: '1.4rem' }} >
+                            <IconContext.Provider value={{ size: ICON_SIZE.NORMAL }} >
                                 <ContentHeader>
-                                    <ContentHeaderSideMenuDisplayIcon>
-                                        <IconOnlyButton
-                                            label='フィルタ設定'
-                                            IconComponent={MdMenuOpen}
-                                            onClick={() => setSideMenuDisplay(!sideMenuDisplay)}
-                                        />
-                                    </ContentHeaderSideMenuDisplayIcon>
                                     <ContentHeaderFilterArea>
+                                        <ContentHeaderSideMenuDisplayIcon>
+                                            <IconOnlyButton
+                                                label='フィルタ設定'
+                                                IconComponent={MdMenuOpen}
+                                                onClick={() => setSideMenuDisplay(!sideMenuDisplay)}
+                                            />
+                                        </ContentHeaderSideMenuDisplayIcon>
                                         <FilterDropDown
                                             options={OPTIONS}
                                             onOptionClick={() => {}}
-                                        >
-                                        </FilterDropDown>
+                                        />
                                         <ContentHeaderFilterClear>クリア</ContentHeaderFilterClear>
                                     </ContentHeaderFilterArea>
+                                    <ContentHeaderFilterRightArea>
+                                        <Button>
+                                            <ContentButtonFontArea>フィルタ条件の保存</ContentButtonFontArea>
+                                        </Button>
+                                        <DropdownButton
+                                            ml={1}
+                                            buttonLabel=''
+                                            iconOnly={true}
+                                            dropdownContents={[
+                                                // ?????
+                                                {
+                                                    type: 'selectable',
+                                                    text: '請求書作成用CSVインポート',
+                                                }
+                                            ]}
+                                        />
+                                    </ContentHeaderFilterRightArea>
                                 </ContentHeader>
                                 <ListTable
                                     headers={

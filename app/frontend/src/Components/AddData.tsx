@@ -22,7 +22,7 @@ const AddData = () => {
     const onChange = (
         event: ChangeEvent<HTMLInputElement>, 
         setState: React.Dispatch<React.SetStateAction<string>>
-    ) => setState(event.currentTarget.value)
+    ) => setState(event.target.value)
 
     return  (
         <ColumnBase paddingSize="small" mb={2}>

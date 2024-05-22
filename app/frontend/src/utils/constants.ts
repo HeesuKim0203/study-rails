@@ -94,3 +94,30 @@ export const OPTIONS = [
     {text: 'Option2'},
     {text: 'Option2'}
 ]
+
+// Icon 
+
+export const ICON_SIZE = {
+    SMALL: '1rem',
+    NORMAL: '1.4rem',
+    LARGE: '1.6rem'
+} as const
+
+// List form
+
+export const DEFAULT_DATA = { summary: '', count: 0, unit: '', price: 0, tax: '10%', withholding: false }
+export const TAX_OPTION = [
+    { name: '10%' },
+    { name: '8%(軽減税率)' },
+    { name: '8%' },
+    { name: '0%' },
+]
+
+// Create
+
+export const FOREIGN_TAX = '外税'
+export const INTERNAL_TAX = '内税'
+export const TAX_RESULT_OPTION = [
+    {name: FOREIGN_TAX},
+    {name: INTERNAL_TAX},
+]

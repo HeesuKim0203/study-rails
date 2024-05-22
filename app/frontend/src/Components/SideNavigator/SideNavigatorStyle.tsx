@@ -32,7 +32,12 @@ const Header = styled.div`
     justify-content: end;
 `
 
-const Icon = styled.div`
+const IconArea = styled.div`
+    display: flex;
+
+    -webkit-box-align: center;
+    align-items: center;
+
     margin: 0.5rem;
     padding: 0.4rem 0.5rem; 
     cursor: pointer;
@@ -61,7 +66,7 @@ const MenuItem = styled.li<{
     
     padding : 0.1rem 0.8rem;
     margin: 0.3rem 0;
-    font-size : 0.9rem;
+    font-size : 1rem;
     ${props => (
         props.selected ? `
             border-left: 5px solid rgb(40, 100, 240);
@@ -86,7 +91,7 @@ export {
     Container,
     Wrapper,
     Header,
-    Icon,
+    IconArea,
     Menu,
     MenuItem,
     MenuText

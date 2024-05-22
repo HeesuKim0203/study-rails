@@ -1,4 +1,4 @@
-import { ORDER } from './constants'
+import { ICON_SIZE, ORDER } from './constants'
 
 type PropertyValueUnion<T extends object> = T[keyof T]
 
@@ -15,3 +15,15 @@ export type ListElm = {
 export type FilterOptions = {
     text: string
 }
+
+export type IconSize = PropertyValueUnion<typeof ICON_SIZE>
+
+export type ListFromType =  {
+    summary: string
+    count: number
+    unit: string
+    price: number
+    tax: string
+    withholding: boolean
+}
+
