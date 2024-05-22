@@ -18,3 +18,12 @@ export type FilterOptions = {
 
 export type IconSize = PropertyValueUnion<typeof ICON_SIZE>
 
+export type ListFromType =  {
+    summary: string
+    count: number
+    unit: string
+    price: number
+    tax: string
+    withholding: boolean
+}
+

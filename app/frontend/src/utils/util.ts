@@ -1,5 +1,7 @@
 import moment from 'moment'
 import * as XLSX from 'xlsx'
+import { ListFromType } from './type'
+import { FOREIGN_TAX, INTERNAL_TAX } from './constants'
 
 export const getFileNameDate = () => {
     const date = new Date()
@@ -35,4 +37,23 @@ const exportToExcel = (sortedData: any) => {
 
     const formattedDate = getFileNameDate()
     XLSX.writeFile(wb, `backup_${formattedDate}.xlsx`)
+}
+
+export const extractNumber = (str: string): number => {
+    const match = str.match(/\d+/)
+    if (match) {
+        return parseInt(match[0], 10)
+    }
+    throw new Error('No numbers found in the string')
+}
+
+export const formatNumberWithCommas = (number: number) => {
+    return number.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' 円'
+}
+
+export const getValueAmount = (v: ListFromType): number => v.price * v.count
+
+export const getTax = (amount: number, tax: number, calTaxes: string): number => {
+    let calcAmount = (amount !== 0 && calTaxes === INTERNAL_TAX) ? amount - amount * (tax / 100) : amount
+    return calcAmount * (tax / 100)
 }

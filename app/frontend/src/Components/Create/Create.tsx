@@ -1,41 +1,14 @@
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import {
-    Button,
-    CheckBox,
-    DateField,
     DateInput,
-    DescriptionList,
-    DigitsInput,
-    FloatingMessageBlock,
-    FormActions,
     FormControl,
     FormControlGroup,
-    InlineLink,
-    ListTable,
-    Loading,
-    Message,
     MessageBlock,
-    MessageIcon,
-    NameField,
-    Note,
     SelectBox,
-    TaskDialog,
     TextField,
-    ToggleButton,
-    VisuallyHidden,
-    WithDescriptionContent,
-    WithBalloon,
-    RequiredIcon,
-    SelectableButton,
     RadioButton,
     ColumnBase,
     Stack,
-    SubSectionTitle,
-    TextButton,
-    ButtonGroup,
-    DropdownButton,
-    TableListCell,
-    TableListRow,
 } from '@freee_jp/vibes'
 import {
     Container,
@@ -45,7 +18,7 @@ import {
     BackHomeButtonArea,
     BackHomeButton,
     Main,
-    SectionRowDiv,
+    SectionRow,
     Section,
     SectionArea,
     SectionTitle,
@@ -54,13 +27,24 @@ import {
     Table,
     Tr,
     TdName,
-    TdData
+    TdData,
+    SectionRowBlock,
+    SectionAreaMarginRight,
+    CalcResultContainer,
+    CalcResultArea,
+    TdCalcResult,
+    TableCalcResult,
+    TdCalcName,
 } from './CreateStyle'
 import { Link } from 'react-router-dom'
-import { HOME_URL, ICON_SIZE } from '../../utils/constants'
+import { DEFAULT_DATA, FOREIGN_TAX, HOME_URL, ICON_SIZE, TAX_OPTION, TAX_RESULT_OPTION } from '../../utils/constants'
 import { FaPen } from 'react-icons/fa'
 import Icon from '../Icon'
-import { SubTitle } from '../CommonStyle'
+import { FontMedium, SubTitle } from '../CommonStyle'
+import ListForm from '../ListForm'
+import { ListFromType } from '../../utils/type'
+import { extractNumber, formatNumberWithCommas, getTax, getValueAmount } from '../../utils/util'
+import TaxCalcTd from './TaxCalcTd'
 
 const Create = () => {
     const [message, setMessage] = useState('')
@@ -69,12 +53,35 @@ const Create = () => {
 
     const [title, setTitle] = useState('')
     const [userName, setUserName] = useState('')
+
+    const [values, setValues] = useState<ListFromType[]>([DEFAULT_DATA])
+    const [taxResult, setTaxResult] = useState(0)
     const [amount, setAmount] = useState(0)
+
+    const [calculatingTaxes, setCalculatingTaxes] = useState('外税') // false : 内税 true : 外税
 
     const onChange = (
         event: ChangeEvent<HTMLInputElement>, 
         setState: React.Dispatch<React.SetStateAction<string>>
-    ) => setState(event.currentTarget.value)
+    ) => setState(event.target.value)
+
+    useEffect(() => {
+        const taxResult = TAX_OPTION.reduce((prev, { name }) => {
+            const tax = extractNumber(name)
+            const amount = values.filter((value) => value.tax === name).reduce((prev, value) => {
+                return prev + value.count * value.price 
+            }, 0)
+            return prev + getTax(amount, tax, calculatingTaxes) 
+        }, 0)
+
+        const amount = values.reduce((prev, value) => {
+            return prev + value.count * value.price
+        }, 0)
+
+        setTaxResult(taxResult)
+        setAmount(amount)
+
+    }, [values, calculatingTaxes])
 
     return (
       <>
@@ -92,7 +99,7 @@ const Create = () => {
                         <Title>請求書作成</Title>
                     </Header>
                     <Main>
-                        <SectionRowDiv>
+                        <SectionRow>
                             <Section>
                                 <SectionArea>
                                     <SectionTitle>取引先情報</SectionTitle>
@@ -215,7 +222,7 @@ const Create = () => {
                                 </SectionArea>
                             </Section>
                             <Section>
-                                <SectionArea>
+                                <SectionAreaMarginRight>
                                     <SectionTitle>自社情報</SectionTitle>
                                     <FormControlGroup>
                                         <FormControl 
@@ -263,14 +270,84 @@ const Create = () => {
                                             </Tr>
                                         </Table>
                                     </ColumnBase>
-                                </SectionArea>
+                                </SectionAreaMarginRight>
                             </Section>
-                        </SectionRowDiv>
-                        <SectionRowDiv>
-                            <SectionArea>
+                        </SectionRow>
+                        <SectionRowBlock>
+                            <SectionAreaMarginRight>
                                 <SectionTitle>明細</SectionTitle>
-                            </SectionArea>
-                        </SectionRowDiv>
+                                <ListForm 
+                                    values={values}
+                                    setValues={setValues}
+                                />
+                                <CalcResultContainer>
+                                    <CalcResultArea>
+                                        <SelectBox 
+                                            small={true}
+                                            width='xSmall'
+                                            options={TAX_RESULT_OPTION}
+                                            onChange={(e) => setCalculatingTaxes(e.target.value)}
+                                        />
+                                        <ColumnBase>
+                                            <TableCalcResult>
+                                                <Tr>
+                                                    <TdCalcName>小計</TdCalcName>
+                                                    <TdCalcResult>
+                                                        { calculatingTaxes === FOREIGN_TAX 
+                                                            ? formatNumberWithCommas(amount) 
+                                                            : formatNumberWithCommas(amount - taxResult)
+                                                        }
+                                                    </TdCalcResult>
+                                                </Tr>
+                                                <Tr>
+                                                    <TdCalcName>消費税</TdCalcName>
+                                                    <TdCalcResult>{formatNumberWithCommas(taxResult)}</TdCalcResult>
+                                                </Tr>
+                                                    {
+                                                        TAX_OPTION.map(({name}) => {
+                                                            const tax = extractNumber(name)
+                                                            const amount = values.filter((value) => value.tax === name).reduce((prev, value) => {
+                                                                return prev + value.count * value.price
+                                                            }, 0)
+
+                                                            const taxResult = getTax(amount, tax, calculatingTaxes)
+
+                                                            return (
+                                                                <>
+                                                                    { amount ? 
+                                                                        <TaxCalcTd
+                                                                            name={name}
+                                                                            tax={taxResult}
+                                                                            targetAmount={
+                                                                                calculatingTaxes === FOREIGN_TAX 
+                                                                                ? amount 
+                                                                                : amount - taxResult
+                                                                            }
+                                                                        /> : <></>
+                                                                    }
+                                                                </>
+                                                            )
+                                                        })
+                                                    }
+                                                <Tr>
+                                                    <TdCalcName>
+                                                        <FontMedium>合計</FontMedium>
+                                                    </TdCalcName>
+                                                    <TdCalcResult>
+                                                        <FontMedium>
+                                                            { calculatingTaxes === FOREIGN_TAX 
+                                                                ? formatNumberWithCommas(amount + taxResult) 
+                                                                : formatNumberWithCommas(amount)
+                                                            }
+                                                        </FontMedium>
+                                                    </TdCalcResult>
+                                                </Tr>
+                                            </TableCalcResult>
+                                        </ColumnBase>
+                                    </CalcResultArea>
+                                </CalcResultContainer>
+                            </SectionAreaMarginRight>
+                        </SectionRowBlock>
                     </Main>
                 </Wrapper>
             </Container>

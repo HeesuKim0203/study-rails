@@ -6,7 +6,7 @@ const Container = styled.div`
 `
 
 const Wrapper = styled.div`
-    
+    overflow-y: auto;
 `
 
 const Header = styled.div`
@@ -45,9 +45,13 @@ const Main = styled.div`
     flex-wrap: wrap;
 `
 
-const SectionRowDiv = styled.div`
-     width: 100%;
-     display: flex;
+const SectionRow = styled.div`
+    width: 100%;
+    display: flex;
+`
+
+const SectionRowBlock = styled.div`
+    width: 100%;
 `
 
 const Section = styled.section`
@@ -58,16 +62,18 @@ const Section = styled.section`
 `
 
 const SectionTitle = styled.h4`
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 500;
 
     margin-bottom: 1rem;
+
+    width: 100%;
 `
 
 const SectionArea = styled.div`
     outline: none;
-    padding: 1rem 0px;
-    margin: 0px 0rem 0px 1.5rem;
+    padding: 1rem 0;
+    margin: 0 0 0 1.5rem;
     border-bottom: 1px solid rgb(233, 231, 231);
 `
 
@@ -85,6 +91,10 @@ const SectionUserInformationUpdate = styled(TextButton)`
 
 `
 
+const SectionAreaMarginRight = styled(SectionArea)`
+    margin: 0 1.5rem 0 1.5rem;
+`
+
 const SectionUserInformationUpdateText = styled.span`
     display: block;
     margin-left: 0.3rem;
@@ -93,6 +103,8 @@ const SectionUserInformationUpdateText = styled.span`
 const Table = styled.table`
     border-collapse: separate;
 	border-spacing: 0 1rem;
+
+    font-size: 0.8rem;
 `
 
 const Tr = styled.tr`
@@ -107,6 +119,48 @@ const TdData = styled.td`
     width: 10rem;
 `
 
+const TableCalcResult = styled.table`
+    font-size: 0.8rem;
+
+    font-weight: 300;
+`
+
+const TdCalcName = styled.td`
+    text-align: left;
+    width: 6rem;
+    font-size: 0.9rem;
+`
+
+const TdCalcResult = styled.td`
+    text-align: right;
+    width: 10rem;
+    font-size: 0.8rem;
+`
+
+const TdTaxCalcName = styled.td`
+    text-align: left;
+    width: 2rem;
+    font-size: 0.9rem;
+`
+
+const TdTaxCalcResult = styled.td`
+    text-align: right;
+    width: 14rem;
+    font-size: 0.8rem;
+`
+
+const CalcResultContainer = styled.div`
+    width: 100%;
+    display: flex;
+    
+    justify-content: end;
+`
+
+const CalcResultArea = styled.div`
+    width: 20rem;
+`
+
+
 export {
     Container,
     Wrapper,
@@ -115,14 +169,23 @@ export {
     BackHomeButtonArea,
     BackHomeButton,
     Main,
-    SectionRowDiv,
+    SectionRow,
+    SectionRowBlock,
     Section,
     SectionArea,
     SectionTitle,
     SectionUserInformationUpdate,
     SectionUserInformationUpdateText,
     Table,
+    TableCalcResult,
     Tr,
     TdName,
-    TdData
+    TdData,
+    TdCalcName,
+    TdCalcResult,
+    TdTaxCalcName,
+    TdTaxCalcResult,
+    SectionAreaMarginRight,
+    CalcResultContainer,
+    CalcResultArea
 }

@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 const TextButton = styled.span`
     display: flex;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     line-height: 0.5rem;
 
@@ -24,8 +24,13 @@ const SubTitle = styled.h3`
     font-weight: 500;
 `
 
+const FontMedium = styled.span`
+    font-weight: 500;
+`
+
 export {
     TextButton,
     FontArea,
-    SubTitle
+    SubTitle,
+    FontMedium
 }

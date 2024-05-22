@@ -95,14 +95,14 @@ const ContentSideMenuItem = styled.li<{
     selected: boolean
 }>`
     display: flex;
-    font-size: 0.8rem ;
+    font-size: 0.8rem;
 
     width: 100%;
     
     padding: 0.3rem 0.8rem;
     margin: 0.4rem 0;
     
-    font-size: 0.95rem;
+    font-size: 0.8rem;
 
     ${props => (
         props.selected ? `
