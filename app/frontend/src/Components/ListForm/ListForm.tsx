@@ -35,7 +35,8 @@ import {
     Index,
     TableHeader,
     Container,
-    Amount
+    Amount,
+    AmountHeader
 } from './ListFormStyle'
 import { FaPlus } from 'react-icons/fa6'
 import { MdDelete } from 'react-icons/md'
@@ -66,8 +67,8 @@ const ListForm = ({
                     { value: '単価', alignRight: true },
                     { value: '税率' },
                     { value: '源泉徴収' },
-                    { value: '金額', alignRight: true },
-                    { value: ''    },
+                    { value: (<AmountHeader>金額</AmountHeader>), alignRight: true },
+                    { value: ''   },
                 ]}
                 rows={
                     values.map((v, i) => ({
@@ -109,7 +110,7 @@ const ListForm = ({
                                     <DigitsInput
                                         value={v.count}
                                         label={`${i + 1}行目の数量`}
-                                        width='xSmall'
+                                        width='full'
                                         onChange={(a) => (
                                             setValues([
                                                 ...values.slice(0, i),
@@ -125,7 +126,7 @@ const ListForm = ({
                                     <TextField
                                         value={v.unit}
                                         label={`${i + 1}行目の単位`}
-                                        width='xSmall'
+                                        width='full'
                                         onChange={(e) => (
                                                 setValues([
                                                     ...values.slice(0, i),
@@ -143,7 +144,7 @@ const ListForm = ({
                                     <DigitsInput
                                         value={v.price}
                                         label={`${i + 1}行目の単価`}
-                                        width='small'
+                                        width='full'
                                         onChange={(a) => (
                                                 setValues([
                                                     ...values.slice(0, i),

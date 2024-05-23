@@ -9,6 +9,11 @@ import {
     RadioButton,
     ColumnBase,
     Stack,
+    TextArea,
+    Loading,
+    FloatingMessageBlock,
+    Button,
+    FormActions,
 } from '@freee_jp/vibes'
 import {
     Container,
@@ -35,14 +40,16 @@ import {
     TdCalcResult,
     TableCalcResult,
     TdCalcName,
+    SubmitFiexd,
+    Footer,
 } from './CreateStyle'
 import { Link } from 'react-router-dom'
-import { DEFAULT_DATA, FOREIGN_TAX, HOME_URL, ICON_SIZE, TAX_OPTION, TAX_RESULT_OPTION } from '../../utils/constants'
+import { DEFAULT_BILL, DEFAULT_DATA, HOME_URL, ICON_SIZE, METHOD_OF_DEPOSIT, METHOD_OF_TAX, TAX_OPTION, TAX_RESULT_OPTION } from '../../utils/constants'
 import { FaPen } from 'react-icons/fa'
 import Icon from '../Icon'
 import { FontMedium, SubTitle } from '../CommonStyle'
 import ListForm from '../ListForm'
-import { ListFromType } from '../../utils/type'
+import { Bill, BillValueUnionType, ListFromType, MethodOfTaxType } from '../../utils/type'
 import { extractNumber, formatNumberWithCommas, getTax, getValueAmount } from '../../utils/util'
 import TaxCalcTd from './TaxCalcTd'
 
@@ -58,12 +65,18 @@ const Create = () => {
     const [taxResult, setTaxResult] = useState(0)
     const [amount, setAmount] = useState(0)
 
-    const [calculatingTaxes, setCalculatingTaxes] = useState('外税') // false : 内税 true : 外税
+    const [calculatingTaxes, setCalculatingTaxes] = useState<MethodOfTaxType>(METHOD_OF_TAX.FOREIGN)
+    const [bill, setBill] = useState<Bill>(DEFAULT_BILL)
 
     const onChange = (
-        event: ChangeEvent<HTMLInputElement>, 
-        setState: React.Dispatch<React.SetStateAction<string>>
-    ) => setState(event.target.value)
+        value: BillValueUnionType,
+        key: keyof Bill
+    ) => {
+        setBill({
+            ...bill,
+            [key] : value
+        })
+    }
 
     useEffect(() => {
         const taxResult = TAX_OPTION.reduce((prev, { name }) => {
@@ -107,25 +120,26 @@ const Create = () => {
                                         mb={1}
                                         mr={1}
                                         label='取引先'
-                                        fieldId='submit_invoice_customer_information'
+                                        fieldId='submit_invoice_customer_name'
                                         required
                                     >
                                         <TextField
                                             name='取引先'
-                                            id='submit_invoice_customer_information'
+                                            id='submit_invoice_customer_name'
                                             error={error}
-                                            value={''}
-                                            onChange={(e) => {}}
+                                            value={bill.businessPartner}
+                                            //onChange={(e) => (onChange(e.target.value, ))}
                                         />
                                         <SelectBox
                                             ml={1}
                                             width='small'
-                                            id='submit_invoice_customer_information'
+                                            id='submit_invoice_customer_name'
                                             options={[
                                                 { name: '御中' },
                                                 { name: '様' },
-                                                { name: '(空白)' },
+                                                { name: '(空白)', value: '' },
                                             ]}
+                                            onChange={(e) => (onChange(e.target.value, 'tailStr'))}
                                         />
                                     </FormControl>
                                 </SectionArea>
@@ -136,12 +150,12 @@ const Create = () => {
                                             mb={1}
                                             mr={1}
                                             label='請求書番号'
-                                            fieldId='submit_invoice_billing_information'
+                                            fieldId='submit_invoice_id'
                                         >
                                             <TextField
                                                 name='請求書番号'
                                                 value='保存時に決定します'
-                                                id='submit_invoice_billing_information'
+                                                id='submit_invoice_id'
                                                 onChange={(e) => {}}
                                                 borderless
                                             />
@@ -181,12 +195,12 @@ const Create = () => {
                                             <RadioButton
                                                 name='入金方法'
                                             >
-                                                振込
+                                                {METHOD_OF_DEPOSIT.BANK_TRANSFER}
                                             </RadioButton>
                                             <RadioButton
                                                 name='入金方法'
                                             >
-                                                振替
+                                                {METHOD_OF_DEPOSIT.TRANSFER}
                                             </RadioButton>
                                         </FormControl>
                                         <FormControl
@@ -252,6 +266,7 @@ const Create = () => {
                                             </SectionUserInformationUpdate>
                                         </Stack>
                                         <Table>
+                                            {/* Server Data */}
                                             <Tr>
                                                 <TdName>自社名</TdName>
                                                 <TdData>事業所名(未設定)</TdData>
@@ -282,18 +297,19 @@ const Create = () => {
                                 />
                                 <CalcResultContainer>
                                     <CalcResultArea>
-                                        <SelectBox 
+                                        <SelectBox
+                                            mb={1}
                                             small={true}
                                             width='xSmall'
                                             options={TAX_RESULT_OPTION}
-                                            onChange={(e) => setCalculatingTaxes(e.target.value)}
+                                            onChange={(e) => setCalculatingTaxes((e.target.value as MethodOfTaxType))}
                                         />
                                         <ColumnBase>
                                             <TableCalcResult>
                                                 <Tr>
                                                     <TdCalcName>小計</TdCalcName>
                                                     <TdCalcResult>
-                                                        { calculatingTaxes === FOREIGN_TAX 
+                                                        { calculatingTaxes === METHOD_OF_TAX.FOREIGN 
                                                             ? formatNumberWithCommas(amount) 
                                                             : formatNumberWithCommas(amount - taxResult)
                                                         }
@@ -319,7 +335,7 @@ const Create = () => {
                                                                             name={name}
                                                                             tax={taxResult}
                                                                             targetAmount={
-                                                                                calculatingTaxes === FOREIGN_TAX 
+                                                                                calculatingTaxes === METHOD_OF_TAX.FOREIGN  
                                                                                 ? amount 
                                                                                 : amount - taxResult
                                                                             }
@@ -335,7 +351,7 @@ const Create = () => {
                                                     </TdCalcName>
                                                     <TdCalcResult>
                                                         <FontMedium>
-                                                            { calculatingTaxes === FOREIGN_TAX 
+                                                            { calculatingTaxes === METHOD_OF_TAX.FOREIGN  
                                                                 ? formatNumberWithCommas(amount + taxResult) 
                                                                 : formatNumberWithCommas(amount)
                                                             }
@@ -348,11 +364,70 @@ const Create = () => {
                                 </CalcResultContainer>
                             </SectionAreaMarginRight>
                         </SectionRowBlock>
+                        <SectionRowBlock>
+                            <SectionAreaMarginRight>
+                                <SectionTitle>備考</SectionTitle>
+                                <FormControl 
+                                    mr={1} 
+                                    mb={1}
+                                    fieldId='submit_invoice_description'
+                                >
+                                    <TextArea
+                                        error={error}
+                                        value={''}
+                                        width='full'
+                                        onChange={(e) => {}}
+                                        id='submit_invoice_description'
+                                    />
+                                </FormControl>
+                            </SectionAreaMarginRight>
+                        </SectionRowBlock>
+                        <SectionRowBlock>
+                            <SectionAreaMarginRight>
+                                <SectionTitle>社内メモ</SectionTitle>
+                                <FormControl 
+                                    mr={1} 
+                                    mb={1}
+                                    fieldId='submit_invoice_memo'
+                                >
+                                    <TextArea
+                                        error={error}
+                                        value={''}
+                                        width='full'
+                                        onChange={(e) => {}}
+                                        id='submit_invoice_memo'
+                                    />
+                                </FormControl>
+                            </SectionAreaMarginRight>
+                        </SectionRowBlock>
                     </Main>
+                    <SubmitFiexd>
+                        <FormActions>
+                            <Button
+                                appearance='primary'
+                                disabled={sending}
+                                onClick={() => {
+                                    setMessage('')
+                                    setSending(true)
+                                    setTimeout(() => {
+                                    setMessage('保存しました')
+                                    setSending(false)
+                                    }, 600)
+                                }}
+                            >
+                                保存
+                            </Button>
+                            <Button disabled={sending}>キャンセル</Button>
+                        </FormActions>
+                        <Loading coverAll isLoading={sending} />
+                    </SubmitFiexd>
+                    <Footer />
                 </Wrapper>
+                <Loading coverAll isLoading={sending} />
+                {message && <FloatingMessageBlock success message={message} />}
             </Container>
       </>
     )
-  }
+}
 
 export default Create

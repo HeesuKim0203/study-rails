@@ -2,11 +2,10 @@ import styled from 'styled-components'
 import { TextButton } from '../CommonStyle'
 
 const Container = styled.div`
-    
+    overflow-y: auto;
 `
 
 const Wrapper = styled.div`
-    overflow-y: auto;
 `
 
 const Header = styled.div`
@@ -62,7 +61,7 @@ const Section = styled.section`
 `
 
 const SectionTitle = styled.h4`
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: 500;
 
     margin-bottom: 1rem;
@@ -154,12 +153,34 @@ const CalcResultContainer = styled.div`
     display: flex;
     
     justify-content: end;
+
 `
 
 const CalcResultArea = styled.div`
+    display: flex;
     width: 20rem;
+    
+    flex-direction: column;
+    align-items: end;
+
+    margin-top: 2rem;
 `
 
+const Footer = styled.div`
+    width: 100%;
+    height: 4.3rem;
+`
+
+const SubmitFiexd = styled.div`
+    border-top: 1px solid rgb(233, 231, 231);
+    background: rgb(255, 255, 255);
+    z-index: 999;
+    position: fixed;
+    padding: 1rem 1.5rem;
+    bottom: 0;
+    height: 4.3rem;
+    width: 100%;
+`
 
 export {
     Container,
@@ -187,5 +208,7 @@ export {
     TdTaxCalcResult,
     SectionAreaMarginRight,
     CalcResultContainer,
-    CalcResultArea
+    CalcResultArea,
+    Footer,
+    SubmitFiexd
 }

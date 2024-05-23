@@ -1,7 +1,7 @@
 import moment from 'moment'
 import * as XLSX from 'xlsx'
-import { ListFromType } from './type'
-import { FOREIGN_TAX, INTERNAL_TAX } from './constants'
+import { ListFromType, MethodOfTaxType } from './type'
+import { METHOD_OF_TAX } from './constants'
 
 export const getFileNameDate = () => {
     const date = new Date()
@@ -53,7 +53,10 @@ export const formatNumberWithCommas = (number: number) => {
 
 export const getValueAmount = (v: ListFromType): number => v.price * v.count
 
-export const getTax = (amount: number, tax: number, calTaxes: string): number => {
-    let calcAmount = (amount !== 0 && calTaxes === INTERNAL_TAX) ? amount - amount * (tax / 100) : amount
+export const getTax = (amount: number, tax: number, calTaxes: MethodOfTaxType): number => {
+    let calcAmount = (amount !== 0 && calTaxes === METHOD_OF_TAX.INTERNAL) 
+        ? amount - amount * (tax / 100) 
+        : amount
+    
     return calcAmount * (tax / 100)
 }
