@@ -7,3 +7,10 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+MyCompany.create!(
+  company_name: "MyCompany",
+  responsible_person: "Heesu kim",
+  company_info: "This is a memo",
+  bank_account: "Bank XYZ, Account 12345"
+)

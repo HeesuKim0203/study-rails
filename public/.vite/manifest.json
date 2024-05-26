@@ -1,0 +1,11 @@
+{
+  "entrypoints/home.tsx": {
+    "file": "assets/home-DOcXz2Kp.js",
+    "name": "entrypoints/home.tsx",
+    "src": "entrypoints/home.tsx",
+    "isEntry": true,
+    "css": [
+      "assets/home-D7i8sgNw.css"
+    ]
+  }
+}

@@ -30,6 +30,7 @@ const SideNavigator = () => {
                         return (
                             <Link to={HOME_URL}>
                                 <MenuItem
+                                    key={index}
                                     selected={index === selected}
                                     onClick={() => setSelected(index)}
                                 >

@@ -133,34 +133,36 @@ export const METHOD_OF_DEPOSIT = {
     TRANSFER :'振替'
 } as const
 
-const today = new Date()
+export const today = new Date()
 
 export const BILL_KEY = {
     BUSINESS_PARTNER: 'businessPartner',
     TAIL_STR: 'tailStr',
     ID: 'id',
-    BRANCH_NAME: 'branchName',
+    BRANCH_NUMBER: 'branchNumber',
     INVOICE_DATE: 'invoiceDate',
     METHOD_OF_DEPOSIT: 'methodOfDeposit',
     DEPOSIT_DATE: 'depositDate',
+    TRANSFER_DATE: 'transferDate',
     TITLE: 'title',
-    representative: 'representative',
-    particulars: 'particulars',
-    remarks: 'remarks',
-    memo: 'memo',
-}
+    REPRESENTATIVE: 'representative',
+    PARTICULARS: 'particulars',
+    REMARKS: 'remarks',
+    MEMO: 'memo',
+} as const
 
 export const DEFAULT_BILL = {
-    businessPartner: '',
-    tailStr: '', 
-    id: '',
-    branchNumber: '',
-    invoiceDate: today,
-    methodOfDeposit: METHOD_OF_DEPOSIT.BANK_TRANSFER,
-    depositDate: today,
-    title: '',
-    representative: '',
-    particulars: [ DEFAULT_DATA ],
-    remarks: '',
-    memo: ''
+    [BILL_KEY.BUSINESS_PARTNER]: '',
+    [BILL_KEY.TAIL_STR]: '御中', 
+    [BILL_KEY.ID]: '',
+    [BILL_KEY.BRANCH_NUMBER]: '',
+    [BILL_KEY.INVOICE_DATE]: today,
+    [BILL_KEY.METHOD_OF_DEPOSIT]: METHOD_OF_DEPOSIT.BANK_TRANSFER,
+    [BILL_KEY.DEPOSIT_DATE]: undefined,
+    [BILL_KEY.TRANSFER_DATE]: undefined,
+    [BILL_KEY.TITLE]: '',
+    [BILL_KEY.REPRESENTATIVE]: '',
+    [BILL_KEY.PARTICULARS]: [ DEFAULT_DATA ],
+    [BILL_KEY.REMARKS]: '',
+    [BILL_KEY.MEMO]: ''
 } as Bill

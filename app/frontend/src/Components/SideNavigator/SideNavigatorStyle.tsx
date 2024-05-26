@@ -16,13 +16,16 @@ const Wrapper = styled.div<{
     box-sizing: border-box;
     border-right: 1px solid rgb(233, 231, 231);
     word-break: break-all;
-    overflow-y: none;
     -webkit-box-flex: 0;
     flex-grow: 0;
     flex-shrink: 0;
 
     span {
         display: ${props => (props.iconMenu ? 'none' : 'inline-block')};
+    }
+
+    ul {
+        width: ${props => (props.iconMenu ? '3.8rem' : '13rem')} ;
     }
 `
 
@@ -51,7 +54,8 @@ const IconArea = styled.div`
 `
 
 const Menu = styled.ul`
-    width : 13rem
+    width: 13rem ;
+    overflow: hidden ;
 `
 
 const MenuItem = styled.li<{

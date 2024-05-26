@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  business_partner: MyString
+  tail_str: MyString
+  bill_id: MyString
+  branch_number: MyString
+  invoice_date: 2024-05-27
+  method_of_deposit: MyString
+  deposit_date: 2024-05-27
+  transfer_date: 2024-05-27
+  title: MyString
+  representative: MyString
+  remarks: MyString
+  memo: MyString
+
+two:
+  business_partner: MyString
+  tail_str: MyString
+  bill_id: MyString
+  branch_number: MyString
+  invoice_date: 2024-05-27
+  method_of_deposit: MyString
+  deposit_date: 2024-05-27
+  transfer_date: 2024-05-27
+  title: MyString
+  representative: MyString
+  remarks: MyString
+  memo: MyString

@@ -4,7 +4,6 @@ import { FontArea, TextButton } from '../CommonStyle'
 
 // Todo : 10rem Code duplication
 const Container = styled.div`
-    
 `
 
 const Wrapper = styled.div`
@@ -31,13 +30,14 @@ const Title = styled.h2`
 
 const ContentWrapper = styled.div`
     display: flex;
-    overflow-y: auto;
 `
 
 const Content = styled.div`
     display: block;
 
-    width: calc(100% - 10rem);
+    min-width: calc(100% - 10rem);
+
+    overflow-y: auto;
 `
 
 const ContentSideMenu = styled.div<{
@@ -48,7 +48,6 @@ const ContentSideMenu = styled.div<{
 
     border-right: 1px solid rgb(233, 231, 231);
     width: ${props => props.display ? 'calc(10rem-1px)' : '0rem'};
-    overflow-y: hidden;
     transition: width 0.1s ease 0s;
     word-break: break-all;
 
