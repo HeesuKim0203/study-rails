@@ -1,6 +1,8 @@
 module Api
   module V1
     class MyCompaniesController < ApplicationController
+      protect_from_forgery with: :null_session
+
       def index
         @my_companies = MyCompany.all
         render json: @my_companies
@@ -23,7 +25,7 @@ module Api
       def update
         @my_company = MyCompany.find(params[:id])
         if @my_company.update(my_company_params)
-          render json: @my_company
+          render json: @my_company, status: :ok
         else
           render json: @my_company.errors, status: :unprocessable_entity
         end

@@ -1,40 +1,43 @@
 module Api
   module V1
     class BillsController < ApplicationController
+      protect_from_forgery with: :null_session
+      skip_before_action :verify_authenticity_token, only: [:create, :update]
+
       def index
         @bills = Bill.all
-        render json: @bills
+        render json: @bills, include: :statements
       end
 
       def show
         @bill = Bill.find(params[:id])
-        render json: @bill
+        render json: @bill, include: :statements
       end
 
       def create
         @bill = Bill.new(bill_params)
         if @bill.save
-          render json: @bill, status: :created
+          render json: @bill, include: :statements, status: :created
         else
-          render json: @bill.errors, status: :unprocessable_entity
+          render json: { errors: @bill.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
       def update
         @bill = Bill.find(params[:id])
         if @bill.update(bill_params)
-          render json: @bill
+          render json: @bill, include: :statements, status: :ok
         else
-          render json: @bill.errors, status: :unprocessable_entity
+          render json: { errors: @bill.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
       def destroy
         @bill = Bill.find(params[:id])
         if @bill.destroy
-          render json: { message: 'Bill successfully deleted' }, status: :ok
+          render json: { message: 'Bill deleted successfully' }, status: :ok
         else
-          render json: { error: 'Failed to delete bill' }, status: :unprocessable_entity
+          render json: { errors: @bill.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -54,7 +57,15 @@ module Api
           :representative,
           :remarks,
           :memo,
-          :my_company_id
+          :my_company_id,
+          statements_attributes: [
+            :summary,
+            :count,
+            :unit,
+            :price,
+            :tax,
+            :withholding
+          ]
         )
       end
     end
