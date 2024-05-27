@@ -133,6 +133,8 @@
 							"pm.test('Extract bill id and save as variable', function () {",
 							"    const jsonData = pm.response.json()",
 							"    const bill_id = jsonData.id",
+							"    const statement_id = jsonData.statements[0].id",
+							"    pm.environment.set('statement_id', statement_id)",
 							"    pm.environment.set('bill_id', bill_id)",
 							"})"
 						],
@@ -157,7 +159,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"bill\": {\n    \"business_partner\": \"Partner A\",\n    \"tail_str\": \"Tail String\",\n    \"bill_id\": \"12345\",\n    \"branch_number\": \"001\",\n    \"invoice_date\": \"2023-05-21\",\n    \"method_of_deposit\": \"Bank Transfer\",\n    \"deposit_date\": \"2023-05-22\",\n    \"transfer_date\": \"2023-05-23\",\n    \"title\": \"Invoice Title\",\n    \"representative\": \"John Doe\",\n    \"remarks\": \"Some remarks\",\n    \"memo\": \"Some memo\",\n    \"my_company_id\": \"{{my_company_id}}\"\n  }\n}",
+					"raw": "{\n  \"bill\": {\n    \"business_partner\": \"ABC Corp\",\n    \"tail_str\": \"1234\",\n    \"bill_id\": \"5678\",\n    \"branch_number\": \"001\",\n    \"invoice_date\": \"2023-05-20\",\n    \"method_of_deposit\": \"Bank Transfer\",\n    \"deposit_date\": \"2023-06-20\",\n    \"transfer_date\": null,\n    \"title\": \"Invoice for Services\",\n    \"representative\": \"John Doe\",\n    \"remarks\": \"Thank you for your business\",\n    \"memo\": \"Urgent\",\n    \"my_company_id\": \"{{my_company_id}}\",\n    \"statements_attributes\": [\n      {\n        \"summary\": \"Service A\",\n        \"count\": 10,\n        \"unit\": \"hours\",\n        \"price\": 100,\n        \"tax\": \"10%\",\n        \"withholding\": true\n      },\n      {\n        \"summary\": \"Service B\",\n        \"count\": 5,\n        \"unit\": \"hours\",\n        \"price\": 200,\n        \"tax\": \"10%\",\n        \"withholding\": true\n      }\n    ]\n  }\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -227,6 +229,73 @@
 					"path": [
 						"bills",
 						"{{bill_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Statement",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{csrf-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"statement\": {\n    \"summary\": \"Updated Summary\",\n    \"count\": 5,\n    \"unit\": \"pcs\",\n    \"price\": 100,\n    \"tax\": \"10%\",\n    \"withholding\": false\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/statements/{{statement_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"statements",
+						"{{statement_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Statement",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{csrf-token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/statements/{{statement_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"statements",
+						"{{statement_id}}"
 					]
 				}
 			},
@@ -311,6 +380,11 @@
 		},
 		{
 			"key": "bill_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "statement_id",
 			"value": "",
 			"type": "string"
 		}
