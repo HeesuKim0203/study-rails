@@ -1,0 +1,318 @@
+{
+	"info": {
+		"_postman_id": "ff355d5b-eaab-45c3-b045-a1c55183571f",
+		"name": "study-rails",
+		"description": "# 🚀 Get started here\n\nThis is a template specifically created for study-rails.\n\n## 🔖 Environment Variables\n\n1. Create a new environment in Postman.\n2. Add a variable named csrf-token. The initial value can be left blank.\n    \n\n## Pre-request Script\n\nAdd the following script to the Pre-request Script of each request:\n\n``` javascript\nconst csrfUrl = pm.variables.get('csrf_url')\npm.sendRequest({\n    url: `${csrfUrl}`,\n    method: 'GET'\n}, function (err, res) {\n    if (err) {\n        console.log(err)\n    } else {\n        const $ = cheerio.load(res.text())\n        const token = $('meta[name=\"csrf-token\"]').attr('content')\n        pm.environment.set('csrf-token', token)\n    }\n})\n\n ```",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27301431"
+	},
+	"item": [
+		{
+			"name": "Get my_companies",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200)",
+							"})",
+							"",
+							"pm.test('Extract My company id and save as variable', function () {",
+							"    const jsonData = pm.response.json()",
+							"    const my_company_id = jsonData[0].id",
+							"    pm.environment.set('my_company_id', my_company_id)",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/my_companies",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"my_companies"
+					]
+				},
+				"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+			},
+			"response": []
+		},
+		{
+			"name": "Update my_company",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful PUT request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{csrf-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"my_company\": {\n        \"company_name\": \"StudyRails\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/my_companies/{{my_company_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"my_companies",
+						"{{my_company_id}}"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				},
+				"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "Get bills",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/bills",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"bills"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create bills",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Extract bill id and save as variable', function () {",
+							"    const jsonData = pm.response.json()",
+							"    const bill_id = jsonData.id",
+							"    pm.environment.set('bill_id', bill_id)",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{csrf-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"bill\": {\n    \"business_partner\": \"Partner A\",\n    \"tail_str\": \"Tail String\",\n    \"bill_id\": \"12345\",\n    \"branch_number\": \"001\",\n    \"invoice_date\": \"2023-05-21\",\n    \"method_of_deposit\": \"Bank Transfer\",\n    \"deposit_date\": \"2023-05-22\",\n    \"transfer_date\": \"2023-05-23\",\n    \"title\": \"Invoice Title\",\n    \"representative\": \"John Doe\",\n    \"remarks\": \"Some remarks\",\n    \"memo\": \"Some memo\",\n    \"my_company_id\": \"{{my_company_id}}\"\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/bills",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"bills"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get bill",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/bills/{{bill_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"bills",
+						"{{bill_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update bill",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{csrf-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"bill\": {\n        \"business_partner\": \"StudyRails\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/bills/{{bill_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"bills",
+						"{{bill_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete bill",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{csrf-token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/bills/{{bill_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"bills",
+						"{{bill_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"const csrfUrl = pm.variables.get('csrf_url')",
+					"",
+					"pm.sendRequest({",
+					"    url: `${csrfUrl}`,",
+					"    method: 'GET'",
+					"}, function (err, res) {",
+					"    if (err) {",
+					"        console.log(err)",
+					"    } else {",
+					"        const $ = cheerio.load(res.text())",
+					"        const token = $('meta[name=\"csrf-token\"]').attr('content')",
+					"        pm.environment.set('csrf-token', token)",
+					"    }",
+					"})"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "my_company_id",
+			"value": ""
+		},
+		{
+			"key": "base_url",
+			"value": "http://localhost:5100/api/v1\n"
+		},
+		{
+			"key": "csrf_url",
+			"value": "http://localhost:5100/",
+			"type": "string"
+		},
+		{
+			"key": "bill_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

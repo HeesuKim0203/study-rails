@@ -107,3 +107,38 @@ rails -v
 ### Reference 
 [rails / react](https://tech.fusic.co.jp/posts/2022-07-07-vite-rails-react/)  
 [rails document](https://guides.rubyonrails.org/)
+
+# Post man
+
+# 🚀 Get started here
+
+This is a template specifically created for study-rails.
+
+## 🔖 Environment Variables
+
+1. Create a new environment in Postman.
+2. Add a variable named csrf-token. The initial value can be left blank.
+    
+
+## Pre-request Script
+
+Add the following script to the Pre-request Script of each request:
+
+``` javascript
+const csrfUrl = pm.variables.get('csrf_url')
+pm.sendRequest({
+    url: `${csrfUrl}`,
+    method: 'GET'
+}, function (err, res) {
+    if (err) {
+        console.log(err)
+    } else {
+        const $ = cheerio.load(res.text())
+        const token = $('meta[name="csrf-token"]').attr('content')
+        pm.environment.set('csrf-token', token)
+    }
+})
+
+```
+
+Postman collection file [here](./postman_collection.json) can download
