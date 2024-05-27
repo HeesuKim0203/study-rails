@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { CREATE_URL, HOME_URL } from '../utils/constants'
 import Home from './Home'
 import Header from './Header'
@@ -30,6 +30,7 @@ const Router = () => {
                     <Routes>
                         <Route path = { HOME_URL } element = { <Home /> } />
                         <Route path = { CREATE_URL } element = { <Create /> } />
+                        <Route path = "*" element={<Navigate to={ HOME_URL } />} />
                     </Routes>
                 </Main>
             </Wrapper>

@@ -28,16 +28,19 @@ const Index = styled.span`
 `
 
 const TableHeader = styled.div`
-    width: 45rem;
-    padding: 0.25rem;
+    width: 28rem;
     white-space: nowrap;
+`
+
+const AmountHeader = styled.div`
+    width: 7rem ;
 `
 
 const Amount = styled.span`
     display: inline-block;
     text-align: right;
 
-    width: 8rem;
+    width: 7rem;
 `
 
 export {
@@ -46,4 +49,5 @@ export {
     Index, 
     TableHeader,
     Amount,
+    AmountHeader,
 }

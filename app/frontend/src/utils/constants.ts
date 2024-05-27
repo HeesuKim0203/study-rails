@@ -4,6 +4,7 @@ import { IoCalculatorOutline } from 'react-icons/io5'
 import { LuTruck } from 'react-icons/lu'
 import { BsCart4 } from 'react-icons/bs'
 import { MdOutlineReceiptLong } from 'react-icons/md'
+import { Bill } from './type'
 
 // url
 export const HOME_URL = '/'
@@ -115,9 +116,53 @@ export const TAX_OPTION = [
 
 // Create
 
-export const FOREIGN_TAX = '外税'
-export const INTERNAL_TAX = '内税'
+export const METHOD_OF_TAX = {
+    FOREIGN: '外税',
+    INTERNAL: '内税'
+} as const
+
 export const TAX_RESULT_OPTION = [
-    {name: FOREIGN_TAX},
-    {name: INTERNAL_TAX},
+    {name: METHOD_OF_TAX.FOREIGN},
+    {name: METHOD_OF_TAX.INTERNAL},
 ]
+
+// Bill
+
+export const METHOD_OF_DEPOSIT = {
+    BANK_TRANSFER : '振込',
+    TRANSFER :'振替'
+} as const
+
+export const today = new Date()
+
+export const BILL_KEY = {
+    BUSINESS_PARTNER: 'businessPartner',
+    TAIL_STR: 'tailStr',
+    ID: 'id',
+    BRANCH_NUMBER: 'branchNumber',
+    INVOICE_DATE: 'invoiceDate',
+    METHOD_OF_DEPOSIT: 'methodOfDeposit',
+    DEPOSIT_DATE: 'depositDate',
+    TRANSFER_DATE: 'transferDate',
+    TITLE: 'title',
+    REPRESENTATIVE: 'representative',
+    PARTICULARS: 'particulars',
+    REMARKS: 'remarks',
+    MEMO: 'memo',
+} as const
+
+export const DEFAULT_BILL = {
+    [BILL_KEY.BUSINESS_PARTNER]: '',
+    [BILL_KEY.TAIL_STR]: '御中', 
+    [BILL_KEY.ID]: '',
+    [BILL_KEY.BRANCH_NUMBER]: '',
+    [BILL_KEY.INVOICE_DATE]: today,
+    [BILL_KEY.METHOD_OF_DEPOSIT]: METHOD_OF_DEPOSIT.BANK_TRANSFER,
+    [BILL_KEY.DEPOSIT_DATE]: undefined,
+    [BILL_KEY.TRANSFER_DATE]: undefined,
+    [BILL_KEY.TITLE]: '',
+    [BILL_KEY.REPRESENTATIVE]: '',
+    [BILL_KEY.PARTICULARS]: [ DEFAULT_DATA ],
+    [BILL_KEY.REMARKS]: '',
+    [BILL_KEY.MEMO]: ''
+} as Bill
