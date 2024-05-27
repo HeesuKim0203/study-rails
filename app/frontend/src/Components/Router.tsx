@@ -6,6 +6,7 @@ import Header from './Header'
 import styled from 'styled-components'
 import SideNavigator from './SideNavigator/SideNavigator'
 import Create from './Create'
+import { Bill, MyCompany, PropsForRailsData } from '../utils/type'
 
 const Wrapper = styled.div`
     box-sizing: border-box;
@@ -20,15 +21,15 @@ const Main = styled.main`
     flex: 1 1 0%;
 `
 
-const Router = () => {
+const Router = ({ bills, mycompany }: PropsForRailsData) => {
     return (
         <BrowserRouter>
-            <Header />
+            <Header mycompany={mycompany} />
             <Wrapper>
                 <SideNavigator />
                 <Main>
                     <Routes>
-                        <Route path = { HOME_URL } element = { <Home /> } />
+                        <Route path = { HOME_URL } element = { <Home bills={bills} mycompany={mycompany} /> } />
                         <Route path = { CREATE_URL } element = { <Create /> } />
                         <Route path = "*" element={<Navigate to={ HOME_URL } />} />
                     </Routes>

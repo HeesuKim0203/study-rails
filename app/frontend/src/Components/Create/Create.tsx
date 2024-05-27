@@ -51,7 +51,7 @@ import Icon from '../Icon'
 import { FontMedium, SubTitle } from '../CommonStyle'
 import ListForm from '../ListForm'
 import { Bill, BillValueUnionType, ListFromType, MethodOfTaxType } from '../../utils/type'
-import { extractNumber, formatNumberWithCommas, getTax, getValueAmount } from '../../utils/util'
+import { extractNumber, formatNumberWithCommas, getAmount, getTax, getTaxAmount, getValueAmount } from '../../utils/util'
 import TaxCalcTd from './TaxCalcTd'
 
 const Create = () => {
@@ -84,21 +84,8 @@ const Create = () => {
     }, [values])
 
     useEffect(() => {
-        const taxResult = TAX_OPTION.reduce((prev, { name }) => {
-            const tax = extractNumber(name)
-            const amount = values.filter((value) => value.tax === name).reduce((prev, value) => {
-                return prev + value.count * value.price 
-            }, 0)
-            return prev + getTax(amount, tax, calculatingTaxes) 
-        }, 0)
-
-        const amount = values.reduce((prev, value) => {
-            return prev + value.count * value.price
-        }, 0)
-
-        setTaxResult(taxResult)
-        setAmount(amount)
-
+        setTaxResult(getTaxAmount(values, calculatingTaxes))
+        setAmount(getAmount(values))
     }, [values, calculatingTaxes])
 
     return (
@@ -132,14 +119,14 @@ const Create = () => {
                                             name='取引先'
                                             id='submit_invoice_customer_name'
                                             error={error}
-                                            value={bill.businessPartner}
+                                            value={bill[BILL_KEY.BUSINESS_PARTNER]}
                                             onChange={(e) => (onChange(e.target.value, BILL_KEY.BUSINESS_PARTNER))}
                                         />
                                         <SelectBox
                                             ml={1}
                                             width='small'
                                             id='submit_invoice_customer_name'
-                                            value={bill.tailStr}
+                                            value={bill[BILL_KEY.TAIL_STR]}
                                             options={[
                                                 { name: '御中' },
                                                 { name: '様' },
@@ -178,7 +165,7 @@ const Create = () => {
                                         >
                                             <TextField
                                                 name='枝番'
-                                                value={bill.branchNumber}
+                                                value={bill[BILL_KEY.BRANCH_NUMBER]}
                                                 onChange={(e) => (onChange(e.target.value, BILL_KEY.BRANCH_NUMBER))}
                                                 width='xSmall'
                                                 id='submit_invoice_branch_number'
@@ -196,7 +183,7 @@ const Create = () => {
                                             <DateInput 
                                                 name='請求日' 
                                                 id='submit_invoice_date' 
-                                                value={bill.invoiceDate}
+                                                value={bill[BILL_KEY.INVOICE_DATE]}
                                                 onChange={(e) => (onChange(new Date(e), BILL_KEY.INVOICE_DATE))}
                                             />
                                         </FormControl>
@@ -209,10 +196,10 @@ const Create = () => {
                                         >
                                             <RadioButton
                                                 value={METHOD_OF_DEPOSIT.BANK_TRANSFER}
-                                                checked={bill.methodOfDeposit === METHOD_OF_DEPOSIT.BANK_TRANSFER}
+                                                checked={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER}
                                                 onChange={(e) => { 
                                                     onChange(e.target.value, BILL_KEY.METHOD_OF_DEPOSIT)
-                                                    bill.transferDate=undefined
+                                                    bill[BILL_KEY.TRANSFER_DATE]=undefined
                                                 }}
                                                 name='入金方法'
                                             >
@@ -220,10 +207,10 @@ const Create = () => {
                                             </RadioButton>
                                             <RadioButton
                                                 value={METHOD_OF_DEPOSIT.TRANSFER}
-                                                checked={bill.methodOfDeposit === METHOD_OF_DEPOSIT.TRANSFER}
+                                                checked={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.TRANSFER}
                                                 onChange={(e) => {
                                                     onChange(e.target.value, BILL_KEY.METHOD_OF_DEPOSIT)
-                                                    bill.depositDate=undefined
+                                                    bill[BILL_KEY.DEPOSIT_DATE]=undefined
                                                 }}
                                                 name='入金方法'
                                             >
@@ -233,20 +220,20 @@ const Create = () => {
                                         <FormControl
                                             mb={1}
                                             mr={1}
-                                            label={bill.methodOfDeposit === METHOD_OF_DEPOSIT.BANK_TRANSFER ? '入金期日' : '振替日'}
-                                            fieldId={bill.methodOfDeposit === METHOD_OF_DEPOSIT.BANK_TRANSFER ? 'submit_invoice_date_of_deposit' : 'submit_invoice_transfer_of_deposit'}
+                                            label={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER ? '入金期日' : '振替日'}
+                                            fieldId={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER ? 'submit_invoice_date_of_deposit' : 'submit_invoice_transfer_of_deposit'}
                                         >
-                                            { bill.methodOfDeposit === METHOD_OF_DEPOSIT.BANK_TRANSFER ? 
+                                            { bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER ? 
                                                 <DateInput
                                                     name={'入金期日'}
                                                     id='submit_invoice_date_of_deposit'
-                                                    value={bill.depositDate}
+                                                    value={bill[BILL_KEY.DEPOSIT_DATE]}
                                                     onChange={(e) => (onChange(new Date(e), BILL_KEY.DEPOSIT_DATE))}
                                                 /> : 
                                                 <DateInput
                                                     name={'振替日'}
                                                     id='submit_invoice_transfer_of_deposit'
-                                                    value={bill.transferDate}
+                                                    value={bill[BILL_KEY.TRANSFER_DATE]}
                                                     onChange={(e) => (onChange(new Date(e), BILL_KEY.TRANSFER_DATE))}
                                                 /> 
                                             }
@@ -440,7 +427,7 @@ const Create = () => {
                                 appearance='primary'
                                 disabled={sending}
                                 onClick={() => {
-                                    if(bill.businessPartner && bill.invoiceDate) {
+                                    if(bill[BILL_KEY.BUSINESS_PARTNER] && bill[BILL_KEY.INVOICE_DATE]) {
                                         setError(false)
                                         setMessage('保存しました')
                                     }else {                               

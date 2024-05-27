@@ -1,29 +1,19 @@
 
-import React, { ElementType, useState } from 'react'
+import React, { useState } from 'react'
 import { GoTriangleDown } from 'react-icons/go'
 import { IoIosSettings } from 'react-icons/io'
 import { MdMenuOpen } from 'react-icons/md'
 import {
-    MarginBase,
     Button,
-    Paragraph,
-    WithSideContent,
     ListTable,
     DropdownButton,
-    Pagination,
     Pager,
     Digits,
-    SectionTitle,
-    VisuallyHidden,
-    SearchField,
     TableHeader,
-    Dropdown,
-    OptionButton,
     IconOnlyButton,
-    TextButton,
   } from '@freee_jp/vibes'
-import { CREATE_URL, DEFAULT_PAGE, DEFAULT_ROWS, HAEDER_DROPDOWN_LABEL, ICON_SIZE, LIST_TABLE_HEADER, OPTIONS, ORDER, ROWS_OPTION, SIDE_MENU_TITLE } from '../../utils/constants'
-import { ListElm, Order } from '../../utils/type'
+import { BILL_KEY, CREATE_URL, DEFAULT_PAGE, HAEDER_DROPDOWN_LABEL, ICON_SIZE, LIST_TABLE_HEADER, OPTIONS, ORDER, ROWS_OPTION, SIDE_MENU_TITLE } from '../../utils/constants'
+import { Bill, ListElm, Order, PropsForRailsData } from '../../utils/type'
 import {
     Container,
     Wrapper,
@@ -49,154 +39,11 @@ import {
 import { IconContext } from 'react-icons'
 import FilterDropDown from '../FilterDropDown'
 import { Link } from 'react-router-dom'
-import Icon from '../Icon'
 
 // Todo : Data -> BackEnd
-const useData = () => {
-    const data: ListElm[] = [
-        {
-            title: '打ち合わせ費用',
-            user: 'フリー太郎',
-            amount: 100000,
-            status: '申請中',
-            date: '2020-10-01',
-        },
-        {
-            title: '書籍購入費',
-            user: 'user.email@example.com',
-            amount: 123000,
-            status: '申請中',
-            date: '2020-09-23',
-        },
-        {
-            title: '交通費',
-            user: '佐々木大輔',
-            amount: 2000,
-            status: '精算済',
-            date: '2020-10-11',
-        },
-        {
-            title: 'UFO撮影ロケ',
-            user: '五反田花子',
-            amount: 3000000,
-            status: '却下',
-            date: '2020-09-12',
-        },
-        {
-            title: 'ツチノコ捜索費',
-            user: '三田次郎',
-            amount: 1000000,
-            status: '申請中',
-            date: '2020-11-01',
-        },
-        {
-            title: 'オフィス備品',
-            user: 'フリー太郎',
-            amount: 48000,
-            status: '精算済',
-            date: '2020-09-12',
-        },
-        {
-            title: '書籍購入費',
-            user: 'user.email@example.com',
-            amount: 2800,
-            status: '申請中',
-            date: '2020-10-12',
-        },
-        {
-            title: 'ネコのエサ代',
-            user: '三田次郎',
-            amount: 3000,
-            status: '申請中',
-            date: '2020-10-27',
-        },
-        {
-            title: '駐車場代',
-            user: 'フリー太郎',
-            amount: 4000,
-            status: '申請中',
-            date: '2020-10-05',
-        },
-        {
-            title: 'PC用品',
-            user: '五反田花子',
-            amount: 800000,
-            status: '申請中',
-            date: '2020-10-21',
-        },
-        {
-            title: '打ち合わせ費用',
-            user: 'フリー太郎',
-            amount: 100000,
-            status: '申請中',
-            date: '2020-10-01',
-        },
-        {
-            title: '書籍購入費',
-            user: 'user.email@example.com',
-            amount: 123000,
-            status: '申請中',
-            date: '2020-09-23',
-        },
-        {
-            title: '交通費',
-            user: '佐々木大輔',
-            amount: 2000,
-            status: '精算済',
-            date: '2020-10-11',
-        },
-        {
-            title: 'UFO撮影ロケ',
-            user: '五反田花子',
-            amount: 3000000,
-            status: '却下',
-            date: '2020-09-12',
-        },
-        {
-            title: 'ツチノコ捜索費',
-            user: '三田次郎',
-            amount: 1000000,
-            status: '申請中',
-            date: '2020-11-01',
-        },
-        {
-            title: 'オフィス備品',
-            user: 'フリー太郎',
-            amount: 48000,
-            status: '精算済',
-            date: '2020-09-12',
-        },
-        {
-            title: '書籍購入費',
-            user: 'user.email@example.com',
-            amount: 2800,
-            status: '申請中',
-            date: '2020-10-12',
-        },
-        {
-            title: 'ネコのエサ代',
-            user: '三田次郎',
-            amount: 3000,
-            status: '申請中',
-            date: '2020-10-27',
-        },
-        {
-            title: '駐車場代',
-            user: 'フリー太郎',
-            amount: 4000,
-            status: '申請中',
-            date: '2020-10-05',
-        },
-        {
-            title: 'PC用品',
-            user: '五反田花子',
-            amount: 800000,
-            status: '申請中',
-            date: '2020-10-21',
-        },
-    ]
+const useData = (data: Bill[]) => {
 
-    const [sortKey, setSortKey] = useState<keyof ListElm>('date')
+    const [sortKey, setSortKey] = useState<keyof Bill>(BILL_KEY.ID)
     const [sortOrder, setSortOrder] = useState<Order>(ORDER.DESC)
     const [statuses, setStatuses] = useState<boolean[]>(
         Array(data.length).fill(false)
@@ -208,7 +55,7 @@ const useData = () => {
         init: ORDER.ASC,
     }
 
-    const sort = (newKey: keyof ListElm) => {
+    const sort = (newKey: keyof Bill) => {
         if (sortKey === newKey) {
             setSortOrder((prev) => nextOrder[prev])
         } else {
@@ -269,7 +116,7 @@ const filterData = () => {
     return data
 }
 
-const Home = () => {
+const Home = ({ bills, mycompany }: PropsForRailsData) => {
     const {
       sort,
       sortKey,
@@ -278,11 +125,9 @@ const Home = () => {
       sortedData,
       changeAllStatus,
       changeRowStatus,
-    } = useData()
+    } = useData(bills)
 
     const filter = filterData()
-
-    const [rowOption, setRowOption] = useState(DEFAULT_ROWS)
     const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE)
     const [search, setSearch] = useState('')
 
@@ -321,7 +166,7 @@ const Home = () => {
 
                     <ContentWrapper>
                         <ContentSideMenu
-                            display={sideMenuDisplay}
+                            display={sideMenuDisplay ? 1 : 0}
                         >
                             <IconContext.Provider value={{ size: ICON_SIZE.SMALL }} >
                                 <ContentSideMenuHeader>
@@ -340,6 +185,7 @@ const Home = () => {
                                         { filter.map(({text, reacordNum}, index) => {
                                             return (
                                                 <ContentSideMenuItem
+                                                    key={index}
                                                     selected={index === filterSelected}
                                                     onClick={() => setFilterSelected(index)}
                                                 >
@@ -399,7 +245,7 @@ const Home = () => {
                                             let typeCastingsortValue = sortValue as keyof ListElm
                                             let result = { value } as TableHeader
                                             if(minWidth) result.minWidth = minWidth
-                                            if(onClick) result.onClick = () => sort(typeCastingsortValue)
+                                            //if(onClick) result.onClick = () => sort(typeCastingsortValue)
                                             if(ordering) result.ordering = (sortKey === typeCastingsortValue && sortOrder) || ORDER.INIT
                                             if(alignRight) result.alignRight = alignRight
 
@@ -415,11 +261,11 @@ const Home = () => {
                                             },
                                             url: `/path/to/single/${i}`,
                                             cells: [
-                                                { value: row.title },
-                                                { value: row.user, breakWord: true },
-                                                { value: Digits.formalize(row.amount), alignRight: true },
-                                                { value: row.status },
-                                                { value: row.date },
+                                                { value: row[BILL_KEY.BUSINESS_PARTNER] },
+                                                { value: `${row[BILL_KEY.ID]} ${row[BILL_KEY.BRANCH_NUMBER]}` },
+                                                // { value: Digits.formalize(row.amount), alignRight: true },
+                                                // { value: row.status },
+                                                // { value: row.date },
                                                 {
                                                     value: (
                                                         <>

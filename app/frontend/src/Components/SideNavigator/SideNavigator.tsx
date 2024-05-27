@@ -8,16 +8,16 @@ import Icon from '../Icon'
 const SideNavigator = () => {
 
     const [selected, setSelected] = useState<number>(0)
-    const [iconMenu, setIconMenu] = useState<boolean>(false)
+    const [iconmenu, seticonmenu] = useState<boolean>(false)
 
     return (
         <Container>
             <Wrapper
-                iconMenu={iconMenu}
+                iconmenu={iconmenu ? 1 : 0}
             >
                 <Header>
                     <IconArea
-                        onClick={() => setIconMenu(!iconMenu)}
+                        onClick={() => seticonmenu(!iconmenu)}
                     >
                         <Icon 
                             size={ICON_SIZE.NORMAL}
@@ -28,18 +28,15 @@ const SideNavigator = () => {
                 <Menu>
                     { SIDE_MENU.map(({ text, icon }, index) => {
                         return (
-                            <Link to={HOME_URL}>
+                            <Link key={index} to={HOME_URL}>
                                 <MenuItem
-                                    key={index}
                                     selected={index === selected}
                                     onClick={() => setSelected(index)}
                                 >
-                                        {/* <IconArea> */}
-                                            <Icon 
-                                                size={ICON_SIZE.NORMAL}
-                                                IconComponent={icon}
-                                            />
-                                        {/* </IconArea> */}
+                                        <Icon 
+                                            size={ICON_SIZE.NORMAL}
+                                            IconComponent={icon}
+                                        />
                                         <MenuText>
                                             {text}
                                         </MenuText>

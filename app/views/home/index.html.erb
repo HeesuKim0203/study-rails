@@ -1,2 +1,4 @@
-<div id="root"></div>
+<%= content_tag :div, '', id: 'root', data: { bills: @bills, mycompany: @my_companies } %>
 <%= vite_javascript_tag 'home.tsx' %>
+
+<div id="root"></div>

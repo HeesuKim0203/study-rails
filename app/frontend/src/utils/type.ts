@@ -27,6 +27,19 @@ export type ListFromType =  {
     withholding: boolean
 }
 
+export type MyCompany = {
+    id: string
+    responsible_person: string
+    company_name: string
+    company_info: string
+    bank_account: string
+}
+
+export type PropsForRailsData = {
+    bills: Bill[]
+    mycompany: MyCompany
+}
+
 export type MethodOfTaxType = PropertyValueUnion<typeof METHOD_OF_TAX>
 
 export type MethodOfDepositType = PropertyValueUnion<typeof METHOD_OF_DEPOSIT>
@@ -45,6 +58,7 @@ export type Bill = {
     [BILL_KEY.PARTICULARS]: ListFromType[]
     [BILL_KEY.REMARKS]: string
     [BILL_KEY.MEMO]: string
+    // Todo: Add calculatingTaxes
 }
 
 export type BillValueUnionType = PropertyValueUnion<Bill>

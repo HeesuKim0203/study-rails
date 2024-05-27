@@ -1,10 +1,18 @@
 import React, { useState } from 'react'
 import Router from './Components/Router'
+import { Bill, MyCompany } from './utils/type'
 
-const App = () => {
+type Props = {
+  bills?: string  
+  mycompany?: string
+}
 
+const App = ({ bills, mycompany }: Props) => {
+
+  const billJson = JSON.parse(bills || '')
+  const mycompanyJson = JSON.parse(mycompany || '')
   return (
-    <Router />
+    <Router bills={billJson} mycompany={mycompanyJson[0]} />
   )
 }
 

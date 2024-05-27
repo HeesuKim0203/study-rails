@@ -8,9 +8,9 @@ const Container = styled.nav`
 `
 
 const Wrapper = styled.div<{
-    iconMenu: boolean
+    iconmenu: number
 }>`
-    width: ${props => (props.iconMenu ? '3.8rem' : '13rem')} ;
+    width: ${props => (props.iconmenu ? '3.8rem' : '13rem')} ;
     transition: width 0.1s ease 0s;
 
     box-sizing: border-box;
@@ -21,11 +21,11 @@ const Wrapper = styled.div<{
     flex-shrink: 0;
 
     span {
-        display: ${props => (props.iconMenu ? 'none' : 'inline-block')};
+        display: ${props => (props.iconmenu ? 'none' : 'inline-block')};
     }
 
     ul {
-        width: ${props => (props.iconMenu ? '3.8rem' : '13rem')} ;
+        width: ${props => (props.iconmenu ? '3.8rem' : '13rem')} ;
     }
 `
 

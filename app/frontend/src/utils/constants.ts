@@ -26,18 +26,18 @@ export const DEFAULT_PAGE = 1
 
 export const LIST_TABLE_HEADER = [
     {
-        value: 'タイトル',
-        minWidth: 15,
-        onClick: true,
-        ordering: true,
-        sortValue: 'title'
+        value: '取引先名・基本情報',
+        minWidth: 10,
+        onClick: false,
+        ordering: false,
+        sortValue: ''
     },
     {
-        value: 'ユーザー',
+        value: '請求書番号',
         minWidth: 10,
-        onClick: true,
-        ordering: true,
-        sortValue: 'user'
+        onClick: false,
+        ordering: false,
+        sortValue: ''
     },
     {
         value: '金額',
@@ -136,17 +136,17 @@ export const METHOD_OF_DEPOSIT = {
 export const today = new Date()
 
 export const BILL_KEY = {
-    BUSINESS_PARTNER: 'businessPartner',
-    TAIL_STR: 'tailStr',
+    BUSINESS_PARTNER: 'business_partner',
+    TAIL_STR: 'tail_str',
     ID: 'id',
-    BRANCH_NUMBER: 'branchNumber',
-    INVOICE_DATE: 'invoiceDate',
-    METHOD_OF_DEPOSIT: 'methodOfDeposit',
-    DEPOSIT_DATE: 'depositDate',
-    TRANSFER_DATE: 'transferDate',
+    BRANCH_NUMBER: 'branch_number',
+    INVOICE_DATE: 'invoice_date',
+    METHOD_OF_DEPOSIT: 'method_of_deposit',
+    DEPOSIT_DATE: 'deposit_date',
+    TRANSFER_DATE: 'transfer_date',
     TITLE: 'title',
     REPRESENTATIVE: 'representative',
-    PARTICULARS: 'particulars',
+    PARTICULARS: 'statements',
     REMARKS: 'remarks',
     MEMO: 'memo',
 } as const

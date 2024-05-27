@@ -47,7 +47,6 @@ module Api
         params.require(:bill).permit(
           :business_partner,
           :tail_str,
-          :bill_id,
           :branch_number,
           :invoice_date,
           :method_of_deposit,

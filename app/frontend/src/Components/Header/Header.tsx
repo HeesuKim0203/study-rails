@@ -7,8 +7,13 @@ import { FaUserCircle } from 'react-icons/fa'
 import Log from '../../../../assets/images/header.svg?react'
 import Icon from '../Icon'
 import { ICON_SIZE } from '../../utils/constants'
+import { MyCompany, } from '../../utils/type'
 
-const Header = () => {
+type Props = {
+    mycompany: MyCompany
+}
+
+const Header = ({ mycompany }: Props) => {
     return (
         <Container>
             <Title>
@@ -20,7 +25,7 @@ const Header = () => {
                         size={ICON_SIZE.NORMAL}
                         IconComponent={FaUserCircle}
                     />
-                    <UserName>userName</UserName> 
+                    <UserName>{mycompany.responsible_person}</UserName> 
                 </User>
                 <Menu>
                     <Icon 

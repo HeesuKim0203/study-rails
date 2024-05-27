@@ -41,7 +41,7 @@ const Content = styled.div`
 `
 
 const ContentSideMenu = styled.div<{
-    display: boolean
+    display: number
 }>`
     display: block;
     min-height: calc(-8.56rem + 100vh);
