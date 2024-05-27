@@ -1,43 +1,54 @@
 {
-    "id": "0f90c128-bca7-46fb-ba60-bed8abde5f49",
-    "business_partner": "ABC Corp",
-    "tail_str": "1234",
-    "branch_number": "001",
-    "invoice_date": "2023-05-20",
-    "method_of_deposit": "Bank Transfer",
-    "deposit_date": "2023-06-20",
-    "transfer_date": null,
-    "title": "Invoice for Services",
-    "representative": "John Doe",
-    "remarks": "Thank you for your business",
-    "memo": "Urgent",
-    "my_company_id": "e1e7163b-5a78-45bb-bf99-5fbdf93d6c77",
-    "created_at": "2024-05-27T14:40:13.518Z",
-    "updated_at": "2024-05-27T14:40:13.518Z",
-    "statements": [
-        {
-            "id": "06519829-c43b-4d40-a90c-07bbbb752a2d",
-            "summary": "Service A",
-            "count": 10,
-            "unit": "hours",
-            "price": 100,
-            "tax": "10%",
-            "withholding": true,
-            "bill_id": "0f90c128-bca7-46fb-ba60-bed8abde5f49",
-            "created_at": "2024-05-27T14:40:13.520Z",
-            "updated_at": "2024-05-27T14:40:13.520Z"
-        },
-        {
-            "id": "40667f0b-d6eb-4f3e-93fe-566a1257d087",
-            "summary": "Service B",
-            "count": 5,
-            "unit": "hours",
-            "price": 200,
-            "tax": "10%",
-            "withholding": true,
-            "bill_id": "0f90c128-bca7-46fb-ba60-bed8abde5f49",
-            "created_at": "2024-05-27T14:40:13.521Z",
-            "updated_at": "2024-05-27T14:40:13.521Z"
-        }
-    ]
+    "bills": {
+        "id": "0f90c128-bca7-46fb-ba60-bed8abde5f49",
+        "business_partner": "ABC Corp",
+        "tail_str": "1234",
+        "branch_number": "001",
+        "invoice_date": "2023-05-20",
+        "method_of_deposit": "Bank Transfer",
+        "deposit_date": "2023-06-20",
+        "transfer_date": null,
+        "title": "Invoice for Services",
+        "representative": "John Doe",
+        "remarks": "Thank you for your business",
+        "memo": "Urgent",
+        "my_company_id": "e1e7163b-5a78-45bb-bf99-5fbdf93d6c77",
+        "created_at": "2024-05-27T14:40:13.518Z",
+        "updated_at": "2024-05-27T14:40:13.518Z",
+        "statements": [
+            {
+                "id": "06519829-c43b-4d40-a90c-07bbbb752a2d",
+                "summary": "Service A",
+                "count": 10,
+                "unit": "hours",
+                "price": 100,
+                "tax": "10%",
+                "withholding": true,
+                "bill_id": "0f90c128-bca7-46fb-ba60-bed8abde5f49",
+                "created_at": "2024-05-27T14:40:13.520Z",
+                "updated_at": "2024-05-27T14:40:13.520Z"
+            },
+            {
+                "id": "40667f0b-d6eb-4f3e-93fe-566a1257d087",
+                "summary": "Service B",
+                "count": 5,
+                "unit": "hours",
+                "price": 200,
+                "tax": "10%",
+                "withholding": true,
+                "bill_id": "0f90c128-bca7-46fb-ba60-bed8abde5f49",
+                "created_at": "2024-05-27T14:40:13.521Z",
+                "updated_at": "2024-05-27T14:40:13.521Z"
+            }
+        ]
+    },
+    "mycompany": {
+        "id": "e1e7163b-5a78-45bb-bf99-5fbdf93d6c77",
+        "responsible_person": "Heesu kim",
+        "company_name": "StudyRails",
+        "company_info": "This is a memo",
+        "bank_account": "Bank XYZ, Account 12345",
+        "created_at": "2024-05-26T16:54:03.135Z",
+        "updated_at": "2024-05-27T09:22:17.525Z"
+    }
 }
