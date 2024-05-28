@@ -124,6 +124,51 @@
 			"response": []
 		},
 		{
+			"name": "PageNation bills",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/bills?page=1&per_page=10",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"bills"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "per_page",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Total count bills",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/bills/count",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"bills",
+						"count"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Create bills",
 			"event": [
 				{
@@ -159,7 +204,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"bill\": {\n    \"business_partner\": \"ABC Corp\",\n    \"tail_str\": \"1234\",\n    \"bill_id\": \"5678\",\n    \"branch_number\": \"001\",\n    \"invoice_date\": \"2023-05-20\",\n    \"method_of_deposit\": \"Bank Transfer\",\n    \"deposit_date\": \"2023-06-20\",\n    \"transfer_date\": null,\n    \"title\": \"Invoice for Services\",\n    \"representative\": \"John Doe\",\n    \"remarks\": \"Thank you for your business\",\n    \"memo\": \"Urgent\",\n    \"my_company_id\": \"{{my_company_id}}\",\n    \"statements_attributes\": [\n      {\n        \"summary\": \"Service A\",\n        \"count\": 10,\n        \"unit\": \"hours\",\n        \"price\": 100,\n        \"tax\": \"10%\",\n        \"withholding\": true\n      },\n      {\n        \"summary\": \"Service B\",\n        \"count\": 5,\n        \"unit\": \"hours\",\n        \"price\": 200,\n        \"tax\": \"10%\",\n        \"withholding\": true\n      }\n    ]\n  }\n}",
+					"raw": "{\n  \"bill\": {\n    \"business_partner\": \"ABC Corp\",\n    \"tail_str\": \"1234\",\n    \"branch_number\": \"001\",\n    \"invoice_date\": \"2023-05-20\",\n    \"method_of_deposit\": \"振込\",\n    \"deposit_date\": \"2023-06-20\",\n    \"amount\": 1000,\n    \"title\": \"Invoice for Services\",\n    \"representative\": \"John Doe\",\n    \"remarks\": \"Thank you for your business\",\n    \"method_of_tax\": \"外税\",\n    \"memo\": \"Urgent\",\n    \"my_company_id\": \"{{my_company_id}}\",\n    \"statements_attributes\": [\n      {\n        \"summary\": \"Service A\",\n        \"count\": 10,\n        \"unit\": \"hours\",\n        \"price\": 100,\n        \"tax\": \"10%\",\n        \"withholding\": true\n      },\n      {\n        \"summary\": \"Service B\",\n        \"count\": 5,\n        \"unit\": \"hours\",\n        \"price\": 200,\n        \"tax\": \"10%\",\n        \"withholding\": true\n      }\n    ]\n  }\n}",
 					"options": {
 						"raw": {
 							"language": "json"

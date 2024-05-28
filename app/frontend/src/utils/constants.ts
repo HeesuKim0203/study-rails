@@ -63,7 +63,8 @@ export const BILL_KEY = {
     MEMO: 'memo',
     AMOUNT: 'amount',
     METHOD_OF_TAX: 'method_of_tax',
-    MY_COMPANY_ID: 'my_company_id'
+    MY_COMPANY_ID: 'my_company_id',
+    UPDATE_AT: 'update_at'
 } as const
 
 export const DEFAULT_BILL = {
@@ -80,7 +81,8 @@ export const DEFAULT_BILL = {
     [BILL_KEY.REMARKS]: '',
     [BILL_KEY.MEMO]: '',
     [BILL_KEY.METHOD_OF_TAX]: METHOD_OF_TAX.FOREIGN,
-    [BILL_KEY.MY_COMPANY_ID]: ''
+    [BILL_KEY.MY_COMPANY_ID]: '',
+    [BILL_KEY.UPDATE_AT]: undefined
 } as Bill
 
 // rows
