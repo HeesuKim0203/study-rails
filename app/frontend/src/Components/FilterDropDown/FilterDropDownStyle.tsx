@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { TextButton } from '../CommonStyle'
 
 const DropdownContainer = styled.div`
     position: relative;
@@ -14,7 +15,7 @@ const DropdownToggle = styled.button`
     justify-content: center;
     
     cursor: pointer;
-    width: 7rem;
+    padding: 0.2rem 1rem ;
     height: 2.2rem ;
     background-color: #ffffff;
     border: 1px solid rgb(233, 231, 231);
@@ -36,12 +37,14 @@ const DropdownToggleText = styled.span`
     line-height: 0.5rem;
 `
 
-const DropdownMenu = styled.div`
+const DropdownMenu = styled.div<{
+    options: number
+}>`
     position: absolute;
     background-color: white;
     border: 1px solid rgb(233, 231, 231);
     width: 15rem;
-    z-index: 1;
+    z-index: 2000;
     display: flex;
     flex-direction: column;
 
@@ -52,12 +55,15 @@ const DropdownMenu = styled.div`
     background-color: white;
     border-radius: 1rem;
 
-    height: 40rem;
+    min-height: ${props => props.options ? '30rem' : '4rem'};
     overflow-x: auto;
+    overflow-y: auto;
 `
 
-const DropdownInput = styled.input`
-    padding: 0.6rem 0.6rem 0.6rem 2.1rem;
+const DropdownInput = styled.input<{
+    options: number
+}>`
+    padding: 0.6rem 0.6rem 0.6rem ${props => props.options ? '2.4rem' : '0.6rem'};
     border: 1px solid rgb(233, 231, 231);
     width: 100%;
     box-sizing: border-box;
@@ -88,6 +94,23 @@ const Icon = styled.span`
     color: #ccc;
 `
 
+const FilterOptionArea = styled.div`
+    display: flex;
+`
+
+const FilterOptionControllerButton = styled(TextButton)`
+    &:not(:last-child) {
+        margin-right: 0.5rem;
+    }
+
+    padding: 0.7rem 0.5rem;
+
+    &:hover {
+        color: #1e46aa;
+        background-color: #dce8ff;
+    }
+`
+
 export {
     DropdownContainer,
     DropdownToggle,
@@ -96,4 +119,6 @@ export {
     DropdownInput,
     DropdownItem,
     Icon,
+    FilterOptionArea,
+    FilterOptionControllerButton
 }

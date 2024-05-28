@@ -1,8 +1,9 @@
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { GoTriangleDown } from 'react-icons/go'
 import { IoIosSettings } from 'react-icons/io'
-import { MdMenuOpen } from 'react-icons/md'
+import { AiOutlineMenuFold } from 'react-icons/ai'
+import { AiOutlineMenuUnfold } from 'react-icons/ai'
 import {
     Button,
     ListTable,
@@ -11,9 +12,23 @@ import {
     Digits,
     TableHeader,
     IconOnlyButton,
+    WithSideContent,
+    Pagination,
   } from '@freee_jp/vibes'
-import { BILL_KEY, CREATE_URL, DEFAULT_PAGE, HAEDER_DROPDOWN_LABEL, ICON_SIZE, LIST_TABLE_HEADER, OPTIONS, ORDER, ROWS_OPTION, SIDE_MENU_TITLE } from '../../utils/constants'
-import { Bill, ListElm, Order, PropsForRailsData } from '../../utils/type'
+import { 
+    BILL_KEY, 
+    CREATE_URL, 
+    DEFAULT_PAGE, 
+    DEFAULT_ROWS_OPTIONS, 
+    HAEDER_DROPDOWN_LABEL, 
+    ICON_SIZE, 
+    INVOICES_URL, 
+    LIST_TABLE_HEADER, 
+    FILTER_OPTIONS, 
+    ORDER, 
+    ROWS_OPTIONS, 
+    SIDE_MENU_TITLE } from '../../utils/constants'
+import { Bill, FilterOptions, ListElm, Order, PropsForRailsData } from '../../utils/type'
 import {
     Container,
     Wrapper,
@@ -35,10 +50,13 @@ import {
     ContentHeaderFilterClear,
     ContentHeaderFilterRightArea,
     ContentButtonFontArea,
+    FilterOptionsArea,
+    PagerArea,
 } from './HomeStyle'
 import { IconContext } from 'react-icons'
 import FilterDropDown from '../FilterDropDown'
 import { Link } from 'react-router-dom'
+import { formatNumberWithCommas } from '../../utils/util'
 
 // Todo : Data -> BackEnd
 const useData = (data: Bill[]) => {
@@ -86,7 +104,7 @@ const useData = (data: Bill[]) => {
                 (typeof a[sortKey] === 'number' && typeof b[sortKey] === 'number'
                     ? Number(a[sortKey]) - Number(b[sortKey])
                     : String(a[sortKey]).localeCompare(String(b[sortKey]))) *
-                (sortOrder === 'desc' ? -1 : 1)
+                (sortOrder === ORDER.DESC ? -1 : 1)
             )
 
     const noResults: ListElm[] = []
@@ -129,10 +147,19 @@ const Home = ({ bills, mycompany }: PropsForRailsData) => {
 
     const filter = filterData()
     const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE)
-    const [search, setSearch] = useState('')
+    const [rowOption, setRowOption] = useState(DEFAULT_ROWS_OPTIONS)
+    const [filterOptions, setFilterOptions] = useState<FilterOptions[]>([])
 
     // Todo : Server Data Record count
-    const [pageCount, setPageCount] = useState(10)
+    const [pageCount, setPageCount] = useState(Math.ceil(bills.length / DEFAULT_ROWS_OPTIONS))
+
+    useEffect(() => {
+        setPageCount(Math.ceil(bills.length / DEFAULT_ROWS_OPTIONS))
+    }, [rowOption])
+
+    useEffect(() => {
+        console.log(filterOptions)
+    }, [filterOptions])
 
     const [filterSelected, setFilterSelected] = useState(0)
     const [sideMenuDisplay, setSideMenuDisplay] = useState<boolean>(true)
@@ -143,7 +170,7 @@ const Home = ({ bills, mycompany }: PropsForRailsData) => {
                     <IconContext.Provider value={{ size: ICON_SIZE.SMALL }} >
                         <Header>
                             <Title>請求書</Title>
-                            <Link to={CREATE_URL}>
+                            <Link to={ `${INVOICES_URL}${CREATE_URL}`}>
                                 <Button appearance='primary'>
                                     新規作成
                                 </Button>
@@ -168,7 +195,7 @@ const Home = ({ bills, mycompany }: PropsForRailsData) => {
                         <ContentSideMenu
                             display={sideMenuDisplay ? 1 : 0}
                         >
-                            <IconContext.Provider value={{ size: ICON_SIZE.SMALL }} >
+                            <IconContext.Provider value={{size: ICON_SIZE.SMALL}} >
                                 <ContentSideMenuHeader>
                                     <ContentSideMenuTitle>
                                         {SIDE_MENU_TITLE}
@@ -186,6 +213,7 @@ const Home = ({ bills, mycompany }: PropsForRailsData) => {
                                             return (
                                                 <ContentSideMenuItem
                                                     key={index}
+                                                    display={sideMenuDisplay ? 1 : 0}
                                                     selected={index === filterSelected}
                                                     onClick={() => setFilterSelected(index)}
                                                 >
@@ -196,23 +224,47 @@ const Home = ({ bills, mycompany }: PropsForRailsData) => {
                                         }) }
                                     </ContentSideMenuItemWrapper>
                                 </IconContext.Provider>
-                            </ContentSideMenu>
+                        </ContentSideMenu>
                         <Content>
-                            <IconContext.Provider value={{ size: ICON_SIZE.NORMAL }} >
+                            <IconContext.Provider value={{size: ICON_SIZE.NORMAL}} >
                                 <ContentHeader>
                                     <ContentHeaderFilterArea>
                                         <ContentHeaderSideMenuDisplayIcon>
                                             <IconOnlyButton
                                                 label='フィルタ設定'
-                                                IconComponent={MdMenuOpen}
+                                                IconComponent={sideMenuDisplay ? AiOutlineMenuFold : AiOutlineMenuUnfold}
                                                 onClick={() => setSideMenuDisplay(!sideMenuDisplay)}
                                             />
                                         </ContentHeaderSideMenuDisplayIcon>
-                                        <FilterDropDown
-                                            options={OPTIONS}
-                                            onOptionClick={() => {}}
-                                        />
-                                        <ContentHeaderFilterClear>クリア</ContentHeaderFilterClear>
+                                        <FilterOptionsArea>
+                                            {
+                                                filterOptions.map((filterOption, index) => {
+                                                    return (
+                                                        <FilterDropDown
+                                                            option={filterOption}
+                                                            onOptionClick={(e) => setFilterOptions([
+                                                                ...filterOptions.slice(0, index),
+                                                                {...filterOption, value:e},
+                                                                ...filterOptions.slice(index + 1, filterOptions.length),
+                                                            ])}
+                                                            onDelete={() => setFilterOptions([
+                                                                ...filterOptions.slice(0, index),
+                                                                ...filterOptions.slice(index + 1, filterOptions.length),
+                                                            ])}
+                                                        />
+                                                    )
+                                                })
+                                            }
+                                            <FilterDropDown
+                                                options={
+                                                        FILTER_OPTIONS.filter((filterOption) => 
+                                                            filterOptions.findIndex((seletedFilterOptions) => 
+                                                                seletedFilterOptions.text === filterOption.text) === -1)
+                                                    }
+                                                onOptionClick={(e) => setFilterOptions(filterOptions.concat({text:e, value:''}))}
+                                            />
+                                            <ContentHeaderFilterClear onClick={() => setFilterOptions([])} >クリア</ContentHeaderFilterClear>
+                                        </FilterOptionsArea>
                                     </ContentHeaderFilterArea>
                                     <ContentHeaderFilterRightArea>
                                         <Button>
@@ -232,7 +284,21 @@ const Home = ({ bills, mycompany }: PropsForRailsData) => {
                                         />
                                     </ContentHeaderFilterRightArea>
                                 </ContentHeader>
+                                <WithSideContent
+                                    mb={1}
+                                    sideContent={
+                                        <Pagination
+                                            rowsPerPageOptions={ROWS_OPTIONS}
+                                            rowsPerPageValue={rowOption}
+                                            currentPage={1}
+                                            rowCount={bills.length + 1}
+                                            mr={1}
+                                            onChange={(e) => setRowOption(Number(e.target.value))}
+                                        />
+                                    }
+                                />
                                 <ListTable
+                                    fixedHeader={true}
                                     headers={
                                         LIST_TABLE_HEADER.map(({ 
                                             value,
@@ -242,10 +308,10 @@ const Home = ({ bills, mycompany }: PropsForRailsData) => {
                                             ordering,
                                             sortValue
                                         }): TableHeader => {
-                                            let typeCastingsortValue = sortValue as keyof ListElm
+                                            let typeCastingsortValue = sortValue as keyof Bill
                                             let result = { value } as TableHeader
                                             if(minWidth) result.minWidth = minWidth
-                                            //if(onClick) result.onClick = () => sort(typeCastingsortValue)
+                                            if(onClick) result.onClick = () => sort(typeCastingsortValue)
                                             if(ordering) result.ordering = (sortKey === typeCastingsortValue && sortOrder) || ORDER.INIT
                                             if(alignRight) result.alignRight = alignRight
 
@@ -259,13 +325,10 @@ const Home = ({ bills, mycompany }: PropsForRailsData) => {
                                             onChangeCheckBox: (e) => {
                                                 changeRowStatus(e.target.checked, i)
                                             },
-                                            url: `/path/to/single/${i}`,
+                                            url: `${INVOICES_URL}/${row.id}`,
                                             cells: [
-                                                { value: row[BILL_KEY.BUSINESS_PARTNER] },
-                                                { value: `${row[BILL_KEY.ID]} ${row[BILL_KEY.BRANCH_NUMBER]}` },
-                                                // { value: Digits.formalize(row.amount), alignRight: true },
-                                                // { value: row.status },
-                                                // { value: row.date },
+                                                {value: row[BILL_KEY.TITLE] },
+                                                {value: row[BILL_KEY.BUSINESS_PARTNER] },
                                                 {
                                                     value: (
                                                         <>
@@ -278,19 +341,31 @@ const Home = ({ bills, mycompany }: PropsForRailsData) => {
                                                         </>
                                                     ),
                                                 },
+                                                {value: `${row[BILL_KEY.ID]} ${row[BILL_KEY.BRANCH_NUMBER]}` },
+                                                {value: formatNumberWithCommas(row[BILL_KEY.AMOUNT]), alignRight: true },
+                                                {value: row[BILL_KEY.MEMO]},
+                                                {value: row[BILL_KEY.REMARKS]},
+                                                //Todo: JP Check
+                                                {value: row[BILL_KEY.METHOD_OF_DEPOSIT]},
+                                                {value: row[BILL_KEY.INVOICE_DATE]},
+                                                {value: row[BILL_KEY.DEPOSIT_DATE]},
+                                                {value: row[BILL_KEY.REPRESENTATIVE]},
                                             ],
                                         })
                                     )}
                                     withCheckBox
                                 ></ListTable>
-                                <Pager
-                                    currentPage={currentPage}
-                                    pageCount={pageCount}
-                                    onPageChange={(e) => {
-                                        // Todo : Server Data <-
-                                        setCurrentPage(e)
-                                    }}
-                                />
+                                <PagerArea>
+                                    <Pager
+                                        mr={2}
+                                        currentPage={currentPage}
+                                        pageCount={pageCount}
+                                        onPageChange={(e) => {
+                                            // Todo : Server Data <-
+                                            setCurrentPage(e)
+                                        }}
+                                    />
+                                </PagerArea>
                              </IconContext.Provider>
                         </Content>
                     </ContentWrapper>

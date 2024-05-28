@@ -1,14 +1,27 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Container, Header, Menu, IconArea, MenuItem, MenuText, Wrapper } from './SideNavigatorStyle'
-import { MdMenuOpen } from 'react-icons/md'
-import { HOME_URL, ICON_SIZE, SIDE_MENU } from '../../utils/constants'
-import { Link } from 'react-router-dom'
+import { AiOutlineMenuFold } from 'react-icons/ai'
+import { AiOutlineMenuUnfold } from 'react-icons/ai'
+import { CREATE_URL, HOME_URL, ICON_SIZE, INVOICES_URL, SIDE_MENU } from '../../utils/constants'
+import { Link, useLocation } from 'react-router-dom'
 import Icon from '../Icon'
 
 const SideNavigator = () => {
 
+    const { pathname } = useLocation()
+
+    let icommenuDefault = false
+
+    if(pathname == `${INVOICES_URL}${CREATE_URL}`) {
+        icommenuDefault = true
+    }
+
     const [selected, setSelected] = useState<number>(0)
-    const [iconmenu, seticonmenu] = useState<boolean>(false)
+    const [iconmenu, seticonmenu] = useState<boolean>(icommenuDefault)
+
+    useEffect(() => {
+        seticonmenu(icommenuDefault)
+    }, [icommenuDefault])
 
     return (
         <Container>
@@ -21,7 +34,7 @@ const SideNavigator = () => {
                     >
                         <Icon 
                             size={ICON_SIZE.NORMAL}
-                            IconComponent={MdMenuOpen}
+                            IconComponent={iconmenu ? AiOutlineMenuUnfold : AiOutlineMenuFold}
                         />
                     </IconArea>
                 </Header>

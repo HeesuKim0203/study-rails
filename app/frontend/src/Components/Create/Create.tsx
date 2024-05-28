@@ -43,9 +43,9 @@ import {
     TdCalcName,
     SubmitFiexd,
     Footer,
+    TitleLink,
 } from './CreateStyle'
-import { Link } from 'react-router-dom'
-import { BILL_KEY, DEFAULT_BILL, DEFAULT_DATA, HOME_URL, ICON_SIZE, METHOD_OF_DEPOSIT, METHOD_OF_TAX, TAX_OPTION, TAX_RESULT_OPTION, today } from '../../utils/constants'
+import { BILL_KEY, CREATE_URL, DEFAULT_BILL, DEFAULT_DATA, HOME_URL, ICON_SIZE, METHOD_OF_DEPOSIT, METHOD_OF_TAX, TAX_OPTION, TAX_RESULT_OPTION, today } from '../../utils/constants'
 import { FaPen } from 'react-icons/fa'
 import Icon from '../Icon'
 import { FontMedium, SubTitle } from '../CommonStyle'
@@ -53,21 +53,28 @@ import ListForm from '../ListForm'
 import { Bill, BillValueUnionType, ListFromType, MethodOfTaxType } from '../../utils/type'
 import { extractNumber, formatNumberWithCommas, getAmount, getTax, getTaxAmount, getValueAmount } from '../../utils/util'
 import TaxCalcTd from './TaxCalcTd'
+import { useLocation } from 'react-router-dom'
 
 const Create = () => {
+
+    const { pathname } = useLocation()
+    const id = pathname.split('/')[2]
+
+    // Todo: Backend Data <-
+
+    const [bill, setBill] = useState<Bill>(DEFAULT_BILL)
+    const [values, setValues] = useState<ListFromType[]>([DEFAULT_DATA])
+
     const [message, setMessage] = useState('')
     const [sending, setSending] = useState(false)
     const [error, setError] = useState(false)
 
     const [title, setTitle] = useState('')
     const [userName, setUserName] = useState('')
-
-    const [values, setValues] = useState<ListFromType[]>([DEFAULT_DATA])
     const [taxResult, setTaxResult] = useState(0)
     const [amount, setAmount] = useState(0)
 
     const [calculatingTaxes, setCalculatingTaxes] = useState<MethodOfTaxType>(METHOD_OF_TAX.FOREIGN)
-    const [bill, setBill] = useState<Bill>(DEFAULT_BILL)
 
     const onChange = (
         value: BillValueUnionType,
@@ -95,11 +102,11 @@ const Create = () => {
                 <Wrapper>
                     <Header>
                         <BackHomeButtonArea>
-                            <Link to={HOME_URL}>
+                            <TitleLink to={HOME_URL}>
                                 <BackHomeButton>
                                     ⇐ 一覧に戻る
                                 </BackHomeButton>
-                            </Link>
+                            </TitleLink>
                         </BackHomeButtonArea>
                         <Title>請求書作成</Title>
                     </Header>
@@ -195,11 +202,11 @@ const Create = () => {
                                             
                                         >
                                             <RadioButton
+                                                mr={1}
                                                 value={METHOD_OF_DEPOSIT.BANK_TRANSFER}
                                                 checked={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER}
                                                 onChange={(e) => { 
                                                     onChange(e.target.value, BILL_KEY.METHOD_OF_DEPOSIT)
-                                                    bill[BILL_KEY.TRANSFER_DATE]=undefined
                                                 }}
                                                 name='入金方法'
                                             >
@@ -210,7 +217,6 @@ const Create = () => {
                                                 checked={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.TRANSFER}
                                                 onChange={(e) => {
                                                     onChange(e.target.value, BILL_KEY.METHOD_OF_DEPOSIT)
-                                                    bill[BILL_KEY.DEPOSIT_DATE]=undefined
                                                 }}
                                                 name='入金方法'
                                             >
@@ -223,20 +229,12 @@ const Create = () => {
                                             label={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER ? '入金期日' : '振替日'}
                                             fieldId={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER ? 'submit_invoice_date_of_deposit' : 'submit_invoice_transfer_of_deposit'}
                                         >
-                                            { bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER ? 
-                                                <DateInput
-                                                    name={'入金期日'}
-                                                    id='submit_invoice_date_of_deposit'
-                                                    value={bill[BILL_KEY.DEPOSIT_DATE]}
-                                                    onChange={(e) => (onChange(new Date(e), BILL_KEY.DEPOSIT_DATE))}
-                                                /> : 
-                                                <DateInput
-                                                    name={'振替日'}
-                                                    id='submit_invoice_transfer_of_deposit'
-                                                    value={bill[BILL_KEY.TRANSFER_DATE]}
-                                                    onChange={(e) => (onChange(new Date(e), BILL_KEY.TRANSFER_DATE))}
-                                                /> 
-                                            }
+                                            <DateInput
+                                                name={ bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER ? '入金期日' : '振替日'}
+                                                id='submit_invoice_date_of_deposit'
+                                                value={bill[BILL_KEY.DEPOSIT_DATE]}
+                                                onChange={(e) => (onChange(new Date(e), BILL_KEY.DEPOSIT_DATE))}
+                                            />
                                         </FormControl>
                                     </FormControlGroup>
                                         <FormControlGroup>

@@ -2,6 +2,9 @@ import React, { useState } from 'react'
 import Router from './Components/Router'
 import { Bill, MyCompany } from './utils/type'
 
+import testBill from './testBill.json'
+import testMyCompany from './testMyCompany.json'
+
 type Props = {
   bills?: string  
   mycompany?: string
@@ -9,10 +12,14 @@ type Props = {
 
 const App = ({ bills, mycompany }: Props) => {
 
-  const billJson = JSON.parse(bills || '')
-  const mycompanyJson = JSON.parse(mycompany || '')
+  const billJson = bills && JSON.parse(bills)
+  const mycompanyJson = mycompany && JSON.parse(mycompany)
+
   return (
-    <Router bills={billJson} mycompany={mycompanyJson[0]} />
+    <Router 
+      bills={billJson.length !== 0 ? billJson : testBill} 
+      mycompany={mycompanyJson.length !== 0 ? mycompanyJson[0] : mycompanyJson} 
+    />
   )
 }
 

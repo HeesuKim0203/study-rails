@@ -14,6 +14,7 @@ type Props = {
 }
 
 const Header = ({ mycompany }: Props) => {
+
     return (
         <Container>
             <Title>
@@ -25,7 +26,7 @@ const Header = ({ mycompany }: Props) => {
                         size={ICON_SIZE.NORMAL}
                         IconComponent={FaUserCircle}
                     />
-                    <UserName>{mycompany.responsible_person}</UserName> 
+                    <UserName>{mycompany?.responsible_person}</UserName> 
                 </User>
                 <Menu>
                     <Icon 
