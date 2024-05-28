@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import { TextButton } from '../CommonStyle'
+import { Link } from 'react-router-dom'
 
 const Container = styled.div`
     overflow-y: auto;
@@ -37,6 +38,10 @@ const BackHomeButton = styled(TextButton)`
         color: #1e46aa;
         background-color: #dce8ff;
     }
+`
+
+const TitleLink = styled(Link)`
+    display: inline-block;
 `
 
 const Main = styled.div`
@@ -189,6 +194,7 @@ export {
     Title,
     BackHomeButtonArea,
     BackHomeButton,
+    TitleLink,
     Main,
     SectionRow,
     SectionRowBlock,

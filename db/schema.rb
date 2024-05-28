@@ -10,16 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_27_131012) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_28_103051) do
   create_table "bills", id: { type: :string, limit: 36 }, charset: "utf8mb3", force: :cascade do |t|
     t.string "business_partner"
     t.string "tail_str"
-    t.string "bill_id"
     t.string "branch_number"
     t.date "invoice_date"
     t.string "method_of_deposit"
     t.date "deposit_date"
-    t.date "transfer_date"
     t.string "title"
     t.string "representative"
     t.string "remarks"
@@ -27,6 +25,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_27_131012) do
     t.string "my_company_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "amount"
+    t.string "method_of_tax"
     t.index ["my_company_id"], name: "index_bills_on_my_company_id"
   end
 

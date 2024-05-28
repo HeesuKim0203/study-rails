@@ -43,31 +43,73 @@ import {
     TdCalcName,
     SubmitFiexd,
     Footer,
+    TitleLink,
 } from './CreateStyle'
-import { Link } from 'react-router-dom'
-import { BILL_KEY, DEFAULT_BILL, DEFAULT_DATA, HOME_URL, ICON_SIZE, METHOD_OF_DEPOSIT, METHOD_OF_TAX, TAX_OPTION, TAX_RESULT_OPTION, today } from '../../utils/constants'
+import { BILL_KEY, CREATE_URL, DEFAULT_BILL, DEFAULT_DATA, HOME_URL, ICON_SIZE, METHOD_OF_DEPOSIT, METHOD_OF_TAX, TAX_OPTION, TAX_RESULT_OPTION, today } from '../../utils/constants'
 import { FaPen } from 'react-icons/fa'
 import Icon from '../Icon'
 import { FontMedium, SubTitle } from '../CommonStyle'
 import ListForm from '../ListForm'
-import { Bill, BillValueUnionType, ListFromType, MethodOfTaxType } from '../../utils/type'
-import { extractNumber, formatNumberWithCommas, getTax, getValueAmount } from '../../utils/util'
+import { Bill, BillValueUnionType, ListFromType, MethodOfTaxType, MyCompany } from '../../utils/type'
+import { extractNumber, formatNumberWithCommas, getAmount, getTax, getTaxAmount, getValueAmount } from '../../utils/util'
 import TaxCalcTd from './TaxCalcTd'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useApiHook } from '../../utils/hooks'
+import { api } from '../../api'
 
-const Create = () => {
+type Props = {
+    mycompany: MyCompany
+}
+
+const Create = ({
+    mycompany
+}: Props) => {
+
+    const navigator = useNavigate()
+    const { pathname } = useLocation()
+    const id = pathname.split('/')[2]
+
+    const [bill, setBill] = useState<Bill>({...DEFAULT_BILL, [BILL_KEY.REPRESENTATIVE] : mycompany.responsible_person})
+    const [values, setValues] = useState<ListFromType[]>([DEFAULT_DATA])
+
     const [message, setMessage] = useState('')
     const [sending, setSending] = useState(false)
     const [error, setError] = useState(false)
 
-    const [title, setTitle] = useState('')
-    const [userName, setUserName] = useState('')
-
-    const [values, setValues] = useState<ListFromType[]>([DEFAULT_DATA])
     const [taxResult, setTaxResult] = useState(0)
     const [amount, setAmount] = useState(0)
 
-    const [calculatingTaxes, setCalculatingTaxes] = useState<MethodOfTaxType>(METHOD_OF_TAX.FOREIGN)
-    const [bill, setBill] = useState<Bill>(DEFAULT_BILL)
+    const { error: messageError, getData: postData } = useApiHook<any>(api, {
+        method: CREATE_URL.includes(id) ? 'POST' : 'PATCH',
+        url: CREATE_URL.includes(id) ? '/bills' : `/bills/${id}`,
+        data : {
+            bill : {
+                ...bill,
+                amount: bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN ? amount + taxResult : amount,
+                my_company_id: mycompany.id,
+                statements: []
+            }
+        }
+    })
+
+    const { data, getData } = useApiHook<any>(api, {
+        method: 'GET',
+        url: `/bills/${id}`,
+    })
+
+    useEffect(() => {
+        async function getUdpateData() {
+            await getData()
+        }
+        getUdpateData()
+    }, [])
+
+    useEffect(() => {
+        if(data && !CREATE_URL.includes(id)) {
+            setBill(data)
+            setValues(data.statements)
+        }
+    }, [data])
 
     const onChange = (
         value: BillValueUnionType,
@@ -84,22 +126,22 @@ const Create = () => {
     }, [values])
 
     useEffect(() => {
-        const taxResult = TAX_OPTION.reduce((prev, { name }) => {
-            const tax = extractNumber(name)
-            const amount = values.filter((value) => value.tax === name).reduce((prev, value) => {
-                return prev + value.count * value.price 
-            }, 0)
-            return prev + getTax(amount, tax, calculatingTaxes) 
-        }, 0)
+        setTaxResult(getTaxAmount(values, bill[BILL_KEY.METHOD_OF_TAX]))
+        setAmount(getAmount(values))
+    }, [values, bill[BILL_KEY.METHOD_OF_TAX]])
 
-        const amount = values.reduce((prev, value) => {
-            return prev + value.count * value.price
-        }, 0)
+    useEffect(() => {
 
-        setTaxResult(taxResult)
-        setAmount(amount)
+        async function createBill() {
+            console.log(bill)
+            // await postData()
+        }
 
-    }, [values, calculatingTaxes])
+        if(!error) {
+            console.log('check')
+            createBill()
+        }
+    }, [error])
 
     return (
       <>
@@ -108,11 +150,11 @@ const Create = () => {
                 <Wrapper>
                     <Header>
                         <BackHomeButtonArea>
-                            <Link to={HOME_URL}>
+                            <TitleLink to={HOME_URL}>
                                 <BackHomeButton>
                                     ⇐ 一覧に戻る
                                 </BackHomeButton>
-                            </Link>
+                            </TitleLink>
                         </BackHomeButtonArea>
                         <Title>請求書作成</Title>
                     </Header>
@@ -132,14 +174,14 @@ const Create = () => {
                                             name='取引先'
                                             id='submit_invoice_customer_name'
                                             error={error}
-                                            value={bill.businessPartner}
+                                            value={bill[BILL_KEY.BUSINESS_PARTNER]}
                                             onChange={(e) => (onChange(e.target.value, BILL_KEY.BUSINESS_PARTNER))}
                                         />
                                         <SelectBox
                                             ml={1}
                                             width='small'
                                             id='submit_invoice_customer_name'
-                                            value={bill.tailStr}
+                                            value={bill[BILL_KEY.TAIL_STR]}
                                             options={[
                                                 { name: '御中' },
                                                 { name: '様' },
@@ -178,7 +220,7 @@ const Create = () => {
                                         >
                                             <TextField
                                                 name='枝番'
-                                                value={bill.branchNumber}
+                                                value={bill[BILL_KEY.BRANCH_NUMBER]}
                                                 onChange={(e) => (onChange(e.target.value, BILL_KEY.BRANCH_NUMBER))}
                                                 width='xSmall'
                                                 id='submit_invoice_branch_number'
@@ -196,7 +238,7 @@ const Create = () => {
                                             <DateInput 
                                                 name='請求日' 
                                                 id='submit_invoice_date' 
-                                                value={bill.invoiceDate}
+                                                value={bill[BILL_KEY.INVOICE_DATE]}
                                                 onChange={(e) => (onChange(new Date(e), BILL_KEY.INVOICE_DATE))}
                                             />
                                         </FormControl>
@@ -208,11 +250,11 @@ const Create = () => {
                                             
                                         >
                                             <RadioButton
+                                                mr={1}
                                                 value={METHOD_OF_DEPOSIT.BANK_TRANSFER}
-                                                checked={bill.methodOfDeposit === METHOD_OF_DEPOSIT.BANK_TRANSFER}
+                                                checked={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER}
                                                 onChange={(e) => { 
                                                     onChange(e.target.value, BILL_KEY.METHOD_OF_DEPOSIT)
-                                                    bill.transferDate=undefined
                                                 }}
                                                 name='入金方法'
                                             >
@@ -220,10 +262,9 @@ const Create = () => {
                                             </RadioButton>
                                             <RadioButton
                                                 value={METHOD_OF_DEPOSIT.TRANSFER}
-                                                checked={bill.methodOfDeposit === METHOD_OF_DEPOSIT.TRANSFER}
+                                                checked={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.TRANSFER}
                                                 onChange={(e) => {
                                                     onChange(e.target.value, BILL_KEY.METHOD_OF_DEPOSIT)
-                                                    bill.depositDate=undefined
                                                 }}
                                                 name='入金方法'
                                             >
@@ -233,23 +274,15 @@ const Create = () => {
                                         <FormControl
                                             mb={1}
                                             mr={1}
-                                            label={bill.methodOfDeposit === METHOD_OF_DEPOSIT.BANK_TRANSFER ? '入金期日' : '振替日'}
-                                            fieldId={bill.methodOfDeposit === METHOD_OF_DEPOSIT.BANK_TRANSFER ? 'submit_invoice_date_of_deposit' : 'submit_invoice_transfer_of_deposit'}
+                                            label={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER ? '入金期日' : '振替日'}
+                                            fieldId={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER ? 'submit_invoice_date_of_deposit' : 'submit_invoice_transfer_of_deposit'}
                                         >
-                                            { bill.methodOfDeposit === METHOD_OF_DEPOSIT.BANK_TRANSFER ? 
-                                                <DateInput
-                                                    name={'入金期日'}
-                                                    id='submit_invoice_date_of_deposit'
-                                                    value={bill.depositDate}
-                                                    onChange={(e) => (onChange(new Date(e), BILL_KEY.DEPOSIT_DATE))}
-                                                /> : 
-                                                <DateInput
-                                                    name={'振替日'}
-                                                    id='submit_invoice_transfer_of_deposit'
-                                                    value={bill.transferDate}
-                                                    onChange={(e) => (onChange(new Date(e), BILL_KEY.TRANSFER_DATE))}
-                                                /> 
-                                            }
+                                            <DateInput
+                                                name={ bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER ? '入金期日' : '振替日'}
+                                                id='submit_invoice_date_of_deposit'
+                                                value={bill[BILL_KEY.DEPOSIT_DATE]}
+                                                onChange={(e) => (onChange(new Date(e), BILL_KEY.DEPOSIT_DATE))}
+                                            />
                                         </FormControl>
                                     </FormControlGroup>
                                         <FormControlGroup>
@@ -336,15 +369,16 @@ const Create = () => {
                                             mb={1}
                                             small={true}
                                             width='xSmall'
+                                            value={bill[BILL_KEY.METHOD_OF_TAX]}
                                             options={TAX_RESULT_OPTION}
-                                            onChange={(e) => setCalculatingTaxes((e.target.value as MethodOfTaxType))}
+                                            onChange={(e) => onChange(e.target.value as MethodOfTaxType, BILL_KEY.METHOD_OF_TAX)}
                                         />
                                         <ColumnBase>
                                             <TableCalcResult>
                                                 <Tr>
                                                     <TdCalcName>小計</TdCalcName>
                                                     <TdCalcResult>
-                                                        { calculatingTaxes === METHOD_OF_TAX.FOREIGN 
+                                                        { bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN 
                                                             ? formatNumberWithCommas(amount) 
                                                             : formatNumberWithCommas(amount - taxResult)
                                                         }
@@ -361,7 +395,7 @@ const Create = () => {
                                                                 return prev + value.count * value.price
                                                             }, 0)
 
-                                                            const taxResult = getTax(amount, tax, calculatingTaxes)
+                                                            const taxResult = getTax(amount, tax, bill[BILL_KEY.METHOD_OF_TAX])
 
                                                             return (
                                                                 <>
@@ -370,7 +404,7 @@ const Create = () => {
                                                                             name={name}
                                                                             tax={taxResult}
                                                                             targetAmount={
-                                                                                calculatingTaxes === METHOD_OF_TAX.FOREIGN  
+                                                                                bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN  
                                                                                 ? amount 
                                                                                 : amount - taxResult
                                                                             }
@@ -386,7 +420,7 @@ const Create = () => {
                                                     </TdCalcName>
                                                     <TdCalcResult>
                                                         <FontMedium>
-                                                            { calculatingTaxes === METHOD_OF_TAX.FOREIGN  
+                                                            { bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN  
                                                                 ? formatNumberWithCommas(amount + taxResult) 
                                                                 : formatNumberWithCommas(amount)
                                                             }
@@ -440,14 +474,18 @@ const Create = () => {
                                 appearance='primary'
                                 disabled={sending}
                                 onClick={() => {
-                                    if(bill.businessPartner && bill.invoiceDate) {
-                                        setError(false)
+                                    if(bill[BILL_KEY.BUSINESS_PARTNER] && bill[BILL_KEY.INVOICE_DATE]) {
                                         setMessage('保存しました')
-                                    }else {                               
-                                        setError(true)
+                                        setError(false)
+                                        postData()
+                                        setTimeout(() => {
+                                            navigator(HOME_URL, {replace:true})
+                                        }, 600)
+                                    }else {               
                                         setMessage(
                                             '入力内容にエラーがあります。修正のうえ、再度お試しください'
                                         )
+                                        setError(true)
                                     }
                                 }}
                             >
@@ -455,11 +493,9 @@ const Create = () => {
                             </Button>
                             <Button disabled={sending}>キャンセル</Button>
                         </FormActions>
-                        <Loading coverAll isLoading={sending} />
                     </SubmitFiexd>
                     <Footer />
                 </Wrapper>
-                <Loading coverAll isLoading={sending} />
                 {message && <FloatingMessageBlock error={error} success={!error} message={message} />}
             </Container>
       </>

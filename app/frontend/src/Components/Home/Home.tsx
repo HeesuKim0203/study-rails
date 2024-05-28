@@ -1,29 +1,33 @@
 
-import React, { ElementType, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { GoTriangleDown } from 'react-icons/go'
 import { IoIosSettings } from 'react-icons/io'
-import { MdMenuOpen } from 'react-icons/md'
+import { AiOutlineMenuFold } from 'react-icons/ai'
+import { AiOutlineMenuUnfold } from 'react-icons/ai'
 import {
-    MarginBase,
     Button,
-    Paragraph,
-    WithSideContent,
     ListTable,
     DropdownButton,
-    Pagination,
     Pager,
-    Digits,
-    SectionTitle,
-    VisuallyHidden,
-    SearchField,
     TableHeader,
-    Dropdown,
-    OptionButton,
     IconOnlyButton,
-    TextButton,
+    WithSideContent,
+    Pagination,
   } from '@freee_jp/vibes'
-import { CREATE_URL, DEFAULT_PAGE, DEFAULT_ROWS, HAEDER_DROPDOWN_LABEL, ICON_SIZE, LIST_TABLE_HEADER, OPTIONS, ORDER, ROWS_OPTION, SIDE_MENU_TITLE } from '../../utils/constants'
-import { ListElm, Order } from '../../utils/type'
+import { 
+    BILL_KEY, 
+    CREATE_URL, 
+    DEFAULT_PAGE, 
+    DEFAULT_ROWS_OPTIONS, 
+    HAEDER_DROPDOWN_LABEL, 
+    ICON_SIZE, 
+    INVOICES_URL, 
+    LIST_TABLE_HEADER, 
+    FILTER_OPTIONS, 
+    ORDER, 
+    ROWS_OPTIONS, 
+    SIDE_MENU_TITLE } from '../../utils/constants'
+import { Bill, FilterOptions, ListElm, Order, PropsForRailsData } from '../../utils/type'
 import {
     Container,
     Wrapper,
@@ -45,216 +49,15 @@ import {
     ContentHeaderFilterClear,
     ContentHeaderFilterRightArea,
     ContentButtonFontArea,
+    FilterOptionsArea,
+    PagerArea,
 } from './HomeStyle'
 import { IconContext } from 'react-icons'
 import FilterDropDown from '../FilterDropDown'
 import { Link } from 'react-router-dom'
-import Icon from '../Icon'
-
-// Todo : Data -> BackEnd
-const useData = () => {
-    const data: ListElm[] = [
-        {
-            title: '打ち合わせ費用',
-            user: 'フリー太郎',
-            amount: 100000,
-            status: '申請中',
-            date: '2020-10-01',
-        },
-        {
-            title: '書籍購入費',
-            user: 'user.email@example.com',
-            amount: 123000,
-            status: '申請中',
-            date: '2020-09-23',
-        },
-        {
-            title: '交通費',
-            user: '佐々木大輔',
-            amount: 2000,
-            status: '精算済',
-            date: '2020-10-11',
-        },
-        {
-            title: 'UFO撮影ロケ',
-            user: '五反田花子',
-            amount: 3000000,
-            status: '却下',
-            date: '2020-09-12',
-        },
-        {
-            title: 'ツチノコ捜索費',
-            user: '三田次郎',
-            amount: 1000000,
-            status: '申請中',
-            date: '2020-11-01',
-        },
-        {
-            title: 'オフィス備品',
-            user: 'フリー太郎',
-            amount: 48000,
-            status: '精算済',
-            date: '2020-09-12',
-        },
-        {
-            title: '書籍購入費',
-            user: 'user.email@example.com',
-            amount: 2800,
-            status: '申請中',
-            date: '2020-10-12',
-        },
-        {
-            title: 'ネコのエサ代',
-            user: '三田次郎',
-            amount: 3000,
-            status: '申請中',
-            date: '2020-10-27',
-        },
-        {
-            title: '駐車場代',
-            user: 'フリー太郎',
-            amount: 4000,
-            status: '申請中',
-            date: '2020-10-05',
-        },
-        {
-            title: 'PC用品',
-            user: '五反田花子',
-            amount: 800000,
-            status: '申請中',
-            date: '2020-10-21',
-        },
-        {
-            title: '打ち合わせ費用',
-            user: 'フリー太郎',
-            amount: 100000,
-            status: '申請中',
-            date: '2020-10-01',
-        },
-        {
-            title: '書籍購入費',
-            user: 'user.email@example.com',
-            amount: 123000,
-            status: '申請中',
-            date: '2020-09-23',
-        },
-        {
-            title: '交通費',
-            user: '佐々木大輔',
-            amount: 2000,
-            status: '精算済',
-            date: '2020-10-11',
-        },
-        {
-            title: 'UFO撮影ロケ',
-            user: '五反田花子',
-            amount: 3000000,
-            status: '却下',
-            date: '2020-09-12',
-        },
-        {
-            title: 'ツチノコ捜索費',
-            user: '三田次郎',
-            amount: 1000000,
-            status: '申請中',
-            date: '2020-11-01',
-        },
-        {
-            title: 'オフィス備品',
-            user: 'フリー太郎',
-            amount: 48000,
-            status: '精算済',
-            date: '2020-09-12',
-        },
-        {
-            title: '書籍購入費',
-            user: 'user.email@example.com',
-            amount: 2800,
-            status: '申請中',
-            date: '2020-10-12',
-        },
-        {
-            title: 'ネコのエサ代',
-            user: '三田次郎',
-            amount: 3000,
-            status: '申請中',
-            date: '2020-10-27',
-        },
-        {
-            title: '駐車場代',
-            user: 'フリー太郎',
-            amount: 4000,
-            status: '申請中',
-            date: '2020-10-05',
-        },
-        {
-            title: 'PC用品',
-            user: '五反田花子',
-            amount: 800000,
-            status: '申請中',
-            date: '2020-10-21',
-        },
-    ]
-
-    const [sortKey, setSortKey] = useState<keyof ListElm>('date')
-    const [sortOrder, setSortOrder] = useState<Order>(ORDER.DESC)
-    const [statuses, setStatuses] = useState<boolean[]>(
-        Array(data.length).fill(false)
-    )
-
-    const nextOrder: { [key in Order]: Order } = {
-        asc: ORDER.DESC,
-        desc: ORDER.INIT,
-        init: ORDER.ASC,
-    }
-
-    const sort = (newKey: keyof ListElm) => {
-        if (sortKey === newKey) {
-            setSortOrder((prev) => nextOrder[prev])
-        } else {
-            setSortKey(newKey)
-            setSortOrder(ORDER.ASC)
-        }
-        // ソートしたときはチェックボックスの状態をリセット
-        setStatuses(Array(data.length).fill(false))
-    }
-
-    const changeAllStatus = (newStatus: boolean) => {
-        setStatuses(Array(data.length).fill(newStatus))
-    }
-
-    const changeRowStatus = (newStatus: boolean, rowIndex: number) => {
-        const newStatuses = statuses.slice()
-        newStatuses[rowIndex] = newStatus
-        setStatuses(newStatuses)
-    }
-
-    const sortedData =
-        sortOrder === ORDER.INIT
-        ? data
-        : data
-            .slice()
-            .sort(
-                (a, b) =>
-                (typeof a[sortKey] === 'number' && typeof b[sortKey] === 'number'
-                    ? Number(a[sortKey]) - Number(b[sortKey])
-                    : String(a[sortKey]).localeCompare(String(b[sortKey]))) *
-                (sortOrder === 'desc' ? -1 : 1)
-            )
-
-    const noResults: ListElm[] = []
-
-    return {
-        sortKey,
-        sortOrder,
-        statuses,
-        sort,
-        sortedData,
-        noResults,
-        changeRowStatus,
-        changeAllStatus,
-    }
-}
+import { formatNumberWithCommas } from '../../utils/util'
+import { api, getBillsCount } from '../../api'
+import { useApiHook, useData } from '../../utils/hooks'
 
 // Todo : Data -> BackEnd
 const filterData = () => {
@@ -270,6 +73,59 @@ const filterData = () => {
 }
 
 const Home = () => {
+
+    const filter = filterData()
+    const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE)
+    const [rowOption, setRowOption] = useState(DEFAULT_ROWS_OPTIONS)
+    const [filterOptions, setFilterOptions] = useState<FilterOptions[]>([])
+
+    const [pageCount, setPageCount] = useState<number>(0)
+    const [bills, setBills] = useState<Bill[]>([])
+
+    const [filterSelected, setFilterSelected] = useState(0)
+    const [sideMenuDisplay, setSideMenuDisplay] = useState<boolean>(true)
+
+    const { data, error, load, getData } = useApiHook<Bill[]>(api, {
+        method: 'GET',
+        url: '/bills',
+        params: {
+            page: currentPage,
+            per_page: rowOption,
+        },
+    })
+
+    const { data: count, getData: getCount } = useApiHook<{
+        total_count: number
+    }>(api, {
+        method: 'GET',
+        url: '/bills/count',
+    })
+
+    async function init() {
+        await getCount()
+        await getData()
+    }
+    
+    useEffect(() => {
+        init()
+    }, [rowOption, currentPage])
+
+    useEffect(() => {
+        setCurrentPage(DEFAULT_PAGE)
+    }, [rowOption])
+
+    useEffect(() => {
+        if(data) {
+            setBills([...data])
+        }
+    }, [data])
+
+    useEffect(() => {
+        if(count) {
+            setPageCount(Math.ceil(count.total_count / rowOption))
+        }
+    }, [count])
+    
     const {
       sort,
       sortKey,
@@ -278,19 +134,7 @@ const Home = () => {
       sortedData,
       changeAllStatus,
       changeRowStatus,
-    } = useData()
-
-    const filter = filterData()
-
-    const [rowOption, setRowOption] = useState(DEFAULT_ROWS)
-    const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE)
-    const [search, setSearch] = useState('')
-
-    // Todo : Server Data Record count
-    const [pageCount, setPageCount] = useState(10)
-
-    const [filterSelected, setFilterSelected] = useState(0)
-    const [sideMenuDisplay, setSideMenuDisplay] = useState<boolean>(true)
+    } = useData(bills)
 
     return (
         <Container>
@@ -298,7 +142,7 @@ const Home = () => {
                     <IconContext.Provider value={{ size: ICON_SIZE.SMALL }} >
                         <Header>
                             <Title>請求書</Title>
-                            <Link to={CREATE_URL}>
+                            <Link to={ `${INVOICES_URL}${CREATE_URL}`}>
                                 <Button appearance='primary'>
                                     新規作成
                                 </Button>
@@ -321,9 +165,9 @@ const Home = () => {
 
                     <ContentWrapper>
                         <ContentSideMenu
-                            display={sideMenuDisplay}
+                            display={sideMenuDisplay ? 1 : 0}
                         >
-                            <IconContext.Provider value={{ size: ICON_SIZE.SMALL }} >
+                            <IconContext.Provider value={{size: ICON_SIZE.SMALL}} >
                                 <ContentSideMenuHeader>
                                     <ContentSideMenuTitle>
                                         {SIDE_MENU_TITLE}
@@ -340,6 +184,8 @@ const Home = () => {
                                         { filter.map(({text, reacordNum}, index) => {
                                             return (
                                                 <ContentSideMenuItem
+                                                    key={index}
+                                                    display={sideMenuDisplay ? 1 : 0}
                                                     selected={index === filterSelected}
                                                     onClick={() => setFilterSelected(index)}
                                                 >
@@ -350,23 +196,47 @@ const Home = () => {
                                         }) }
                                     </ContentSideMenuItemWrapper>
                                 </IconContext.Provider>
-                            </ContentSideMenu>
+                        </ContentSideMenu>
                         <Content>
-                            <IconContext.Provider value={{ size: ICON_SIZE.NORMAL }} >
+                            <IconContext.Provider value={{size: ICON_SIZE.NORMAL}} >
                                 <ContentHeader>
                                     <ContentHeaderFilterArea>
                                         <ContentHeaderSideMenuDisplayIcon>
                                             <IconOnlyButton
                                                 label='フィルタ設定'
-                                                IconComponent={MdMenuOpen}
+                                                IconComponent={sideMenuDisplay ? AiOutlineMenuFold : AiOutlineMenuUnfold}
                                                 onClick={() => setSideMenuDisplay(!sideMenuDisplay)}
                                             />
                                         </ContentHeaderSideMenuDisplayIcon>
-                                        <FilterDropDown
-                                            options={OPTIONS}
-                                            onOptionClick={() => {}}
-                                        />
-                                        <ContentHeaderFilterClear>クリア</ContentHeaderFilterClear>
+                                        <FilterOptionsArea>
+                                            {
+                                                filterOptions.map((filterOption, index) => {
+                                                    return (
+                                                        <FilterDropDown
+                                                            option={filterOption}
+                                                            onOptionClick={(e) => setFilterOptions([
+                                                                ...filterOptions.slice(0, index),
+                                                                {...filterOption, value:e},
+                                                                ...filterOptions.slice(index + 1, filterOptions.length),
+                                                            ])}
+                                                            onDelete={() => setFilterOptions([
+                                                                ...filterOptions.slice(0, index),
+                                                                ...filterOptions.slice(index + 1, filterOptions.length),
+                                                            ])}
+                                                        />
+                                                    )
+                                                })
+                                            }
+                                            <FilterDropDown
+                                                options={
+                                                        FILTER_OPTIONS.filter((filterOption) => 
+                                                            filterOptions.findIndex((seletedFilterOptions) => 
+                                                                seletedFilterOptions.text === filterOption.text) === -1)
+                                                    }
+                                                onOptionClick={(e) => setFilterOptions(filterOptions.concat({text:e, value:''}))}
+                                            />
+                                            <ContentHeaderFilterClear onClick={() => setFilterOptions([])} >クリア</ContentHeaderFilterClear>
+                                        </FilterOptionsArea>
                                     </ContentHeaderFilterArea>
                                     <ContentHeaderFilterRightArea>
                                         <Button>
@@ -386,7 +256,21 @@ const Home = () => {
                                         />
                                     </ContentHeaderFilterRightArea>
                                 </ContentHeader>
-                                <ListTable
+                                <WithSideContent
+                                    mb={1}
+                                    sideContent={
+                                        <Pagination
+                                            rowsPerPageOptions={ROWS_OPTIONS}
+                                            rowsPerPageValue={rowOption}
+                                            currentPage={1}
+                                            rowCount={bills.length + 1}
+                                            mr={1}
+                                            onChange={(e) => setRowOption(Number(e.target.value))}
+                                        />
+                                    }
+                                />
+                                {load ? <ListTable
+                                    fixedHeader={true}
                                     headers={
                                         LIST_TABLE_HEADER.map(({ 
                                             value,
@@ -396,7 +280,7 @@ const Home = () => {
                                             ordering,
                                             sortValue
                                         }): TableHeader => {
-                                            let typeCastingsortValue = sortValue as keyof ListElm
+                                            let typeCastingsortValue = sortValue as keyof Bill
                                             let result = { value } as TableHeader
                                             if(minWidth) result.minWidth = minWidth
                                             if(onClick) result.onClick = () => sort(typeCastingsortValue)
@@ -413,13 +297,10 @@ const Home = () => {
                                             onChangeCheckBox: (e) => {
                                                 changeRowStatus(e.target.checked, i)
                                             },
-                                            url: `/path/to/single/${i}`,
+                                            url: `${INVOICES_URL}/${row.id}`,
                                             cells: [
-                                                { value: row.title },
-                                                { value: row.user, breakWord: true },
-                                                { value: Digits.formalize(row.amount), alignRight: true },
-                                                { value: row.status },
-                                                { value: row.date },
+                                                {value: row[BILL_KEY.TITLE] },
+                                                {value: row[BILL_KEY.BUSINESS_PARTNER] },
                                                 {
                                                     value: (
                                                         <>
@@ -432,19 +313,31 @@ const Home = () => {
                                                         </>
                                                     ),
                                                 },
+                                                {value: `${row[BILL_KEY.ID]} ${row[BILL_KEY.BRANCH_NUMBER]}` },
+                                                {value: formatNumberWithCommas(row[BILL_KEY.AMOUNT]), alignRight: true },
+                                                {value: row[BILL_KEY.MEMO]},
+                                                {value: row[BILL_KEY.REMARKS]},
+                                                //Todo: JP Check
+                                                {value: row[BILL_KEY.METHOD_OF_DEPOSIT]},
+                                                {value: row[BILL_KEY.INVOICE_DATE]},
+                                                {value: row[BILL_KEY.DEPOSIT_DATE]},
+                                                {value: row[BILL_KEY.REPRESENTATIVE]},
                                             ],
                                         })
                                     )}
                                     withCheckBox
-                                ></ListTable>
-                                <Pager
-                                    currentPage={currentPage}
-                                    pageCount={pageCount}
-                                    onPageChange={(e) => {
-                                        // Todo : Server Data <-
-                                        setCurrentPage(e)
-                                    }}
-                                />
+                                ></ListTable> : <></>}
+                                <PagerArea>
+                                    <Pager
+                                        mr={2}
+                                        currentPage={currentPage}
+                                        pageCount={pageCount}
+                                        onPageChange={(e) => {
+                                            // Todo : Server Data <-
+                                            setCurrentPage(e)
+                                        }}
+                                    />
+                                </PagerArea>
                              </IconContext.Provider>
                         </Content>
                     </ContentWrapper>

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@freee_jp/vibes": "^100.1.0",
+    "axios": "^1.7.2",
     "moment": "^2.30.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",

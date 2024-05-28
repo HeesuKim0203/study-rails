@@ -1,7 +1,7 @@
 import moment from 'moment'
 import * as XLSX from 'xlsx'
-import { ListFromType, MethodOfTaxType } from './type'
-import { METHOD_OF_TAX } from './constants'
+import { Bill, ListFromType, MethodOfDepositType, MethodOfTaxType } from './type'
+import { METHOD_OF_TAX, TAX_OPTION } from './constants'
 
 export const getFileNameDate = () => {
     const date = new Date()
@@ -60,3 +60,19 @@ export const getTax = (amount: number, tax: number, calTaxes: MethodOfTaxType): 
     
     return calcAmount * (tax / 100)
 }
+
+export const getTaxAmount = (values: ListFromType[], calculatingTaxes: MethodOfTaxType) => (
+    TAX_OPTION.reduce((prev, { name }) => {
+        const tax = extractNumber(name)
+        const amount = values.filter((value) => value.tax === name).reduce((prev, value) => {
+            return prev + value.count * value.price 
+        }, 0)
+        return prev + getTax(amount, tax, calculatingTaxes) 
+    }, 0)
+)
+
+export const getAmount = (values: ListFromType[]) => (
+    values.reduce((prev, value) => {
+        return prev + value.count * value.price
+    }, 0)
+)

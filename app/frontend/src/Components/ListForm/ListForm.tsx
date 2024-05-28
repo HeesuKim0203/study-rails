@@ -44,6 +44,8 @@ import { IconContext } from 'react-icons'
 import { ListFromType } from '../../utils/type'
 import { DEFAULT_DATA, TAX_OPTION } from '../../utils/constants'
 import { extractNumber, formatNumberWithCommas, getValueAmount } from '../../utils/util'
+import { deleteStatement } from '../../api'
+import { AxiosResponse } from 'axios'
 
 interface ListFormProps {
     values: ListFromType[]
@@ -161,6 +163,7 @@ const ListForm = ({
                                     <SelectBox
                                         width='small'
                                         label={`${i + 1}行目の税率`}
+                                        value={v.tax}
                                         options={TAX_OPTION}
                                         onChange={(e) => {
                                             setValues([
@@ -200,6 +203,15 @@ const ListForm = ({
                                         small={true}
                                         label={`${i + 1}行目の削除`}
                                         IconComponent={MdDelete}
+                                        onClick={async () => {
+                                            const response = v.id && await deleteStatement(v.id)
+                                            if((response as AxiosResponse)?.status === 200) {
+                                                setValues([
+                                                    ...values.slice(0, i),
+                                                    ...values.slice(i + 1, values.length)
+                                                ])
+                                            }
+                                        }}
                                     />
                                 ),
                             },

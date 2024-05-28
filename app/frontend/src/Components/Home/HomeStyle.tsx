@@ -1,13 +1,15 @@
 import styled from 'styled-components'
 import { FontArea, TextButton } from '../CommonStyle'
 
-
-// Todo : 10rem Code duplication
 const Container = styled.div`
+
+    .vb-listTable {
+        overflow-x: auto;
+    }
 `
 
 const Wrapper = styled.div`
-    
+    width: 100%;
 `
 
 const Header = styled.div`
@@ -35,34 +37,30 @@ const ContentWrapper = styled.div`
 const Content = styled.div`
     display: block;
 
-    min-width: calc(100% - 10rem);
+    flex: 1 1 0% ;
 
-    overflow-y: auto;
+    width: calc(100% - 180px);
 `
 
 const ContentSideMenu = styled.div<{
-    display: boolean
+    display: number
 }>`
     display: block;
     min-height: calc(-8.56rem + 100vh);
+    
+    overflow-x: hidden;
 
-    border-right: 1px solid rgb(233, 231, 231);
-    width: ${props => props.display ? 'calc(10rem-1px)' : '0rem'};
+    box-sizing: border-box;
+
+    border-right: ${props => props.display ? '1px solid rgb(233, 231, 231)' : 'none'};
+    width: ${props => props.display ? '180px' : '0rem'};
     transition: width 0.1s ease 0s;
     word-break: break-all;
-
-    h3 {
-        display: ${props => (props.display ? 'block' : 'none')};
-    }
-
-    span {
-        display: ${props => (props.display ? 'flex' : 'none')};
-    }
 `
 
 const ContentSideMenuHeader = styled.div`
     display: flex;
-    width: 10rem;
+    width: 180px;
 
     -webkit-box-align: center;
     align-items: center;
@@ -87,11 +85,12 @@ const ContentSideMenuTitleIcon = styled.div`
 `
 
 const ContentSideMenuItemWrapper = styled.ul`
-    width: 10rem;
+    width: 160px;
 `
 
 const ContentSideMenuItem = styled.li<{
     selected: boolean
+    display: number
 }>`
     display: flex;
     font-size: 0.8rem;
@@ -104,7 +103,7 @@ const ContentSideMenuItem = styled.li<{
     font-size: 0.8rem;
 
     ${props => (
-        props.selected ? `
+        props.selected && props.display ? `
             border-left: 5px solid rgb(40, 100, 240);
             color: rgb(40, 90, 200);
         ` : ` 
@@ -142,9 +141,14 @@ const ContentHeader = styled.div`
 
     -webkit-box-pack: justify;
     justify-content: space-between;
+
+    width: 100%;
 `
 
 const ContentHeaderSideMenuDisplayIcon = styled.div`
+    
+    display: flex;
+    align-items: center;
     margin-right: 1rem;
     button {
         border-left:none ;
@@ -155,13 +159,11 @@ const ContentHeaderSideMenuDisplayIcon = styled.div`
 const ContentHeaderFilterArea = styled.div`
     display: flex;
 
-    -webkit-box-align: center;
-    align-items: center;
+    align-items: flex-start;
 
 `
 
 const ContentHeaderFilterClear = styled(TextButton)`
-    margin-left: 0.8rem;
 
     width: 5rem;
     height: 2.5rem;
@@ -179,6 +181,22 @@ const ContentHeaderFilterRightArea = styled.div`
 const ContentButtonFontArea = styled(FontArea)`
     font-family: "Noto Sans JP", sans-serif;
     font-size: 1rem;
+`
+
+const FilterOptionsArea = styled.div`
+    display : flex;
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 1rem 0.5rem;
+
+    max-width: 80rem;
+`
+
+const PagerArea = styled.div`
+    display: flex;
+    justify-content: end;
 `
 
 export {
@@ -201,5 +219,7 @@ export {
     ContentHeaderFilterArea,
     ContentHeaderFilterClear,
     ContentHeaderFilterRightArea,
-    ContentButtonFontArea
+    ContentButtonFontArea,
+    FilterOptionsArea,
+    PagerArea
 }
