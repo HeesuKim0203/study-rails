@@ -19,19 +19,31 @@ export const SHOW_INVOICES_URL = `${INVOICES_URL}/:id`
 
 // List form
 
-export const DEFAULT_DATA = { summary: '', count: 0, unit: '', price: 0, tax: '10%', withholding: false }
+export const DEFAULT_DATA = { id : '', summary: '', count: 0, unit: '', price: 0, tax: '10%', withholding: false }
 export const TAX_OPTION = [
-    { name: '10%' },
-    { name: '8%(軽減税率)' },
-    { name: '8%' },
-    { name: '0%' },
+    {name: '10%'},
+    {name: '8%(軽減税率)'},
+    {name: '8%'},
+    {name: '0%'},
+]
+
+// Create
+
+export const METHOD_OF_TAX = {
+    FOREIGN: '外税',
+    INTERNAL: '内税'
+} as const
+
+export const TAX_RESULT_OPTION = [
+    {name: METHOD_OF_TAX.FOREIGN},
+    {name: METHOD_OF_TAX.INTERNAL},
 ]
 
 // Bill
 
 export const METHOD_OF_DEPOSIT = {
-    BANK_TRANSFER : '振込',
-    TRANSFER :'振替'
+    BANK_TRANSFER: '振込',
+    TRANSFER: '振替'
 } as const
 
 export const today = new Date()
@@ -46,10 +58,12 @@ export const BILL_KEY = {
     DEPOSIT_DATE: 'deposit_date',
     TITLE: 'title',
     REPRESENTATIVE: 'representative',
-    PARTICULARS: 'statements',
+    PARTICULARS: 'statements_attributes',
     REMARKS: 'remarks',
     MEMO: 'memo',
-    AMOUNT: 'amount'
+    AMOUNT: 'amount',
+    METHOD_OF_TAX: 'method_of_tax',
+    MY_COMPANY_ID: 'my_company_id'
 } as const
 
 export const DEFAULT_BILL = {
@@ -64,7 +78,9 @@ export const DEFAULT_BILL = {
     [BILL_KEY.REPRESENTATIVE]: '',
     [BILL_KEY.PARTICULARS]: [DEFAULT_DATA],
     [BILL_KEY.REMARKS]: '',
-    [BILL_KEY.MEMO]: ''
+    [BILL_KEY.MEMO]: '',
+    [BILL_KEY.METHOD_OF_TAX]: METHOD_OF_TAX.FOREIGN,
+    [BILL_KEY.MY_COMPANY_ID]: ''
 } as Bill
 
 // rows
@@ -188,7 +204,7 @@ export const FILTER_OPTIONS = LIST_TABLE_HEADER.map((header, index) => ({
 export const DEFAULT_ROWS_OPTIONS = 10
 export const ROWS_OPTIONS = [
     { value: String(DEFAULT_ROWS_OPTIONS) },
-    { value: '10' },
+    { value: '20' },
     { value: '50' },
     { value: '100' },
     { value: '200' },
@@ -201,15 +217,3 @@ export const ICON_SIZE = {
     NORMAL: '1.4rem',
     LARGE: '1.6rem'
 } as const
-
-// Create
-
-export const METHOD_OF_TAX = {
-    FOREIGN: '外税',
-    INTERNAL: '内税'
-} as const
-
-export const TAX_RESULT_OPTION = [
-    {name: METHOD_OF_TAX.FOREIGN},
-    {name: METHOD_OF_TAX.INTERNAL},
-]

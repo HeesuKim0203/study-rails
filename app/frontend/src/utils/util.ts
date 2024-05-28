@@ -1,6 +1,6 @@
 import moment from 'moment'
 import * as XLSX from 'xlsx'
-import { ListFromType, MethodOfDepositType, MethodOfTaxType } from './type'
+import { Bill, ListFromType, MethodOfDepositType, MethodOfTaxType } from './type'
 import { METHOD_OF_TAX, TAX_OPTION } from './constants'
 
 export const getFileNameDate = () => {

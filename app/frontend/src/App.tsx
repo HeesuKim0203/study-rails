@@ -10,14 +10,12 @@ type Props = {
   mycompany?: string
 }
 
-const App = ({ bills, mycompany }: Props) => {
+const App = ({ mycompany }: Props) => {
 
-  const billJson = bills && JSON.parse(bills)
   const mycompanyJson = mycompany && JSON.parse(mycompany)
 
   return (
-    <Router 
-      bills={billJson.length !== 0 ? billJson : testBill} 
+    <Router
       mycompany={mycompanyJson.length !== 0 ? mycompanyJson[0] : mycompanyJson} 
     />
   )

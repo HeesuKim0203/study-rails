@@ -21,7 +21,7 @@ const Main = styled.main`
     flex: 1 1 0%;
 `
 
-const Router = ({ bills, mycompany }: PropsForRailsData) => {
+const Router = ({ mycompany }: PropsForRailsData) => {
     return (
         <BrowserRouter>
             <Header mycompany={mycompany} />
@@ -30,10 +30,9 @@ const Router = ({ bills, mycompany }: PropsForRailsData) => {
                 <Main>
                     <Routes>
                         <Route path = { HOME_URL } element={<Navigate to={ INVOICES_URL } />} />
-                        <Route path = { INVOICES_URL } element = { <Home bills={bills} mycompany={mycompany} /> } />
-                        <Route path = { `${INVOICES_URL}${CREATE_URL}` } element = { <Create /> } />
-                        <Route path = { `${SHOW_INVOICES_URL}` } element = { <Create /> } />
-                        {/* <Route path = { CREATE_URL } element = { <Create /> } /> */}
+                        <Route path = { INVOICES_URL } element = { <Home /> } />
+                        <Route path = { `${INVOICES_URL}${CREATE_URL}` } element = { <Create mycompany={mycompany} /> } />
+                        <Route path = { `${SHOW_INVOICES_URL}` } element = { <Create mycompany={mycompany} /> } />
                         <Route path = "*" element={<Navigate to={ HOME_URL } />} />
                     </Routes>
                 </Main>

@@ -20,6 +20,7 @@ export type FilterOptions = {
 export type IconSize = PropertyValueUnion<typeof ICON_SIZE>
 
 export type ListFromType =  {
+    id: string
     summary: string
     count: number
     unit: string
@@ -37,12 +38,10 @@ export type MyCompany = {
 }
 
 export type PropsForRailsData = {
-    bills: Bill[]
     mycompany: MyCompany
 }
 
 export type MethodOfTaxType = PropertyValueUnion<typeof METHOD_OF_TAX>
-
 export type MethodOfDepositType = PropertyValueUnion<typeof METHOD_OF_DEPOSIT>
 
 export type Bill = {
@@ -59,7 +58,9 @@ export type Bill = {
     [BILL_KEY.REMARKS]: string
     [BILL_KEY.MEMO]: string
     [BILL_KEY.AMOUNT]: number
-    // Todo: Add amount
+    [BILL_KEY.METHOD_OF_TAX]: MethodOfTaxType
+    [BILL_KEY.MY_COMPANY_ID]: string
+    [BILL_KEY.UPDATE_AT]: Date | undefined
 }
 
 export type BillValueUnionType = PropertyValueUnion<Bill>

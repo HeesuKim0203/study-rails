@@ -50,31 +50,66 @@ import { FaPen } from 'react-icons/fa'
 import Icon from '../Icon'
 import { FontMedium, SubTitle } from '../CommonStyle'
 import ListForm from '../ListForm'
-import { Bill, BillValueUnionType, ListFromType, MethodOfTaxType } from '../../utils/type'
+import { Bill, BillValueUnionType, ListFromType, MethodOfTaxType, MyCompany } from '../../utils/type'
 import { extractNumber, formatNumberWithCommas, getAmount, getTax, getTaxAmount, getValueAmount } from '../../utils/util'
 import TaxCalcTd from './TaxCalcTd'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useApiHook } from '../../utils/hooks'
+import { api } from '../../api'
 
-const Create = () => {
+type Props = {
+    mycompany: MyCompany
+}
 
+const Create = ({
+    mycompany
+}: Props) => {
+
+    const navigator = useNavigate()
     const { pathname } = useLocation()
     const id = pathname.split('/')[2]
 
-    // Todo: Backend Data <-
-
-    const [bill, setBill] = useState<Bill>(DEFAULT_BILL)
+    const [bill, setBill] = useState<Bill>({...DEFAULT_BILL, [BILL_KEY.REPRESENTATIVE] : mycompany.responsible_person})
     const [values, setValues] = useState<ListFromType[]>([DEFAULT_DATA])
 
     const [message, setMessage] = useState('')
     const [sending, setSending] = useState(false)
     const [error, setError] = useState(false)
 
-    const [title, setTitle] = useState('')
-    const [userName, setUserName] = useState('')
     const [taxResult, setTaxResult] = useState(0)
     const [amount, setAmount] = useState(0)
 
-    const [calculatingTaxes, setCalculatingTaxes] = useState<MethodOfTaxType>(METHOD_OF_TAX.FOREIGN)
+    const { error: messageError, getData: postData } = useApiHook<any>(api, {
+        method: CREATE_URL.includes(id) ? 'POST' : 'PATCH',
+        url: CREATE_URL.includes(id) ? '/bills' : `/bills/${id}`,
+        data : {
+            bill : {
+                ...bill,
+                amount: bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN ? amount + taxResult : amount,
+                my_company_id: mycompany.id,
+                statements: []
+            }
+        }
+    })
+
+    const { data, getData } = useApiHook<any>(api, {
+        method: 'GET',
+        url: `/bills/${id}`,
+    })
+
+    useEffect(() => {
+        async function getUdpateData() {
+            await getData()
+        }
+        getUdpateData()
+    }, [])
+
+    useEffect(() => {
+        if(data && !CREATE_URL.includes(id)) {
+            setBill(data)
+            setValues(data.statements)
+        }
+    }, [data])
 
     const onChange = (
         value: BillValueUnionType,
@@ -91,9 +126,22 @@ const Create = () => {
     }, [values])
 
     useEffect(() => {
-        setTaxResult(getTaxAmount(values, calculatingTaxes))
+        setTaxResult(getTaxAmount(values, bill[BILL_KEY.METHOD_OF_TAX]))
         setAmount(getAmount(values))
-    }, [values, calculatingTaxes])
+    }, [values, bill[BILL_KEY.METHOD_OF_TAX]])
+
+    useEffect(() => {
+
+        async function createBill() {
+            console.log(bill)
+            // await postData()
+        }
+
+        if(!error) {
+            console.log('check')
+            createBill()
+        }
+    }, [error])
 
     return (
       <>
@@ -321,15 +369,16 @@ const Create = () => {
                                             mb={1}
                                             small={true}
                                             width='xSmall'
+                                            value={bill[BILL_KEY.METHOD_OF_TAX]}
                                             options={TAX_RESULT_OPTION}
-                                            onChange={(e) => setCalculatingTaxes((e.target.value as MethodOfTaxType))}
+                                            onChange={(e) => onChange(e.target.value as MethodOfTaxType, BILL_KEY.METHOD_OF_TAX)}
                                         />
                                         <ColumnBase>
                                             <TableCalcResult>
                                                 <Tr>
                                                     <TdCalcName>小計</TdCalcName>
                                                     <TdCalcResult>
-                                                        { calculatingTaxes === METHOD_OF_TAX.FOREIGN 
+                                                        { bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN 
                                                             ? formatNumberWithCommas(amount) 
                                                             : formatNumberWithCommas(amount - taxResult)
                                                         }
@@ -346,7 +395,7 @@ const Create = () => {
                                                                 return prev + value.count * value.price
                                                             }, 0)
 
-                                                            const taxResult = getTax(amount, tax, calculatingTaxes)
+                                                            const taxResult = getTax(amount, tax, bill[BILL_KEY.METHOD_OF_TAX])
 
                                                             return (
                                                                 <>
@@ -355,7 +404,7 @@ const Create = () => {
                                                                             name={name}
                                                                             tax={taxResult}
                                                                             targetAmount={
-                                                                                calculatingTaxes === METHOD_OF_TAX.FOREIGN  
+                                                                                bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN  
                                                                                 ? amount 
                                                                                 : amount - taxResult
                                                                             }
@@ -371,7 +420,7 @@ const Create = () => {
                                                     </TdCalcName>
                                                     <TdCalcResult>
                                                         <FontMedium>
-                                                            { calculatingTaxes === METHOD_OF_TAX.FOREIGN  
+                                                            { bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN  
                                                                 ? formatNumberWithCommas(amount + taxResult) 
                                                                 : formatNumberWithCommas(amount)
                                                             }
@@ -426,13 +475,17 @@ const Create = () => {
                                 disabled={sending}
                                 onClick={() => {
                                     if(bill[BILL_KEY.BUSINESS_PARTNER] && bill[BILL_KEY.INVOICE_DATE]) {
-                                        setError(false)
                                         setMessage('保存しました')
-                                    }else {                               
-                                        setError(true)
+                                        setError(false)
+                                        postData()
+                                        setTimeout(() => {
+                                            navigator(HOME_URL, {replace:true})
+                                        }, 600)
+                                    }else {               
                                         setMessage(
                                             '入力内容にエラーがあります。修正のうえ、再度お試しください'
                                         )
+                                        setError(true)
                                     }
                                 }}
                             >
@@ -440,11 +493,9 @@ const Create = () => {
                             </Button>
                             <Button disabled={sending}>キャンセル</Button>
                         </FormActions>
-                        <Loading coverAll isLoading={sending} />
                     </SubmitFiexd>
                     <Footer />
                 </Wrapper>
-                <Loading coverAll isLoading={sending} />
                 {message && <FloatingMessageBlock error={error} success={!error} message={message} />}
             </Container>
       </>

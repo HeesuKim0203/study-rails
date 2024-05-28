@@ -9,7 +9,6 @@ import {
     ListTable,
     DropdownButton,
     Pager,
-    Digits,
     TableHeader,
     IconOnlyButton,
     WithSideContent,
@@ -57,69 +56,8 @@ import { IconContext } from 'react-icons'
 import FilterDropDown from '../FilterDropDown'
 import { Link } from 'react-router-dom'
 import { formatNumberWithCommas } from '../../utils/util'
-
-// Todo : Data -> BackEnd
-const useData = (data: Bill[]) => {
-
-    const [sortKey, setSortKey] = useState<keyof Bill>(BILL_KEY.ID)
-    const [sortOrder, setSortOrder] = useState<Order>(ORDER.DESC)
-    const [statuses, setStatuses] = useState<boolean[]>(
-        Array(data.length).fill(false)
-    )
-
-    const nextOrder: { [key in Order]: Order } = {
-        asc: ORDER.DESC,
-        desc: ORDER.INIT,
-        init: ORDER.ASC,
-    }
-
-    const sort = (newKey: keyof Bill) => {
-        if (sortKey === newKey) {
-            setSortOrder((prev) => nextOrder[prev])
-        } else {
-            setSortKey(newKey)
-            setSortOrder(ORDER.ASC)
-        }
-        // ソートしたときはチェックボックスの状態をリセット
-        setStatuses(Array(data.length).fill(false))
-    }
-
-    const changeAllStatus = (newStatus: boolean) => {
-        setStatuses(Array(data.length).fill(newStatus))
-    }
-
-    const changeRowStatus = (newStatus: boolean, rowIndex: number) => {
-        const newStatuses = statuses.slice()
-        newStatuses[rowIndex] = newStatus
-        setStatuses(newStatuses)
-    }
-
-    const sortedData =
-        sortOrder === ORDER.INIT
-        ? data
-        : data
-            .slice()
-            .sort(
-                (a, b) =>
-                (typeof a[sortKey] === 'number' && typeof b[sortKey] === 'number'
-                    ? Number(a[sortKey]) - Number(b[sortKey])
-                    : String(a[sortKey]).localeCompare(String(b[sortKey]))) *
-                (sortOrder === ORDER.DESC ? -1 : 1)
-            )
-
-    const noResults: ListElm[] = []
-
-    return {
-        sortKey,
-        sortOrder,
-        statuses,
-        sort,
-        sortedData,
-        noResults,
-        changeRowStatus,
-        changeAllStatus,
-    }
-}
+import { api, getBillsCount } from '../../api'
+import { useApiHook, useData } from '../../utils/hooks'
 
 // Todo : Data -> BackEnd
 const filterData = () => {
@@ -134,7 +72,60 @@ const filterData = () => {
     return data
 }
 
-const Home = ({ bills, mycompany }: PropsForRailsData) => {
+const Home = () => {
+
+    const filter = filterData()
+    const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE)
+    const [rowOption, setRowOption] = useState(DEFAULT_ROWS_OPTIONS)
+    const [filterOptions, setFilterOptions] = useState<FilterOptions[]>([])
+
+    const [pageCount, setPageCount] = useState<number>(0)
+    const [bills, setBills] = useState<Bill[]>([])
+
+    const [filterSelected, setFilterSelected] = useState(0)
+    const [sideMenuDisplay, setSideMenuDisplay] = useState<boolean>(true)
+
+    const { data, error, load, getData } = useApiHook<Bill[]>(api, {
+        method: 'GET',
+        url: '/bills',
+        params: {
+            page: currentPage,
+            per_page: rowOption,
+        },
+    })
+
+    const { data: count, getData: getCount } = useApiHook<{
+        total_count: number
+    }>(api, {
+        method: 'GET',
+        url: '/bills/count',
+    })
+
+    async function init() {
+        await getCount()
+        await getData()
+    }
+    
+    useEffect(() => {
+        init()
+    }, [rowOption, currentPage])
+
+    useEffect(() => {
+        setCurrentPage(DEFAULT_PAGE)
+    }, [rowOption])
+
+    useEffect(() => {
+        if(data) {
+            setBills([...data])
+        }
+    }, [data])
+
+    useEffect(() => {
+        if(count) {
+            setPageCount(Math.ceil(count.total_count / rowOption))
+        }
+    }, [count])
+    
     const {
       sort,
       sortKey,
@@ -144,25 +135,6 @@ const Home = ({ bills, mycompany }: PropsForRailsData) => {
       changeAllStatus,
       changeRowStatus,
     } = useData(bills)
-
-    const filter = filterData()
-    const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE)
-    const [rowOption, setRowOption] = useState(DEFAULT_ROWS_OPTIONS)
-    const [filterOptions, setFilterOptions] = useState<FilterOptions[]>([])
-
-    // Todo : Server Data Record count
-    const [pageCount, setPageCount] = useState(Math.ceil(bills.length / DEFAULT_ROWS_OPTIONS))
-
-    useEffect(() => {
-        setPageCount(Math.ceil(bills.length / DEFAULT_ROWS_OPTIONS))
-    }, [rowOption])
-
-    useEffect(() => {
-        console.log(filterOptions)
-    }, [filterOptions])
-
-    const [filterSelected, setFilterSelected] = useState(0)
-    const [sideMenuDisplay, setSideMenuDisplay] = useState<boolean>(true)
 
     return (
         <Container>
@@ -297,7 +269,7 @@ const Home = ({ bills, mycompany }: PropsForRailsData) => {
                                         />
                                     }
                                 />
-                                <ListTable
+                                {load ? <ListTable
                                     fixedHeader={true}
                                     headers={
                                         LIST_TABLE_HEADER.map(({ 
@@ -354,7 +326,7 @@ const Home = ({ bills, mycompany }: PropsForRailsData) => {
                                         })
                                     )}
                                     withCheckBox
-                                ></ListTable>
+                                ></ListTable> : <></>}
                                 <PagerArea>
                                     <Pager
                                         mr={2}

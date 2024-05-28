@@ -52,7 +52,7 @@ const ContentSideMenu = styled.div<{
 
     box-sizing: border-box;
 
-    border-right: 1px solid rgb(233, 231, 231);
+    border-right: ${props => props.display ? '1px solid rgb(233, 231, 231)' : 'none'};
     width: ${props => props.display ? '180px' : '0rem'};
     transition: width 0.1s ease 0s;
     word-break: break-all;
