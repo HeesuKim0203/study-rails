@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { GoTriangleDown } from 'react-icons/go'
-import { IoIosSettings } from 'react-icons/io'
 import { AiOutlineMenuFold } from 'react-icons/ai'
 import { AiOutlineMenuUnfold } from 'react-icons/ai'
 import {
@@ -19,7 +18,7 @@ import {
     Note,
     FormActions,
     FloatingMessageBlock,
-  } from '@freee_jp/vibes'
+} from '@freee_jp/vibes'
 import { 
     BILL_KEY, 
     CREATE_URL, 
@@ -195,6 +194,7 @@ const Home = () => {
                                         {SIDE_MENU_TITLE}
                                     </ContentSideMenuTitle>
                                     <ContentSideMenuTitleIcon>
+                                        {/* Todo: Implement Filter Page */}
                                         {/* <IconOnlyButton 
                                             small={true}
                                             label='フィルタ設定'
@@ -203,7 +203,7 @@ const Home = () => {
                                     </ContentSideMenuTitleIcon>
                                 </ContentSideMenuHeader>
                                 <ContentSideMenuItemWrapper>
-                                        { filter.map(({text, filterOption, recordNum}, index) => {
+                                        { filter.map(({text, filterOption, recordNum}: FilterDataType, index) => {
                                             return (
                                                 <ContentSideMenuItem
                                                     key={index}

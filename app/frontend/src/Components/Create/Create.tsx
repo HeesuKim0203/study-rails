@@ -51,7 +51,7 @@ import Icon from '../Icon'
 import { FontMedium, SubTitle } from '../CommonStyle'
 import ListForm from '../ListForm'
 import { Bill, BillValueUnionType, ListFromType, MethodOfTaxType, MyCompany } from '../../utils/type'
-import { extractNumber, formatNumberWithCommas, getAmount, getTax, getTaxAmount, getValueAmount } from '../../utils/util'
+import { extractNumber, formatNumberWithCommas, getAmount, getTax, getTaxAmount, getValueAmount, isMethodOfDepositBankTransfer, isMethodOfTaxForeign } from '../../utils/util'
 import TaxCalcTd from './TaxCalcTd'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { createBill, getBill, updateBill } from '../../api'
@@ -162,12 +162,12 @@ const Create = ({
                                             ]}
                                             onChange={(e) => (onChange(e.target.value, BILL_KEY.TAIL_STR))}
                                         />
-                                        {error && (
-                                            <Message ml={1} error>
-                                                取引先を入力してください。
-                                            </Message>
-                                        )}
                                     </FormControl>
+                                    {error && (
+                                        <Message ml={1} error>
+                                            取引先を入力してください。
+                                        </Message>
+                                    )}
                                 </SectionArea>
                                 <SectionArea>
                                     <SectionTitle>請求情報</SectionTitle>
@@ -225,7 +225,7 @@ const Create = ({
                                             <RadioButton
                                                 mr={1}
                                                 value={METHOD_OF_DEPOSIT.BANK_TRANSFER}
-                                                checked={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER}
+                                                checked={isMethodOfDepositBankTransfer(bill[BILL_KEY.METHOD_OF_DEPOSIT])}
                                                 onChange={(e) => { 
                                                     onChange(e.target.value, BILL_KEY.METHOD_OF_DEPOSIT)
                                                 }}
@@ -247,11 +247,11 @@ const Create = ({
                                         <FormControl
                                             mb={1}
                                             mr={1}
-                                            label={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER ? '入金期日' : '振替日'}
-                                            fieldId={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER ? 'submit_invoice_date_of_deposit' : 'submit_invoice_transfer_of_deposit'}
+                                            label={isMethodOfDepositBankTransfer(bill[BILL_KEY.METHOD_OF_DEPOSIT]) ? '入金期日' : '振替日'}
+                                            fieldId={isMethodOfDepositBankTransfer(bill[BILL_KEY.METHOD_OF_DEPOSIT]) ? 'submit_invoice_date_of_deposit' : 'submit_invoice_transfer_of_deposit'}
                                         >
                                             <DateInput
-                                                name={ bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.BANK_TRANSFER ? '入金期日' : '振替日'}
+                                                name={isMethodOfDepositBankTransfer(bill[BILL_KEY.METHOD_OF_DEPOSIT]) ? '入金期日' : '振替日'}
                                                 id='submit_invoice_date_of_deposit'
                                                 value={bill[BILL_KEY.DEPOSIT_DATE]}
                                                 onChange={(e) => (onChange(new Date(e), BILL_KEY.DEPOSIT_DATE))}
@@ -351,7 +351,7 @@ const Create = ({
                                                 <Tr>
                                                     <TdCalcName>小計</TdCalcName>
                                                     <TdCalcResult>
-                                                        { bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN 
+                                                        { isMethodOfTaxForeign(bill[BILL_KEY.METHOD_OF_TAX])
                                                             ? formatNumberWithCommas(amount) 
                                                             : formatNumberWithCommas(amount - taxResult)
                                                         }
@@ -393,7 +393,7 @@ const Create = ({
                                                     </TdCalcName>
                                                     <TdCalcResult>
                                                         <FontMedium>
-                                                            { bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN  
+                                                            { isMethodOfTaxForeign(bill[BILL_KEY.METHOD_OF_TAX])  
                                                                 ? formatNumberWithCommas(amount + taxResult) 
                                                                 : formatNumberWithCommas(amount)
                                                             }

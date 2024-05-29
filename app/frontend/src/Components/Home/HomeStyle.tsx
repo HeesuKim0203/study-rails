@@ -18,7 +18,7 @@ const Header = styled.div`
     -webkit-box-align: center;
     align-items: center;
 
-    border-bottom: 1px solid rgb(233, 231, 231);
+    border-bottom: var(--primary-border);
 
     padding: 1.5rem;
 `
@@ -39,7 +39,7 @@ const Content = styled.div`
 
     flex: 1 1 0% ;
 
-    width: calc(100% - 180px);
+    width: calc(100% - var(--home-sideBar-width));
 `
 
 const ContentSideMenu = styled.div<{
@@ -52,15 +52,15 @@ const ContentSideMenu = styled.div<{
 
     box-sizing: border-box;
 
-    border-right: ${props => props.display ? '1px solid rgb(233, 231, 231)' : 'none'};
-    width: ${props => props.display ? '180px' : '0rem'};
+    border-right: ${props => props.display ? 'var(--primary-border)' : 'none'};
+    width: ${props => props.display ? 'var(--home-sideBar-width)' : '0rem'};
     transition: width 0.1s ease 0s;
     word-break: break-all;
 `
 
 const ContentSideMenuHeader = styled.div`
     display: flex;
-    width: 180px;
+    width: var(--home-sideBar-width);
 
     -webkit-box-align: center;
     align-items: center;
@@ -85,7 +85,7 @@ const ContentSideMenuTitleIcon = styled.div`
 `
 
 const ContentSideMenuItemWrapper = styled.ul`
-    width: 180px;
+    width: var(--home-sideBar-width);
 `
 
 const ContentSideMenuItem = styled.li<{
@@ -100,12 +100,12 @@ const ContentSideMenuItem = styled.li<{
     padding: 0.3rem 0.8rem;
     margin: 0.4rem 0;
     
-    font-size: 0.8rem;
+    font-size: 0.9rem;
 
     ${props => (
         props.selected && props.display ? `
-            border-left: 5px solid rgb(40, 100, 240);
-            color: rgb(40, 90, 200);
+            border-left: 5px solid var(--primary-button-hover-color);
+            color: var(--home-sideBar-hover-color);
         ` : ` 
             border-left: 5px solid rgba(0, 0, 0, 0);
         `)}
@@ -115,7 +115,7 @@ const ContentSideMenuItem = styled.li<{
 
     &:hover {
         background: rgb(235, 243, 255);
-        fill: rgb(40, 100, 240);
+        fill: var(--primary-button-hover-color);
         transition-duration: 0.2s;
     }
 `
@@ -169,8 +169,8 @@ const ContentHeaderFilterClear = styled(TextButton)`
     height: 2.5rem;
 
     &:hover {
-        color: #1e46aa;
-        background-color: #dce8ff;
+        color: var(--button-hover-color);
+        background-color: var(--primary-button-hover-bg);
     }
 
 `

@@ -13,7 +13,7 @@ const Header = styled.div`
     display: block;
     width: 100%;
 
-    border-bottom: 1px solid rgb(233, 231, 231);
+    border-bottom: 1px solid var(--primary-border);
 
     padding: 1.5rem;
 `
@@ -35,8 +35,8 @@ const BackHomeButton = styled(TextButton)`
     height: 2.5rem;
 
     &:hover {
-        color: #1e46aa;
-        background-color: #dce8ff;
+        color: var(--primary-button-hover-color);
+        background-color: var(--primary-button-hover-bg);
     }
 `
 
@@ -75,10 +75,15 @@ const SectionTitle = styled.h4`
 `
 
 const SectionArea = styled.div`
+    display: flex;
     outline: none;
     padding: 1rem 0;
     margin: 0 0 0 1.5rem;
-    border-bottom: 1px solid rgb(233, 231, 231);
+    border-bottom: var(--primary-border);
+
+    flex-direction: column;
+
+    justify-content: start;
 `
 
 const SectionUserInformationUpdate = styled(TextButton)`
@@ -89,8 +94,8 @@ const SectionUserInformationUpdate = styled(TextButton)`
     margin-left: 1rem;
 
     &:hover {
-        color: #1e46aa;
-        background-color: #dce8ff;
+        color: var(--primary-button-hover-color);
+        background-color: var(--primary-button-hover-bg);
     }
 
 `
@@ -177,8 +182,8 @@ const Footer = styled.div`
 `
 
 const SubmitFiexd = styled.div`
-    border-top: 1px solid rgb(233, 231, 231);
-    background: rgb(255, 255, 255);
+    border-top: var(--primary-border);
+    background: var(--white);
     z-index: 999;
     position: fixed;
     padding: 1rem 1.5rem;

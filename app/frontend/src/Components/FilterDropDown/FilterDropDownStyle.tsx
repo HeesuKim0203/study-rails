@@ -18,7 +18,7 @@ const DropdownToggle = styled.button`
     padding: 0.2rem 1rem ;
     height: 2.2rem ;
     background-color: #ffffff;
-    border: 1px solid rgb(233, 231, 231);
+    border: var(--primary-border);
     border-radius: 0.5rem ;
 
     font-weight: 600;
@@ -26,9 +26,9 @@ const DropdownToggle = styled.button`
     font-family: "Noto Sans JP", sans-serif ;
 
     &:hover {
-        color: #1e46aa;
-        background-color: #dce8ff;
-        border-color: #1e46aa;
+        color: var(--button-hover-color);
+        background-color: var(--primary-button-hover-bg);
+        border-color: var(--button-hover-color);
     }
 `
 
@@ -41,8 +41,7 @@ const DropdownMenu = styled.div<{
     options: number
 }>`
     position: absolute;
-    background-color: white;
-    border: 1px solid rgb(233, 231, 231);
+    border: var(--primary-border);
     width: 15rem;
     z-index: 2000;
     display: flex;
@@ -52,7 +51,7 @@ const DropdownMenu = styled.div<{
     
     padding: 1.2rem 0.8rem;
     
-    background-color: white;
+    background-color: var(--white);
     border-radius: 1rem;
 
     min-height: ${props => props.options ? '30rem' : '4rem'};
@@ -64,7 +63,7 @@ const DropdownInput = styled.input<{
     options: number
 }>`
     padding: 0.6rem 0.6rem 0.6rem ${props => props.options ? '2.4rem' : '0.6rem'};
-    border: 1px solid rgb(233, 231, 231);
+    border: var(--primary-border);
     width: 100%;
     box-sizing: border-box;
     border-radius: 0.5rem;
@@ -80,7 +79,7 @@ const DropdownItem = styled.div`
     font-size: 0.9rem;
 
     &:hover {
-        background-color: #f1f1f1;
+        background-color: var(--primary-menu-item-bg);
     }
 `
 
@@ -106,8 +105,8 @@ const FilterOptionControllerButton = styled(TextButton)`
     padding: 0.7rem 0.5rem;
 
     &:hover {
-        color: #1e46aa;
-        background-color: #dce8ff;
+        color: var(--primary-button-hover-color);
+        background-color: var(--primary-button-hover-bg);
     }
 `
 

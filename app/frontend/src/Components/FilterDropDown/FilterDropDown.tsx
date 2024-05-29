@@ -16,6 +16,7 @@ import {
     FilterOptionArea,
     FilterOptionControllerButton
 } from './FilterDropDownStyle'
+import { ICON_SIZE } from '../../utils/constants'
 
 interface DropdownProps {
     option?: FilterOptions
@@ -42,7 +43,7 @@ const Dropdown = ({
 
     return (
         <DropdownContainer>
-            <IconContext.Provider value={{ size: '1.4rem' }} >
+            <IconContext.Provider value={{ size: ICON_SIZE.NORMAL }} >
                 <DropdownToggle
                     onClick={() => setIsOpen(!isOpen)}
                 >
@@ -51,7 +52,7 @@ const Dropdown = ({
                         { option ? `${option.text} : ${option.value}` : 'フィルタ追加'}
                     </DropdownToggleText>
                     {options ? <></> : 
-                        <IconContext.Provider value={{ size: '1rem' }} >
+                        <IconContext.Provider value={{ size: ICON_SIZE.SMALL }} >
                             <GoTriangleDown/>
                         </IconContext.Provider>
                     }
