@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:5.7
+    container_name: mysql
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: your_root_password
+      MYSQL_DATABASE: your_database_name
+      MYSQL_USER: your_database_user
+      MYSQL_PASSWORD: your_database_password
+    ports:
+      - "3306:3306"
+
+  opensearch:
+    image: opensearchproject/opensearch:latest
+    container_name: opensearch
+    environment:
+      discovery.type: single-node
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+      OPENSEARCH_SECURITY_SSL_HTTP_ENABLED: "false"
+      OPENSEARCH_PLUGINS_SECURITY_DISABLED: "true"
+      OPENSEARCH_USERNAME: admin
+      OPENSEARCH_PASSWORD: admin
+      # Install kuromoji plugin on startup
+      OPENSEARCH_PLUGINS_INSTALL: "analysis-kuromoji"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    container_name: opensearch-dashboards
+    ports:
+      - "5601:5601"
+    environment:
+      OPENSEARCH_HOSTS: "http://opensearch:9200"
+      OPENSEARCH_SECURITY_SSL_HTTP_ENABLED: "false"
+      OPENSEARCH_USERNAME: admin
+      OPENSEARCH_PASSWORD: admin
+
+  web:
+    build: .
+    container_name: rails
+    command: ./bin/rails server -b 0.0.0.0 -p 3000
+    volumes:
+      - .:/rails
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: mysql2://your_database_user:your_database_password@db/your_database_name
+      ELASTICSEARCH_URL: http://opensearch:9200
+    depends_on:
+      - db
+      - opensearch
+
+volumes:
+  db_data:
+  opensearch-data:

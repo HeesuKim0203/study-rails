@@ -13,7 +13,7 @@ export const api = axios.create({
     }
 })
 
-export const getBillsCount = () => api.get('/bills/count')
+export const getBillsCount = (query: AxiosRequestConfig) => api.get('/bills/count', query)
 export const getBillsPagenation = (query: AxiosRequestConfig) => api.get('/bills', query)
 export const getBill = (id: string) => api.get(`/bills/${id}`)
 

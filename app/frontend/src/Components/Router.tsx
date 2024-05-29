@@ -13,7 +13,6 @@ const Wrapper = styled.div`
     box-sizing: border-box;
     display: flex;
     flex: 1 1 0%;
-    overflow: auto;
     position: relative;
 `
 

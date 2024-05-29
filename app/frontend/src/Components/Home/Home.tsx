@@ -18,6 +18,8 @@ import {
     Note,
     FormActions,
     FloatingMessageBlock,
+    NoDataCreated,
+    NoSearchResults,
 } from '@freee_jp/vibes'
 import { 
     BILL_KEY, 
@@ -34,7 +36,7 @@ import {
     SIDE_MENU_TITLE, 
     SUCCESS,
     FILTER_DATA} from '../../utils/constants'
-import { Bill, FilterDataType, FilterOptions } from '../../utils/type'
+import { Bill, FilterDataType, FilterOptions, GetBillParams } from '../../utils/type'
 import {
     Container,
     Wrapper,
@@ -90,15 +92,27 @@ const Home = () => {
     const [filterName, setFilterName] = useState('')
     const [filterUpdate, setFilterUpdate] = useState(false)
 
-    async function getData() {
+    const getData = async() => {
+
+        let paramsOptions: GetBillParams = filterOptions.reduce((prev: any, {text, key, value}: FilterOptions, index) => {
+            if(value) {
+                prev[key] = value
+            }
+            return prev
+        }, {})
+
+        paramsOptions.page = currentPage
+        paramsOptions.per_page = rowOption
+
         try {    
-            const responseCount = await getBillsCount()
+            const responseCount = await getBillsCount(
+                {
+                    params: paramsOptions
+                }
+            )
             const responseBills = await getBillsPagenation(
                 {
-                    params: {
-                        page: currentPage,
-                        per_page: rowOption,
-                    },
+                    params: paramsOptions
                 }
             )
             
@@ -106,7 +120,7 @@ const Home = () => {
                 throw Error
             }
 
-            setPageCount(Math.ceil(responseCount.data.total_count / rowOption))
+            setPageCount(Math.ceil((responseCount.data.total_count || 1) / rowOption))
             setBills(responseBills.data)
 
         } catch (error) {
@@ -120,19 +134,61 @@ const Home = () => {
             setLoading(false)
 
         }
-        
+    }
+
+    const getFilterRecordNum = async (filterOptions: FilterOptions[]) => {
+        let paramsOptions: GetBillParams = filterOptions.reduce((prev: any, {text, key, value}: FilterOptions, index) => {
+            if(value) {
+                prev[key] = value
+            }
+            return prev
+        }, {})
+
+        try {    
+            const responseCount = await getBillsCount(
+                {
+                    params: paramsOptions
+                }
+            )
+
+            return responseCount.data.total_count
+        }catch {
+            return 0
+        }
+    }
+
+    async function updateFilters(oneFilter?: FilterDataType): Promise<FilterDataType> {
+
+        let updatedFilters: FilterDataType[] | FilterDataType  = []
+
+        if(oneFilter) {
+            const recordNum = await getFilterRecordNum(oneFilter.filterOption)
+            updatedFilters = { ...oneFilter, recordNum }
+            return updatedFilters
+        }else {
+            updatedFilters = await Promise.all(
+                filter.filter((_, index) => index !== 0).map(async (filter, index) => {
+                    const recordNum = await getFilterRecordNum(filter.filterOption)
+                    return { ...filter, recordNum }
+                })
+            )
+            setFilter([ filter[0], ...updatedFilters ])
+        }
+
+        return {text: '', filterOption: [], recordNum : 0}
     }
 
     useEffect(() => {
-        const filterJsonData = localStorage.getItem('study-rails')
+        const filterJsonData = localStorage.getItem('study-rail@test1')
         if(filterJsonData) { 
             setFilter(JSON.parse(filterJsonData))
         } 
+        updateFilters()
     }, [])
     
     useEffect(() => {
         getData()
-    }, [rowOption, currentPage])
+    }, [rowOption, currentPage, filterOptions])
 
     useEffect(() => {
         setCurrentPage(DEFAULT_PAGE)
@@ -143,9 +199,14 @@ const Home = () => {
     }, [filterSelected])
 
     useEffect(() => {
-        //Todo : Search Data
-        localStorage.setItem('study-rails', JSON.stringify(filter))
+        localStorage.setItem('study-rail@test1', JSON.stringify(filter))
     }, [filter])
+
+    useEffect(() => {
+        if(bills.length === 0) {
+            getData()
+        }
+    }, [bills])
     
     const {
       sort,
@@ -236,11 +297,14 @@ const Home = () => {
                                                     return (
                                                         <FilterDropDown
                                                             option={filterOption}
-                                                            onOptionClick={(e) => setFilterOptions([
-                                                                ...filterOptions.slice(0, index),
-                                                                {...filterOption, value:e},
-                                                                ...filterOptions.slice(index + 1, filterOptions.length),
-                                                            ])}
+                                                            onOptionClick={(e) => {
+                                                                console.log(e)
+                                                                setFilterOptions([
+                                                                    ...filterOptions.slice(0, index),
+                                                                    e,
+                                                                    ...filterOptions.slice(index + 1, filterOptions.length),
+                                                                ])}
+                                                            }
                                                             onDelete={() => setFilterOptions([
                                                                 ...filterOptions.slice(0, index),
                                                                 ...filterOptions.slice(index + 1, filterOptions.length),
@@ -255,7 +319,7 @@ const Home = () => {
                                                             filterOptions.findIndex((seletedFilterOptions) => 
                                                                 seletedFilterOptions.text === filterOption.text) === -1)
                                                     }
-                                                onOptionClick={(e) => setFilterOptions(filterOptions.concat({text:e, value:''}))}
+                                                onOptionClick={(e) => setFilterOptions(filterOptions.concat(e))}
                                             />
                                             <ContentHeaderFilterClear onClick={() => setFilterOptions([])} >クリア</ContentHeaderFilterClear>
                                         </FilterOptionsArea>
@@ -274,15 +338,17 @@ const Home = () => {
                                                     {
                                                         type: 'selectable',
                                                         text: '新規作成',
-                                                        onClick: () => setModalDisplay(!modalDisplay)
+                                                        onClick: () => {
+                                                            setModalDisplay(!modalDisplay)
+                                                            setFilterUpdate(true)
+                                                        }
                                                     },
                                                     {
                                                         type: 'selectable',
                                                         text: '選択したもの修正',
                                                         onClick: () => {
-                                                            setFilterName(filter[filterSelected].text)
-                                                            setFilterUpdate(true)
                                                             setModalDisplay(!modalDisplay)
+                                                            setFilterName(filter[filterSelected].text)
                                                         }
                                                     },
                                                     {
@@ -326,7 +392,7 @@ const Home = () => {
                                         />
                                     }
                                 />
-                                {!loading ? <ListTable
+                                {bills.length ? <ListTable
                                     fixedHeader={true}
                                     headers={
                                         LIST_TABLE_HEADER.map(({ 
@@ -360,25 +426,20 @@ const Home = () => {
                                                 {value: row[BILL_KEY.BUSINESS_PARTNER] },
                                                 {
                                                     value: (
-                                                        <>
-                                                            <Button mr={0.5} small appearance='tertiary'>
-                                                                コピー
-                                                            </Button>
-                                                            <Button 
-                                                                mr={0.5} danger small appearance='tertiary'
-                                                                onClick={async () => {
-                                                                    const response = row.id && await deleteBill(row.id)
-                                                                    if((response as AxiosResponse)?.status === 200) {
-                                                                        setBills([
-                                                                            ...bills.slice(0, i),
-                                                                            ...bills.slice(i + 1, bills.length)
-                                                                        ])
-                                                                    }
-                                                                }}
-                                                            >
-                                                                削除
-                                                            </Button>
-                                                        </>
+                                                        <Button 
+                                                            mr={0.5} danger small appearance='tertiary'
+                                                            onClick={async () => {
+                                                                const response = row.id && await deleteBill(row.id)
+                                                                if((response as AxiosResponse)?.status === 200) {
+                                                                    setBills([
+                                                                        ...bills.slice(0, i),
+                                                                        ...bills.slice(i + 1, bills.length)
+                                                                    ])
+                                                                }
+                                                            }}
+                                                        >
+                                                            削除
+                                                        </Button>
                                                     ),
                                                 },
                                                 {value: `${row[BILL_KEY.ID]} ${row[BILL_KEY.BRANCH_NUMBER]}` },
@@ -395,7 +456,22 @@ const Home = () => {
                                     )}
                                     withCheckBox
                                     // Todo : Loading
-                                ></ListTable> : <></>}
+                                >
+                                </ListTable> 
+                                : filterOptions.length ? 
+                                    (
+                                        <NoSearchResults mt={1} />
+                                    ) : 
+                                    (
+                                        <NoDataCreated mt={3}>
+                                            <Link to={ `${INVOICES_URL}${CREATE_URL}`}>
+                                                <Button appearance='primary' mt={1}>
+                                                    新規作成
+                                                </Button>
+                                            </Link>
+                                        </NoDataCreated>
+                                    )
+                                }
                                 <PagerArea>
                                     <Pager
                                         mr={2}
@@ -446,19 +522,21 @@ const Home = () => {
                                 <FormActions>
                                     <Button
                                         appearance='primary'
-                                        onClick={() => {
+                                        onClick={async () => {
                                             if(filterName && filterName.length <= 18) {
                                                 setFilterModalError(false)
                                                 if(filterUpdate) {
+                                                    const newFilter = await updateFilters({ ...filter[filterSelected], filterOption: filterOptions, recordNum: 0})
                                                     setFilter([
                                                         ...filter.slice(0, filterSelected),
-                                                        { ...filter[filterSelected], filterOption: filterOptions, recordNum: 0},
+                                                        newFilter,
                                                         ...filter.slice(filterSelected + 1, filter.length)
                                                     ])
                                                     setFilterUpdate(false)
                                                 }else {
+                                                    const newFilter = await updateFilters({text: filterName, filterOption: filterOptions, recordNum: 0})
                                                     setFilter([
-                                                        ...filter, {text: filterName, filterOption: filterOptions, recordNum: 0}
+                                                        ...filter, newFilter
                                                     ])
                                                 }
                                                 setModalDisplay(false)
