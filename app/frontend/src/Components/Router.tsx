@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactNode, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { CREATE_URL, HOME_URL, INVOICES_URL, SHOW_INVOICES_URL } from '../utils/constants'
 import Home from './Home'
@@ -7,12 +7,14 @@ import styled from 'styled-components'
 import SideNavigator from './SideNavigator/SideNavigator'
 import Create from './Create'
 import { Bill, MyCompany, PropsForRailsData } from '../utils/type'
+import Modal from './Modal'
 
 const Wrapper = styled.div`
     box-sizing: border-box;
     display: flex;
     flex: 1 1 0%;
     overflow: auto;
+    position: relative;
 `
 
 const Main = styled.main`
@@ -22,6 +24,7 @@ const Main = styled.main`
 `
 
 const Router = ({ mycompany }: PropsForRailsData) => {
+
     return (
         <BrowserRouter>
             <Header mycompany={mycompany} />

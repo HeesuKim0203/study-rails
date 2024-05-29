@@ -48,6 +48,9 @@ export const extractNumber = (str: string): number => {
 }
 
 export const formatNumberWithCommas = (number: number) => {
+
+    if(!number) return 0
+
     return number.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' 円'
 }
 

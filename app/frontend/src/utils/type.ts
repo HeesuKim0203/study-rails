@@ -1,3 +1,4 @@
+import { ReactChild, ReactFragment, ReactPortal } from 'react'
 import { BILL_KEY, ICON_SIZE, METHOD_OF_DEPOSIT, METHOD_OF_TAX, ORDER } from './constants'
 
 type PropertyValueUnion<T extends object> = T[keyof T]
@@ -64,3 +65,9 @@ export type Bill = {
 }
 
 export type BillValueUnionType = PropertyValueUnion<Bill>
+
+export type FilterDataType = {
+    text: string
+    filterOption: FilterOptions[]
+    recordNum: number
+}

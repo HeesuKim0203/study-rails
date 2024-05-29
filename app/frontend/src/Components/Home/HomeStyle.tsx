@@ -85,7 +85,7 @@ const ContentSideMenuTitleIcon = styled.div`
 `
 
 const ContentSideMenuItemWrapper = styled.ul`
-    width: 160px;
+    width: 180px;
 `
 
 const ContentSideMenuItem = styled.li<{

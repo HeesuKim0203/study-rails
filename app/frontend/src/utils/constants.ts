@@ -4,7 +4,7 @@ import { IoCalculatorOutline } from 'react-icons/io5'
 import { LuTruck } from 'react-icons/lu'
 import { BsCart4 } from 'react-icons/bs'
 import { MdOutlineReceiptLong } from 'react-icons/md'
-import { Bill } from './type'
+import { Bill, FilterDataType } from './type'
 
 // url
 export const HOME_URL = '/'
@@ -219,3 +219,19 @@ export const ICON_SIZE = {
     NORMAL: '1.4rem',
     LARGE: '1.6rem'
 } as const
+
+
+// http
+export const SUCCESS = 200
+export const CREATE_SUCCESS = 201
+
+// filter data
+export const FILTER_DATA = [
+    {text : '全ての請求書'},
+    {
+        text : '入金方法:振込', filterOption: [
+            {text: '入金方法', value: '振込'}
+        ],
+        recordNum: 0
+    },
+] as FilterDataType[]

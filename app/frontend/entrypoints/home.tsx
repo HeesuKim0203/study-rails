@@ -6,7 +6,7 @@ import '../src/index.scss'
 const element = document.getElementById('root')
 
 ReactDOM.createRoot(element!).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <App {...element?.dataset} />
-  </React.StrictMode>
+  // </React.StrictMode>
 )

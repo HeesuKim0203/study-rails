@@ -205,7 +205,8 @@ const ListForm = ({
                                         IconComponent={MdDelete}
                                         onClick={async () => {
                                             const response = v.id && await deleteStatement(v.id)
-                                            if((response as AxiosResponse)?.status === 200) {
+
+                                            if((response as AxiosResponse)?.status === 200 || !v.id) {
                                                 setValues([
                                                     ...values.slice(0, i),
                                                     ...values.slice(i + 1, values.length)

@@ -45,7 +45,7 @@ import {
     Footer,
     TitleLink,
 } from './CreateStyle'
-import { BILL_KEY, CREATE_URL, DEFAULT_BILL, DEFAULT_DATA, HOME_URL, ICON_SIZE, METHOD_OF_DEPOSIT, METHOD_OF_TAX, TAX_OPTION, TAX_RESULT_OPTION, today } from '../../utils/constants'
+import { BILL_KEY, CREATE_SUCCESS, CREATE_URL, DEFAULT_BILL, DEFAULT_DATA, HOME_URL, ICON_SIZE, METHOD_OF_DEPOSIT, METHOD_OF_TAX, SUCCESS, TAX_OPTION, TAX_RESULT_OPTION, today } from '../../utils/constants'
 import { FaPen } from 'react-icons/fa'
 import Icon from '../Icon'
 import { FontMedium, SubTitle } from '../CommonStyle'
@@ -54,8 +54,7 @@ import { Bill, BillValueUnionType, ListFromType, MethodOfTaxType, MyCompany } fr
 import { extractNumber, formatNumberWithCommas, getAmount, getTax, getTaxAmount, getValueAmount } from '../../utils/util'
 import TaxCalcTd from './TaxCalcTd'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useApiHook } from '../../utils/hooks'
-import { api } from '../../api'
+import { createBill, getBill, updateBill } from '../../api'
 
 type Props = {
     mycompany: MyCompany
@@ -79,37 +78,24 @@ const Create = ({
     const [taxResult, setTaxResult] = useState(0)
     const [amount, setAmount] = useState(0)
 
-    const { error: messageError, getData: postData } = useApiHook<any>(api, {
-        method: CREATE_URL.includes(id) ? 'POST' : 'PATCH',
-        url: CREATE_URL.includes(id) ? '/bills' : `/bills/${id}`,
-        data : {
-            bill : {
-                ...bill,
-                amount: bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN ? amount + taxResult : amount,
-                my_company_id: mycompany.id,
-                statements: []
-            }
-        }
-    })
-
-    const { data, getData } = useApiHook<any>(api, {
-        method: 'GET',
-        url: `/bills/${id}`,
-    })
-
     useEffect(() => {
         async function getUdpateData() {
-            await getData()
-        }
-        getUdpateData()
-    }, [])
+            try {
+                const response = await getBill(id)
 
-    useEffect(() => {
-        if(data && !CREATE_URL.includes(id)) {
-            setBill(data)
-            setValues(data.statements)
+                if(response.status !== SUCCESS) throw Error
+
+                setBill(response.data)
+                setValues(response.data.statements)
+                
+            } catch (error) {
+                alert('Not Found Id!!')
+                navigator(HOME_URL, {replace:true})
+            }
         }
-    }, [data])
+        
+        !CREATE_URL.includes(id) && getUdpateData()
+    }, [])
 
     const onChange = (
         value: BillValueUnionType,
@@ -129,19 +115,6 @@ const Create = ({
         setTaxResult(getTaxAmount(values, bill[BILL_KEY.METHOD_OF_TAX]))
         setAmount(getAmount(values))
     }, [values, bill[BILL_KEY.METHOD_OF_TAX]])
-
-    useEffect(() => {
-
-        async function createBill() {
-            console.log(bill)
-            // await postData()
-        }
-
-        if(!error) {
-            console.log('check')
-            createBill()
-        }
-    }, [error])
 
     return (
       <>
@@ -473,18 +446,43 @@ const Create = ({
                             <Button
                                 appearance='primary'
                                 disabled={sending}
-                                onClick={() => {
+                                onClick={async () => {
                                     if(bill[BILL_KEY.BUSINESS_PARTNER] && bill[BILL_KEY.INVOICE_DATE]) {
-                                        setMessage('保存しました')
-                                        setError(false)
-                                        postData()
-                                        setTimeout(() => {
-                                            navigator(HOME_URL, {replace:true})
-                                        }, 600)
+                                        try {
+                                            if(CREATE_URL.includes(id)) {
+                                                const response = await createBill({
+                                                    bill : {
+                                                        ...bill,
+                                                        amount: bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN ? amount + taxResult : amount,
+                                                        my_company_id: mycompany.id,
+                                                    }
+                                                }, {})
+
+                                                if(response.status !== CREATE_SUCCESS) throw Error
+                                            }else {
+                                                const response = await updateBill({
+                                                    bill : {
+                                                        ...bill,
+                                                        amount: bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN ? amount + taxResult : amount,
+                                                        my_company_id: mycompany.id,
+                                                    }
+                                                }, id, {})
+
+                                                if(response.status !== SUCCESS) throw Error
+                                            }
+                                            setMessage('保存しました')
+                                            setError(false)
+
+                                            setTimeout(() => {
+                                                navigator(HOME_URL, {replace:true})
+                                            }, 600)
+
+                                        } catch(error) {
+                                            setMessage('入力内容にエラーがあります。修正のうえ、再度お試しください')
+                                            setError(true)
+                                        }
                                     }else {               
-                                        setMessage(
-                                            '入力内容にエラーがあります。修正のうえ、再度お試しください'
-                                        )
+                                        setMessage('入力内容にエラーがあります。修正のうえ、再度お試しください')
                                         setError(true)
                                     }
                                 }}
@@ -497,6 +495,7 @@ const Create = ({
                     <Footer />
                 </Wrapper>
                 {message && <FloatingMessageBlock error={error} success={!error} message={message} />}
+                
             </Container>
       </>
     )

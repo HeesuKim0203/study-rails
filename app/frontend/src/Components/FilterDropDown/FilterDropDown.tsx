@@ -40,27 +40,6 @@ const Dropdown = ({
         setIsOpen(!isOpen)
     }
 
-    // useEffect(() => {
-    //     const closeDropDown = (e: any) => {
-    //         if(e.currentTarget.className !== 'dropDown') {
-    //             console.log('document')
-    //         //     console.log('document')
-    //         //     setIsOpen(false) 
-    //         }
-
-            
-    //     }
-    //     if(isOpen) {
-    //         document.addEventListener('mousedown', closeDropDown)
-    //     }else {
-    //         document.removeEventListener('mousedown', closeDropDown)
-    //     }
-    // }, [isOpen])
-
-    useEffect(() => {
-        options
-    }, [inputValue])
-
     return (
         <DropdownContainer>
             <IconContext.Provider value={{ size: '1.4rem' }} >
@@ -69,7 +48,7 @@ const Dropdown = ({
                 >
                     {options ? <RiFilter3Fill /> : <></>}
                     <DropdownToggleText>
-                        { option ? option.text : 'フィルタ追加'}
+                        { option ? `${option.text} : ${option.value}` : 'フィルタ追加'}
                     </DropdownToggleText>
                     {options ? <></> : 
                         <IconContext.Provider value={{ size: '1rem' }} >
