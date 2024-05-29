@@ -2,15 +2,15 @@ version: '3.8'
 
 services:
   db:
-    image: mysql:5.7
+    image: mysql:latest
     container_name: mysql
     volumes:
       - db_data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: your_root_password
-      MYSQL_DATABASE: your_database_name
-      MYSQL_USER: your_database_user
-      MYSQL_PASSWORD: your_database_password
+      MYSQL_ROOT_PASSWORD: ${RAILS_DB_PASSWORD}
+      MYSQL_DATABASE: ${RAILS_DATABASE_NAME}
+      MYSQL_USER: ${DOCKER_DB_USER_NAME}
+      MYSQL_PASSWORD: ${RAILS_DB_PASSWORD}
     ports:
       - "3306:3306"
 
@@ -22,8 +22,8 @@ services:
       OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
       OPENSEARCH_SECURITY_SSL_HTTP_ENABLED: "false"
       OPENSEARCH_PLUGINS_SECURITY_DISABLED: "true"
-      OPENSEARCH_USERNAME: admin
-      OPENSEARCH_PASSWORD: admin
+      OPENSEARCH_PASSWORD: ${DOCKER_OPENSEARCH_USERNAME}
+      OPENSEARCH_PASSWORD: ${DOCKER_OPENSEARCH_PASSWORD}
       # Install kuromoji plugin on startup
       OPENSEARCH_PLUGINS_INSTALL: "analysis-kuromoji"
     ulimits:
@@ -44,8 +44,8 @@ services:
     environment:
       OPENSEARCH_HOSTS: "http://opensearch:9200"
       OPENSEARCH_SECURITY_SSL_HTTP_ENABLED: "false"
-      OPENSEARCH_USERNAME: admin
-      OPENSEARCH_PASSWORD: admin
+      OPENSEARCH_PASSWORD: ${DOCKER_OPENSEARCH_USERNAME}
+      OPENSEARCH_PASSWORD: ${DOCKER_OPENSEARCH_PASSWORD}
 
   web:
     build: .
@@ -56,7 +56,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: mysql2://your_database_user:your_database_password@db/your_database_name
+      DATABASE_URL: mysql2://${RAILS_DB_USER_NAME}:${RAILS_DB_PASSWORD}@db/${RAILS_DATABASE_NAME}
       ELASTICSEARCH_URL: http://opensearch:9200
     depends_on:
       - db
