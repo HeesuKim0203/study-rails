@@ -31,7 +31,7 @@ development: &default
   pool: 5
   username: <%= ENV['RAILS_DB_USER_NAME'] %>
   password: <%= ENV['RAILS_DB_PASSWORD'] %>
-  database: <%= ENV['RAILS_DATABASE_NAME'] =>
+  database: <%= ENV['RAILS_DATABASE_NAME'] %>
   host: <%= ENV['RAILS_DATABASE_HOST'] %>
   port: 3306
 

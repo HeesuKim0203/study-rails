@@ -19,7 +19,7 @@ require "rails/test_unit/railtie"
 Bundler.require(*Rails.groups)
 
 # Load environment variables
-Dotenv::Railtie.load
+# Dotenv::Railtie.load
 
 module ViteRailsApp
   class Application < Rails::Application
