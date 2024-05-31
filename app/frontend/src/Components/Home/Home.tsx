@@ -127,7 +127,6 @@ const Home = () => {
             
             // Todo : error message logic
             setPageCount(1)
-            setBills([])
 
         }finally {
             
@@ -203,9 +202,7 @@ const Home = () => {
     }, [filter])
 
     useEffect(() => {
-        if(bills.length === 0) {
-            getData()
-        }
+        if(bills.length === 0) getData()
     }, [bills])
     
     const {
