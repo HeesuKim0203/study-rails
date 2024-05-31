@@ -47,11 +47,11 @@ const Dropdown = ({
                 <DropdownToggle
                     onClick={() => setIsOpen(!isOpen)}
                 >
-                    {options ? <RiFilter3Fill /> : <></>}
+                    {options && <RiFilter3Fill />}
                     <DropdownToggleText>
                         { option ? `${option.text} : ${option.value}` : 'フィルタ追加'}
                     </DropdownToggleText>
-                    {options ? <></> : 
+                    {options && 
                         <IconContext.Provider value={{ size: ICON_SIZE.SMALL }} >
                             <GoTriangleDown/>
                         </IconContext.Provider>
