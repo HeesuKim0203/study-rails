@@ -31,11 +31,15 @@ end
 gem 'vite_rails', '~> 3.0'
 
 # Mysql
-# gem 'mysql2'
+gem 'mysql2'
 
-# group :development, :test do
-#   gem 'rspec-rails'
-#   gem 'factory_bot_rails'
-# end
+group :development, :test do
+  gem 'rspec-rails'
+  gem 'factory_bot_rails'
+end
 
 gem 'kaminari'
+
+gem 'dotenv-rails', groups: [:development, :test]
+
+gem 'opensearch-ruby'

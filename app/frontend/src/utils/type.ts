@@ -1,4 +1,3 @@
-import { ReactChild, ReactFragment, ReactPortal } from 'react'
 import { BILL_KEY, ICON_SIZE, METHOD_OF_DEPOSIT, METHOD_OF_TAX, ORDER } from './constants'
 
 type PropertyValueUnion<T extends object> = T[keyof T]
@@ -15,6 +14,7 @@ export type ListElm = {
 
 export type FilterOptions = {
     text: string
+    key: keyof Bill
     value?: string
 }
 
@@ -63,6 +63,8 @@ export type Bill = {
     [BILL_KEY.MY_COMPANY_ID]: string
     [BILL_KEY.UPDATE_AT]: Date | undefined
 }
+
+export type GetBillParams = Partial<Bill & { page : number, per_page: number }>
 
 export type BillValueUnionType = PropertyValueUnion<Bill>
 

@@ -179,10 +179,11 @@ const ListForm = ({
                                 value: (
                                     <CheckBox
                                         name='源泉徴収'
+                                        checked={v.withholding}
                                         onChange={(e) => {
                                             setValues([
                                                 ...values.slice(0, i),
-                                                { ...v, withholding: Boolean(e.target.value) },
+                                                { ...v, withholding: e.target.checked },
                                                 ...values.slice(i + 1),
                                             ])
                                         }}

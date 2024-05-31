@@ -4,7 +4,7 @@ import { IoCalculatorOutline } from 'react-icons/io5'
 import { LuTruck } from 'react-icons/lu'
 import { BsCart4 } from 'react-icons/bs'
 import { MdOutlineReceiptLong } from 'react-icons/md'
-import { Bill, FilterDataType } from './type'
+import { Bill, FilterDataType, FilterOptions } from './type'
 
 // url
 export const HOME_URL = '/'
@@ -101,6 +101,7 @@ export const LIST_TABLE_HEADER = [
         onClick: false,
         ordering: false,
         sortValue: '',
+        key: BILL_KEY.TITLE
     },
     {
         value: '取引先名・基本情報',
@@ -108,6 +109,7 @@ export const LIST_TABLE_HEADER = [
         onClick: false,
         ordering: false,
         sortValue: '',
+        key: BILL_KEY.BUSINESS_PARTNER
     },
     {
         value: '操作',
@@ -121,7 +123,7 @@ export const LIST_TABLE_HEADER = [
         minWidth: 20,
         onClick: false,
         ordering: false,
-        sortValue: ''
+        sortValue: '',
     },
     {
         value: '金額',
@@ -129,49 +131,56 @@ export const LIST_TABLE_HEADER = [
         alignRight: true,
         onClick: true,
         ordering: true,
-        sortValue: BILL_KEY.AMOUNT
+        sortValue: BILL_KEY.AMOUNT,
+        key: BILL_KEY.AMOUNT
     },
     {
         value: '社内メモ',
         minWidth: 15,
         onClick: false,
         ordering: false,
-        sortValue: ''
+        sortValue: '',
+        key: BILL_KEY.MEMO
     },
     {
         value: '備考',
         minWidth: 15,
         onClick: false,
         ordering: false,
-        sortValue: ''
+        sortValue: '',
+        key: BILL_KEY.REMARKS
     },
     {
         value: '入金方法',
         minWidth: 10,
         onClick: false,
         ordering: false,
-        sortValue: ''
+        sortValue: '',
+        key: BILL_KEY.METHOD_OF_DEPOSIT
     },
     {
         value: '請求日',
         minWidth: 10,
         onClick: true,
         ordering: true,
-        sortValue: BILL_KEY.INVOICE_DATE
+        sortValue: BILL_KEY.INVOICE_DATE,
+        key: BILL_KEY.INVOICE_DATE
     },
     {
         value: '期日',
         minWidth: 10,
         onClick: true,
         ordering: true,
-        sortValue: BILL_KEY.DEPOSIT_DATE
+        sortValue: BILL_KEY.DEPOSIT_DATE,
+        key: BILL_KEY.DEPOSIT_DATE
     },
     {
         value: '自社担当者',
         minWidth: 10,
         onClick: false,
         ordering: false,
-        sortValue: ''
+        sortValue: '',
+        key: BILL_KEY.REPRESENTATIVE
     },
 ]
 
@@ -198,9 +207,10 @@ export const SIDE_MENU_TITLE = 'フィルタ条件'
 export const HAEDER_DROPDOWN_LABEL = '請求書作成用CSVインポート'
 
 // Filter Options
-export const FILTER_OPTIONS = LIST_TABLE_HEADER.map((header, index) => ({
-    text: header.value
-}))
+export const FILTER_OPTIONS = LIST_TABLE_HEADER.filter((header) => header.key).map((header, index) => ({
+    text: header.value,
+    key: header.key
+})) as FilterOptions[]
 
 // Pagination Options
 export const DEFAULT_ROWS_OPTIONS = 10
@@ -230,7 +240,7 @@ export const FILTER_DATA = [
     {text : '全ての請求書'},
     {
         text : '入金方法:振込', filterOption: [
-            {text: '入金方法', value: '振込'}
+            {text: '入金方法', key: BILL_KEY.METHOD_OF_DEPOSIT, value: '振込'}
         ],
         recordNum: 0
     },

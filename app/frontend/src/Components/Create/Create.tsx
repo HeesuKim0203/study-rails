@@ -53,7 +53,7 @@ import ListForm from '../ListForm'
 import { Bill, BillValueUnionType, ListFromType, MethodOfTaxType, MyCompany } from '../../utils/type'
 import { extractNumber, formatNumberWithCommas, getAmount, getTax, getTaxAmount, getValueAmount, isMethodOfDepositBankTransfer, isMethodOfTaxForeign } from '../../utils/util'
 import TaxCalcTd from './TaxCalcTd'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { createBill, getBill, updateBill } from '../../api'
 
 type Props = {
@@ -489,7 +489,9 @@ const Create = ({
                             >
                                 保存
                             </Button>
-                            <Button disabled={sending}>キャンセル</Button>
+                            <Link to={HOME_URL}>
+                                <Button disabled={sending}>キャンセル</Button>
+                            </Link>
                         </FormActions>
                     </SubmitFiexd>
                     <Footer />

@@ -10,4 +10,7 @@ export default defineConfig({
     react(),
     svgr()
   ],
+  build: {
+  	outDir: 'public/vite'
+  }
 })
