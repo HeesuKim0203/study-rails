@@ -6,6 +6,12 @@ if [ -f .env ]; then
   export $(cat .env | xargs)
 fi
 
+# Check if node_modules folder exists, if not run npm install
+if [ ! -d "node_modules" ]; then
+  echo "Installing npm dependencies..."
+  npm install
+fi
+
 # Check if database exists
 bundle exec rails db:prepare
 

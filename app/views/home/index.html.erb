@@ -3,7 +3,7 @@
 <% if Rails.env.development? %>
     <%= vite_javascript_tag 'home.tsx' %>
 <% else %>
-    <%= javascript_include_tag 'vite/main' %>
+    <%= javascript_include_tag 'main' %>
 <% end %>
 
 <div id="root"></div>

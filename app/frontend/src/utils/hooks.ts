@@ -36,6 +36,8 @@ export function useApiHook<T>(api: AxiosInstance, query: AxiosRequestConfig): Ap
 
 export const useData = (data: Bill[]) => {
 
+    console.log(data)
+
     const [sortKey, setSortKey] = useState<keyof Bill>(BILL_KEY.UPDATE_AT)
     const [sortOrder, setSortOrder] = useState<Order>(ORDER.DESC)
     const [statuses, setStatuses] = useState<boolean[]>(

@@ -36,17 +36,6 @@ services:
       - "9200:9200"
       - "9600:9600"
 
-  opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:latest
-    container_name: opensearch-dashboards
-    ports:
-      - "5601:5601"
-    environment:
-      OPENSEARCH_HOSTS: "http://opensearch:9200"
-      OPENSEARCH_SECURITY_SSL_HTTP_ENABLED: "false"
-      OPENSEARCH_USERNAME: ${DOCKER_OPENSEARCH_USERNAME}
-      OPENSEARCH_PASSWORD: ${DOCKER_OPENSEARCH_PASSWORD}
-
   web:
     build: .
     container_name: rails

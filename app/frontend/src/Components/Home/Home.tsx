@@ -143,6 +143,8 @@ const Home = () => {
             return prev
         }, {})
 
+        console.log(paramsOptions)
+
         try {    
             const responseCount = await getBillsCount(
                 {

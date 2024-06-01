@@ -30,14 +30,6 @@ RUN bundle install && \
 # Copy application code
 COPY . .
 
-# Install npm dependencies and build assets
-RUN npm install && \
-    NODE_OPTIONS="--max-old-space-size=4096" npm run build && \
-    rm -rf node_modules
-
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
-
 # Final stage for app image
 FROM base
 
@@ -50,16 +42,21 @@ RUN apt-get update -qq && \
 COPY --from=build /usr/local/bundle /usr/local/bundle
 COPY --from=build /rails /rails
 
-# Run and own only the runtime files as a non-root user for security
-RUN useradd rails --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
-USER rails:rails
+# Ensure npm is available
+ENV PATH="/usr/local/nodejs/bin:$PATH"
 
-# Copy entrypoint script
+# Run and own only the runtime files as a non-root user for security
+RUN useradd -ms /bin/bash rails && \
+    chown -R rails:rails /rails
+
+# Copy entrypoint script and set permissions
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Entrypoint prepares the database.
+# Switch to non-root user
+USER rails
+
+# Entrypoint prepares the database and builds assets if necessary
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 # Start the server by default, this can be overwritten at runtime
