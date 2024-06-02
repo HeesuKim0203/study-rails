@@ -1,5 +1,8 @@
-@import '../../../node_modules/@freee_jp/vibes/vibes_2021.min.css' ;
+@import './theme.scss';
+
+@import '../../../../node_modules/@freee_jp/vibes/vibes_2021.min.css';
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+
 
 * {
     box-sizing: border-box;
@@ -8,7 +11,7 @@
 }
 
 body {
-    font-family: "Noto Sans JP", sans-serif ;
+    font-family: "Noto Sans JP", sans-serif;
 }
 
 ul, li {

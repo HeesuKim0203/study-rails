@@ -12,7 +12,7 @@ const Container = styled.header`
     justify-content: space-between;
     -webkit-box-align: center;
     align-items: center;
-    border-bottom: 1px solid rgb(233, 231, 231);
+    border-bottom: var(--primary-border);
 
     user-select: none;
 `

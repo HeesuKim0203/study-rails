@@ -62,15 +62,15 @@ const ListForm = ({
             <ListTable
                 mb={1}
                 headers={[
-                    { value: ''    },
-                    { value: (<TableHeader>摘要</TableHeader>) },
-                    { value: '数量', alignRight: true },
-                    { value: '単位' },
-                    { value: '単価', alignRight: true },
-                    { value: '税率' },
-                    { value: '源泉徴収' },
-                    { value: (<AmountHeader>金額</AmountHeader>), alignRight: true },
-                    { value: ''   },
+                    { value: '', width: 2    },
+                    { value: '摘要', width: 40 },
+                    { value: '数量', width: 10, alignRight: true },
+                    { value: '単位', width: 10 },
+                    { value: '単価', width: 15, alignRight: true },
+                    { value: '税率', width: 8 },
+                    { value: '源泉徴収', width: 15 },
+                    { value: '金額', width:5, alignRight: true },
+                    { value: '', width: 3   },
                 ]}
                 rows={
                     values.map((v, i) => ({
@@ -179,10 +179,11 @@ const ListForm = ({
                                 value: (
                                     <CheckBox
                                         name='源泉徴収'
+                                        checked={v.withholding}
                                         onChange={(e) => {
                                             setValues([
                                                 ...values.slice(0, i),
-                                                { ...v, withholding: Boolean(e.target.value) },
+                                                { ...v, withholding: e.target.checked },
                                                 ...values.slice(i + 1),
                                             ])
                                         }}
@@ -205,7 +206,8 @@ const ListForm = ({
                                         IconComponent={MdDelete}
                                         onClick={async () => {
                                             const response = v.id && await deleteStatement(v.id)
-                                            if((response as AxiosResponse)?.status === 200) {
+
+                                            if((response as AxiosResponse)?.status === 200 || !v.id) {
                                                 setValues([
                                                     ...values.slice(0, i),
                                                     ...values.slice(i + 1, values.length)

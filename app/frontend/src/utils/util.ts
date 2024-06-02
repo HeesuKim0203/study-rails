@@ -1,7 +1,7 @@
 import moment from 'moment'
 import * as XLSX from 'xlsx'
 import { Bill, ListFromType, MethodOfDepositType, MethodOfTaxType } from './type'
-import { METHOD_OF_TAX, TAX_OPTION } from './constants'
+import { METHOD_OF_DEPOSIT, METHOD_OF_TAX, TAX_OPTION } from './constants'
 
 export const getFileNameDate = () => {
     const date = new Date()
@@ -48,6 +48,9 @@ export const extractNumber = (str: string): number => {
 }
 
 export const formatNumberWithCommas = (number: number) => {
+
+    if(!number) return 0
+
     return number.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' 円'
 }
 
@@ -75,4 +78,14 @@ export const getAmount = (values: ListFromType[]) => (
     values.reduce((prev, value) => {
         return prev + value.count * value.price
     }, 0)
+)
+
+export const isMethodOfDepositBankTransfer = (methodOfDeposit: MethodOfDepositType)
+    : methodOfDeposit is typeof METHOD_OF_DEPOSIT.BANK_TRANSFER => (
+    methodOfDeposit === METHOD_OF_DEPOSIT.BANK_TRANSFER
+)
+
+export const isMethodOfTaxForeign = (methodOfTax: MethodOfTaxType) 
+    : methodOfTax is typeof METHOD_OF_TAX.FOREIGN => (
+        methodOfTax === METHOD_OF_TAX.FOREIGN
 )

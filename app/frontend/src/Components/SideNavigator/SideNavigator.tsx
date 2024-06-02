@@ -10,18 +10,14 @@ const SideNavigator = () => {
 
     const { pathname } = useLocation()
 
-    let icommenuDefault = false
-
-    if(pathname == `${INVOICES_URL}${CREATE_URL}`) {
-        icommenuDefault = true
-    }
-
     const [selected, setSelected] = useState<number>(0)
-    const [iconmenu, seticonmenu] = useState<boolean>(icommenuDefault)
+    const [iconmenu, seticonmenu] = useState<boolean>(false)
 
     useEffect(() => {
-        seticonmenu(icommenuDefault)
-    }, [icommenuDefault])
+        if(pathname.includes(`${INVOICES_URL}${CREATE_URL}`)) {
+            seticonmenu(true)
+        }
+    }, [pathname])
 
     return (
         <Container>

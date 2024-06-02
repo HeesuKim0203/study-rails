@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { GoTriangleDown } from 'react-icons/go'
-import { IoIosSettings } from 'react-icons/io'
 import { AiOutlineMenuFold } from 'react-icons/ai'
 import { AiOutlineMenuUnfold } from 'react-icons/ai'
 import {
@@ -13,7 +12,15 @@ import {
     IconOnlyButton,
     WithSideContent,
     Pagination,
-  } from '@freee_jp/vibes'
+    FormControl,
+    TextField,
+    Message,
+    Note,
+    FormActions,
+    FloatingMessageBlock,
+    NoDataCreated,
+    NoSearchResults,
+} from '@freee_jp/vibes'
 import { 
     BILL_KEY, 
     CREATE_URL, 
@@ -26,8 +33,10 @@ import {
     FILTER_OPTIONS, 
     ORDER, 
     ROWS_OPTIONS, 
-    SIDE_MENU_TITLE } from '../../utils/constants'
-import { Bill, FilterOptions, ListElm, Order, PropsForRailsData } from '../../utils/type'
+    SIDE_MENU_TITLE, 
+    SUCCESS,
+    FILTER_DATA} from '../../utils/constants'
+import { Bill, FilterDataType, FilterOptions, GetBillParams } from '../../utils/type'
 import {
     Container,
     Wrapper,
@@ -56,25 +65,14 @@ import { IconContext } from 'react-icons'
 import FilterDropDown from '../FilterDropDown'
 import { Link } from 'react-router-dom'
 import { formatNumberWithCommas } from '../../utils/util'
-import { api, getBillsCount } from '../../api'
-import { useApiHook, useData } from '../../utils/hooks'
-
-// Todo : Data -> BackEnd
-const filterData = () => {
-    const data = [
-        {text : '全ての請求書'},
-        {text : '送付待ち', reacordNum: 0},
-        {text : '取引登録待ち', reacordNum: 0},
-        {text : '入金待ち', reacordNum: 0},
-        {text : '入金期日超過', reacordNum: 0},
-    ]
-
-    return data
-}
+import { deleteBill, getBillsCount, getBillsPagenation } from '../../api'
+import { useData } from '../../utils/hooks'
+import { AxiosResponse } from 'axios'
+import Modal, { ModalContent, ModalFooter, ModalHeader, ModalTitle } from '../Modal'
 
 const Home = () => {
-
-    const filter = filterData()
+    
+    const [filter, setFilter] = useState<FilterDataType[]>(FILTER_DATA)
     const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE)
     const [rowOption, setRowOption] = useState(DEFAULT_ROWS_OPTIONS)
     const [filterOptions, setFilterOptions] = useState<FilterOptions[]>([])
@@ -85,46 +83,125 @@ const Home = () => {
     const [filterSelected, setFilterSelected] = useState(0)
     const [sideMenuDisplay, setSideMenuDisplay] = useState<boolean>(true)
 
-    const { data, error, load, getData } = useApiHook<Bill[]>(api, {
-        method: 'GET',
-        url: '/bills',
-        params: {
-            page: currentPage,
-            per_page: rowOption,
-        },
-    })
+    const [loading, setLoading] = useState(true)
 
-    const { data: count, getData: getCount } = useApiHook<{
-        total_count: number
-    }>(api, {
-        method: 'GET',
-        url: '/bills/count',
-    })
+    const [modalDisplay, setModalDisplay] = useState<boolean>(false)
 
-    async function init() {
-        await getCount()
-        await getData()
+    const [filterModalError, setFilterModalError] = useState(false)
+    const [filterModalMessage, setFilterModalMessage] = useState('')
+    const [filterName, setFilterName] = useState('')
+    const [filterUpdate, setFilterUpdate] = useState(false)
+
+    const getData = async() => {
+
+        let paramsOptions: GetBillParams = filterOptions.reduce((prev: any, {text, key, value}: FilterOptions, index) => {
+            if(value) {
+                prev[key] = value
+            }
+            return prev
+        }, {})
+
+        paramsOptions.page = currentPage
+        paramsOptions.per_page = rowOption
+
+        try {    
+            const responseCount = await getBillsCount(
+                {
+                    params: paramsOptions
+                }
+            )
+            const responseBills = await getBillsPagenation(
+                {
+                    params: paramsOptions
+                }
+            )
+            
+            if(responseCount.status !== SUCCESS && responseBills.status !== SUCCESS) {
+                throw Error
+            }
+
+            setPageCount(Math.ceil((responseCount.data.total_count || 1) / rowOption))
+            setBills(responseBills.data)
+
+        } catch (error) {
+            
+            // Todo : error message logic
+            setPageCount(1)
+
+        }finally {
+            
+            setLoading(false)
+
+        }
     }
+
+    const getFilterRecordNum = async (filterOptions: FilterOptions[]) => {
+        let paramsOptions: GetBillParams = filterOptions.reduce((prev: any, {text, key, value}: FilterOptions, index) => {
+            if(value) {
+                prev[key] = value
+            }
+            return prev
+        }, {})
+
+        console.log(paramsOptions)
+
+        try {    
+            const responseCount = await getBillsCount(
+                {
+                    params: paramsOptions
+                }
+            )
+
+            return responseCount.data.total_count
+        }catch {
+            return 0
+        }
+    }
+
+    async function updateFilters(oneFilter?: FilterDataType): Promise<FilterDataType> {
+
+        let updatedFilters: FilterDataType[] | FilterDataType  = []
+
+        if(oneFilter) {
+            const recordNum = await getFilterRecordNum(oneFilter.filterOption)
+            updatedFilters = { ...oneFilter, recordNum }
+            return updatedFilters
+        }else {
+            updatedFilters = await Promise.all(
+                filter.filter((_, index) => index !== 0).map(async (filter, index) => {
+                    const recordNum = await getFilterRecordNum(filter.filterOption)
+                    return { ...filter, recordNum }
+                })
+            )
+            setFilter([ filter[0], ...updatedFilters ])
+        }
+
+        return {text: '', filterOption: [], recordNum : 0}
+    }
+
+    useEffect(() => {
+        const filterJsonData = localStorage.getItem('study-rail@test1')
+        if(filterJsonData) { 
+            setFilter(JSON.parse(filterJsonData))
+        } 
+        updateFilters()
+    }, [])
     
     useEffect(() => {
-        init()
-    }, [rowOption, currentPage])
+        getData()
+    }, [rowOption, currentPage, filterOptions])
 
     useEffect(() => {
         setCurrentPage(DEFAULT_PAGE)
     }, [rowOption])
 
     useEffect(() => {
-        if(data) {
-            setBills([...data])
-        }
-    }, [data])
+        setFilterOptions(filter[filterSelected]?.filterOption || [])
+    }, [filterSelected])
 
     useEffect(() => {
-        if(count) {
-            setPageCount(Math.ceil(count.total_count / rowOption))
-        }
-    }, [count])
+        localStorage.setItem('study-rail@test1', JSON.stringify(filter))
+    }, [filter])
     
     const {
       sort,
@@ -173,15 +250,16 @@ const Home = () => {
                                         {SIDE_MENU_TITLE}
                                     </ContentSideMenuTitle>
                                     <ContentSideMenuTitleIcon>
-                                        <IconOnlyButton 
+                                        {/* Todo: Implement Filter Page */}
+                                        {/* <IconOnlyButton 
                                             small={true}
                                             label='フィルタ設定'
                                             IconComponent={IoIosSettings}
-                                        />
+                                        /> */}
                                     </ContentSideMenuTitleIcon>
                                 </ContentSideMenuHeader>
                                 <ContentSideMenuItemWrapper>
-                                        { filter.map(({text, reacordNum}, index) => {
+                                        { filter.map(({text, filterOption, recordNum}: FilterDataType, index) => {
                                             return (
                                                 <ContentSideMenuItem
                                                     key={index}
@@ -190,7 +268,7 @@ const Home = () => {
                                                     onClick={() => setFilterSelected(index)}
                                                 >
                                                     <ContentSideMenuItemText>{text}</ContentSideMenuItemText>
-                                                    {reacordNum !== undefined && <ContentSideMenuItemCounter>{reacordNum}</ContentSideMenuItemCounter>}
+                                                    {recordNum !== undefined && <ContentSideMenuItemCounter>{recordNum}</ContentSideMenuItemCounter>}
                                                 </ContentSideMenuItem>
                                             )
                                         }) }
@@ -214,11 +292,14 @@ const Home = () => {
                                                     return (
                                                         <FilterDropDown
                                                             option={filterOption}
-                                                            onOptionClick={(e) => setFilterOptions([
-                                                                ...filterOptions.slice(0, index),
-                                                                {...filterOption, value:e},
-                                                                ...filterOptions.slice(index + 1, filterOptions.length),
-                                                            ])}
+                                                            onOptionClick={(e) => {
+                                                                console.log(e)
+                                                                setFilterOptions([
+                                                                    ...filterOptions.slice(0, index),
+                                                                    e,
+                                                                    ...filterOptions.slice(index + 1, filterOptions.length),
+                                                                ])}
+                                                            }
                                                             onDelete={() => setFilterOptions([
                                                                 ...filterOptions.slice(0, index),
                                                                 ...filterOptions.slice(index + 1, filterOptions.length),
@@ -233,15 +314,52 @@ const Home = () => {
                                                             filterOptions.findIndex((seletedFilterOptions) => 
                                                                 seletedFilterOptions.text === filterOption.text) === -1)
                                                     }
-                                                onOptionClick={(e) => setFilterOptions(filterOptions.concat({text:e, value:''}))}
+                                                onOptionClick={(e) => setFilterOptions(filterOptions.concat(e))}
                                             />
                                             <ContentHeaderFilterClear onClick={() => setFilterOptions([])} >クリア</ContentHeaderFilterClear>
                                         </FilterOptionsArea>
                                     </ContentHeaderFilterArea>
                                     <ContentHeaderFilterRightArea>
-                                        <Button>
-                                            <ContentButtonFontArea>フィルタ条件の保存</ContentButtonFontArea>
-                                        </Button>
+                                        {filterSelected === 0 ? 
+                                            <Button>
+                                                <ContentButtonFontArea
+                                                    onClick={() => setModalDisplay(!modalDisplay)}
+                                                >フィルタ条件の保存</ContentButtonFontArea>
+                                            </Button> : 
+                                            <DropdownButton
+                                                ml={1}
+                                                buttonLabel='フィルタ条件の保存'
+                                                dropdownContents={[
+                                                    {
+                                                        type: 'selectable',
+                                                        text: '新規作成',
+                                                        onClick: () => {
+                                                            setModalDisplay(!modalDisplay)
+                                                            setFilterUpdate(true)
+                                                        }
+                                                    },
+                                                    {
+                                                        type: 'selectable',
+                                                        text: '選択したもの修正',
+                                                        onClick: () => {
+                                                            setModalDisplay(!modalDisplay)
+                                                            setFilterName(filter[filterSelected].text)
+                                                        }
+                                                    },
+                                                    {
+                                                        type: 'selectable',
+                                                        text: '選択したもの削除',
+                                                        onClick: () => {
+                                                            setFilterSelected(0)
+                                                            setFilter([
+                                                                ...filter.slice(0, filterSelected),
+                                                                ...filter.slice(filterSelected + 1, filter.length)
+                                                            ])
+                                                        }
+                                                    },
+                                                ]}
+                                            />
+                                        }
                                         <DropdownButton
                                             ml={1}
                                             buttonLabel=''
@@ -269,7 +387,7 @@ const Home = () => {
                                         />
                                     }
                                 />
-                                {load ? <ListTable
+                                {bills.length ? <ListTable
                                     fixedHeader={true}
                                     headers={
                                         LIST_TABLE_HEADER.map(({ 
@@ -303,14 +421,22 @@ const Home = () => {
                                                 {value: row[BILL_KEY.BUSINESS_PARTNER] },
                                                 {
                                                     value: (
-                                                        <>
-                                                            <Button mr={0.5} small appearance='tertiary'>
-                                                                コピー
-                                                            </Button>
-                                                            <Button mr={0.5} danger small appearance='tertiary'>
-                                                                削除
-                                                            </Button>
-                                                        </>
+                                                        <Button 
+                                                            mr={0.5} danger small appearance='tertiary'
+                                                            onClick={async () => {
+                                                                const response = row.id && await deleteBill(row.id)
+                                                                if((response as AxiosResponse)?.status === 200) {
+                                                                    setBills([
+                                                                        ...bills.slice(0, i),
+                                                                        ...bills.slice(i + 1, bills.length)
+                                                                    ])
+
+								    getData()
+                                                                }
+                                                            }}
+                                                        >
+                                                            削除
+                                                        </Button>
                                                     ),
                                                 },
                                                 {value: `${row[BILL_KEY.ID]} ${row[BILL_KEY.BRANCH_NUMBER]}` },
@@ -326,14 +452,29 @@ const Home = () => {
                                         })
                                     )}
                                     withCheckBox
-                                ></ListTable> : <></>}
+                                    // Todo : Loading
+                                >
+                                </ListTable> 
+                                : filterOptions.length ? 
+                                    (
+                                        <NoSearchResults mt={1} />
+                                    ) : 
+                                    (
+                                        <NoDataCreated mt={3}>
+                                            <Link to={ `${INVOICES_URL}${CREATE_URL}`}>
+                                                <Button appearance='primary' mt={1}>
+                                                    新規作成
+                                                </Button>
+                                            </Link>
+                                        </NoDataCreated>
+                                    )
+                                }
                                 <PagerArea>
                                     <Pager
                                         mr={2}
                                         currentPage={currentPage}
                                         pageCount={pageCount}
                                         onPageChange={(e) => {
-                                            // Todo : Server Data <-
                                             setCurrentPage(e)
                                         }}
                                     />
@@ -342,6 +483,77 @@ const Home = () => {
                         </Content>
                     </ContentWrapper>
                 </Wrapper>
+                <Modal 
+                    display={modalDisplay}
+                    onClose={() => setModalDisplay(false)}
+                    content={(
+                        <>
+                            <ModalHeader>
+                                <ModalTitle>test</ModalTitle>
+                            </ModalHeader>
+                            <ModalContent>
+                                <FormControl
+                                    mb={1}
+                                    mr={1}
+                                    label='フィルタ条件名'
+                                    fieldId='invoice_filter'
+                                    required
+                                >
+                                    <TextField
+                                        width='large'
+                                        name='フィルタ条件名'
+                                        id='invoice_filter'
+                                        value={filterName}
+                                        onChange={(e) => setFilterName(e.target.value)}
+                                        mb={0.5}
+                                    />
+                                    <Note>18文字まで</Note>
+                                </FormControl>
+                                {filterModalError && (
+                                    <Message ml={1} error={filterModalError}>
+                                        フィルタ条件名を入力してください
+                                    </Message>
+                                )}
+                            </ModalContent>
+                            <ModalFooter>
+                                <FormActions>
+                                    <Button
+                                        appearance='primary'
+                                        onClick={async () => {
+                                            if(filterName && filterName.length <= 18) {
+                                                setFilterModalError(false)
+                                                if(filterUpdate) {
+                                                    const newFilter = await updateFilters({ ...filter[filterSelected], filterOption: filterOptions, recordNum: 0})
+                                                    setFilter([
+                                                        ...filter.slice(0, filterSelected),
+                                                        newFilter,
+                                                        ...filter.slice(filterSelected + 1, filter.length)
+                                                    ])
+                                                    setFilterUpdate(false)
+                                                }else {
+                                                    const newFilter = await updateFilters({text: filterName, filterOption: filterOptions, recordNum: 0})
+                                                    setFilter([
+                                                        ...filter, newFilter
+                                                    ])
+                                                }
+                                                setModalDisplay(false)
+                                                setFilterName('')
+                                                setFilterSelected(filter.length)
+                                            }else {
+                                                setFilterModalMessage('入力されたデータに誤りがあります。')
+                                                setFilterModalError(true)
+                                            }
+                                        }}
+                                    >OK</Button>
+                                    <Button
+                                        onClick={() => setModalDisplay(false)}
+                                    >キャンセル</Button>
+                                </FormActions>
+                            </ModalFooter>
+                            {filterModalMessage && <FloatingMessageBlock error={filterModalError} success={!filterModalError} message={filterModalMessage} />}
+                        </>
+                    )}
+                />
         </Container>
     )
 }

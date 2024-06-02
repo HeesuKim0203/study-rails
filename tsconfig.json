@@ -20,6 +20,4 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["./app/frontend/src", "./app/frontend/entrypoints"],
-  "references": [{ "path": "./tsconfig.node.json" }]
 }

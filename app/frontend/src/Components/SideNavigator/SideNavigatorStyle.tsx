@@ -14,7 +14,7 @@ const Wrapper = styled.div<{
     transition: width 0.1s ease 0s;
 
     box-sizing: border-box;
-    border-right: 1px solid rgb(233, 231, 231);
+    border-right: var(--primary-border);
     word-break: break-all;
     -webkit-box-flex: 0;
     flex-grow: 0;
@@ -48,8 +48,8 @@ const IconArea = styled.div`
     border-radius: 0.5rem;
 
     &:hover {
-        color: #1e46aa;
-        background-color: #dce8ff;
+        color: var(--button-hover-color);
+        background-color: var(--primary-button-hover-bg);
     }
 `
 
@@ -73,8 +73,8 @@ const MenuItem = styled.li<{
     font-size : 1rem;
     ${props => (
         props.selected ? `
-            border-left: 5px solid rgb(40, 100, 240);
-            color: rgb(40, 90, 200);
+            border-left: 5px solid var(--primary-button-hover-color);
+            color: var(--home-sideBar-hover-color);
         ` : ` 
             border-left: 5px solid rgba(0, 0, 0, 0);
         `)}
@@ -82,7 +82,7 @@ const MenuItem = styled.li<{
     cursor: pointer;
 
     &:hover {
-        background-color: rgb(247, 245, 245);
+        background-color: var(--primary-menu-item-bg);
     }
 `
 

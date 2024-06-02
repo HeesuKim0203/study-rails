@@ -9,17 +9,20 @@ WORKDIR /rails
 
 # Set production environment
 ENV RAILS_ENV="production" \
+    NODE_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
-
+    BUNDLE_WITHOUT="development test"
 
 # Throw-away build stage to reduce size of final image
 FROM base as build
 
-# Install packages needed to build gems
+# Install packages needed to build gems and Node.js
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git pkg-config
+    apt-get install --no-install-recommends -y build-essential git pkg-config libmariadb-dev curl && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
@@ -29,30 +32,20 @@ RUN bundle install && \
 # Copy application code
 COPY . .
 
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
-
-
-# Final stage for app image
-FROM base
-
-# Install packages needed for deployment
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libsqlite3-0 && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
-
-# Copy built artifacts: gems, application
-COPY --from=build /usr/local/bundle /usr/local/bundle
-COPY --from=build /rails /rails
+# Ensure npm is available
+ENV PATH="/usr/local/nodejs/bin:$PATH"
 
 # Run and own only the runtime files as a non-root user for security
-RUN useradd rails --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
-USER rails:rails
+RUN useradd -ms /bin/bash rails && \
+    chown -R rails:rails /rails
 
-# Entrypoint prepares the database.
-ENTRYPOINT ["/rails/bin/docker-entrypoint"]
+# Copy entrypoint script and set permissions
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Start the server by default, this can be overwritten at runtime
-EXPOSE 3000
-CMD ["./bin/rails", "server"]
+# Switch to non-root user
+USER rails
+
+# Entrypoint prepares the database and builds assets if necessary
+ENTRYPOINT ["docker-entrypoint.sh"]
+

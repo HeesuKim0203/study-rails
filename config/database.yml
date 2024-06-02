@@ -29,10 +29,10 @@ development: &default
   encoding: utf8
   reconnect: false
   pool: 5
-  username: root
-  password: 1234
-  database: study-rails
-  host: 127.0.0.1
+  username: <%= ENV['RAILS_DB_USER_NAME'] %>
+  password: <%= ENV['RAILS_DB_PASSWORD'] %>
+  database: <%= ENV['RAILS_DATABASE_NAME'] %>
+  host: <%= ENV['RAILS_DATABASE_HOST'] %>
   port: 3306
 
 test:

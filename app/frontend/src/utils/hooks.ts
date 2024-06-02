@@ -34,8 +34,9 @@ export function useApiHook<T>(api: AxiosInstance, query: AxiosRequestConfig): Ap
     return { data, error, load, getData, setLoad }
 }
 
-
 export const useData = (data: Bill[]) => {
+
+    console.log(data)
 
     const [sortKey, setSortKey] = useState<keyof Bill>(BILL_KEY.UPDATE_AT)
     const [sortOrder, setSortOrder] = useState<Order>(ORDER.DESC)
@@ -56,7 +57,7 @@ export const useData = (data: Bill[]) => {
             setSortKey(newKey)
             setSortOrder(ORDER.ASC)
         }
-        // ソートしたときはチェックボックスの状態をリセット
+
         setStatuses(Array(data.length).fill(false))
     }
 

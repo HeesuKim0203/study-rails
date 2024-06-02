@@ -6,16 +6,66 @@ module Api
       skip_before_action :verify_authenticity_token, only: [:create, :update]
 
       def count
-        @total_count = Bill.count
+        search_params = params.permit(
+          :business_partner, :tail_str, :branch_number, :invoice_date,
+          :method_of_deposit, :deposit_date, :title, :representative,
+          :remarks, :memo, :my_company_id, :amount, :method_of_tax
+        ).to_h.compact
+
+        if search_params.present?
+
+            must_queries = search_params.map do |key, value|
+            { wildcard: { key => "*#{value}*" } }
+          end
+
+            query_body = {
+            query: {
+              bool: {
+                must: must_queries
+              }
+            }
+          }
+
+          search_response = Bill.search(query_body)
+          @bills = search_response['hits']['hits'].map { |hit| Bill.find(hit['_id']) }
+          @total_count = @bills.size
+        else
+          @total_count = Bill.count
+        end
         render json: { total_count: @total_count }
       end
 
       def index
-        if params[:per_page] && params[:page]
-          @bills = Bill.order(updated_at: :desc).page(params[:page]).per(params[:per_page])
+        search_params = params.permit(
+          :business_partner, :tail_str, :branch_number, :invoice_date,
+          :method_of_deposit, :deposit_date, :title, :representative,
+          :remarks, :memo, :my_company_id, :amount, :method_of_tax
+        ).to_h.compact
+
+        if search_params.present?
+
+          must_queries = search_params.map do |key, value|
+            { wildcard: { key => "*#{value}*" } }
+          end
+
+          query_body = {
+            query: {
+              bool: {
+                must: must_queries
+              }
+            }
+          }
+
+          search_response = Bill.search(query_body)
+          @bills = search_response['hits']['hits'].map { |hit| Bill.find(hit['_id']) }
         else
-          @bills = Bill.all
+          @bills = Bill.order(updated_at: :desc)
         end
+
+        if params[:per_page].present? && params[:page].present?
+          @bills = Kaminari.paginate_array(@bills).page(params[:page]).per(params[:per_page])
+        end
+
         render json: @bills, include: :statements
       end
 

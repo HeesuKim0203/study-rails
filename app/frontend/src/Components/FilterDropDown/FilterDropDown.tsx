@@ -16,11 +16,12 @@ import {
     FilterOptionArea,
     FilterOptionControllerButton
 } from './FilterDropDownStyle'
+import { ICON_SIZE } from '../../utils/constants'
 
 interface DropdownProps {
     option?: FilterOptions
     options?: FilterOptions[]
-    onOptionClick: (option: string) => void
+    onOptionClick: (option: FilterOptions) => void
     onDelete?: () => void
 }
 
@@ -35,44 +36,23 @@ const Dropdown = ({
     const [inputValue, setInputValue] = useState('')
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)
-    const handleInputOption = () => {
-        onOptionClick(inputValue)
+    const handleInputOption = (option: FilterOptions) => {
+        onOptionClick({...option, value:inputValue})
         setIsOpen(!isOpen)
     }
 
-    // useEffect(() => {
-    //     const closeDropDown = (e: any) => {
-    //         if(e.currentTarget.className !== 'dropDown') {
-    //             console.log('document')
-    //         //     console.log('document')
-    //         //     setIsOpen(false) 
-    //         }
-
-            
-    //     }
-    //     if(isOpen) {
-    //         document.addEventListener('mousedown', closeDropDown)
-    //     }else {
-    //         document.removeEventListener('mousedown', closeDropDown)
-    //     }
-    // }, [isOpen])
-
-    useEffect(() => {
-        options
-    }, [inputValue])
-
     return (
         <DropdownContainer>
-            <IconContext.Provider value={{ size: '1.4rem' }} >
+            <IconContext.Provider value={{ size: ICON_SIZE.NORMAL }} >
                 <DropdownToggle
                     onClick={() => setIsOpen(!isOpen)}
                 >
-                    {options ? <RiFilter3Fill /> : <></>}
+                    {options && <RiFilter3Fill />}
                     <DropdownToggleText>
-                        { option ? option.text : 'フィルタ追加'}
+                        { option ? `${option.text} ${option.value ? ' : ' + option.value : ''}` : 'フィルタ追加'}
                     </DropdownToggleText>
-                    {options ? <></> : 
-                        <IconContext.Provider value={{ size: '1rem' }} >
+                    {options && 
+                        <IconContext.Provider value={{ size: ICON_SIZE.SMALL }} >
                             <GoTriangleDown/>
                         </IconContext.Provider>
                     }
@@ -91,12 +71,14 @@ const Dropdown = ({
                             value={inputValue}
                             onChange={handleInputChange}
                         ></DropdownInput>
-                        {options ? options.map((option, index) => (
+                        {options ? options.filter((value) => 
+                            value.text.includes(inputValue)
+                        ).map((option, index) => (
                             <DropdownItem key={index} onClick={(e) => {
-                                    console.log('check')
                                     e.stopPropagation()
-                                    onOptionClick(option.text)
+                                    onOptionClick(option)
                                     setIsOpen(!isOpen)
+                                    setInputValue('')
                                 }}
                             >
                                 {option.text}
@@ -104,7 +86,7 @@ const Dropdown = ({
                         )) : 
                             <FilterOptionArea>
                                 <FilterOptionControllerButton
-                                    onClick={(e) => handleInputOption()}
+                                    onClick={(e) => {option && handleInputOption(option)}}
                                 >適用</FilterOptionControllerButton> 
                                 <FilterOptionControllerButton
                                     onClick={(e) => {

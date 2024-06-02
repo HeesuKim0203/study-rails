@@ -14,6 +14,7 @@ export type ListElm = {
 
 export type FilterOptions = {
     text: string
+    key: keyof Bill
     value?: string
 }
 
@@ -63,4 +64,12 @@ export type Bill = {
     [BILL_KEY.UPDATE_AT]: Date | undefined
 }
 
+export type GetBillParams = Partial<Bill & { page : number, per_page: number }>
+
 export type BillValueUnionType = PropertyValueUnion<Bill>
+
+export type FilterDataType = {
+    text: string
+    filterOption: FilterOptions[]
+    recordNum: number
+}

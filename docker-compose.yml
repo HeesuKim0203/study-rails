@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:latest
+    container_name: mysql
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${RAILS_DB_PASSWORD}
+      MYSQL_DATABASE: ${RAILS_DATABASE_NAME}
+      MYSQL_USER: ${DOCKER_DB_USER_NAME}
+      MYSQL_PASSWORD: ${RAILS_DB_PASSWORD}
+    ports:
+      - "3306:3306"
+
+  opensearch:
+    image: opensearchproject/opensearch:latest
+    container_name: opensearch
+    environment:
+      discovery.type: single-node
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+      OPENSEARCH_SECURITY_SSL_HTTP_ENABLED: "false"
+      OPENSEARCH_PLUGINS_SECURITY_DISABLED: "true"
+      DISABLE_SECURITY_PLUGIN: "true"
+      OPENSEARCH_USERNAME: ${DOCKER_OPENSEARCH_USERNAME}
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: ${DOCKER_OPENSEARCH_PASSWORD}
+      # Install kuromoji plugin on startup
+      OPENSEARCH_PLUGINS_INSTALL: "analysis-kuromoji"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+      - ./opensearch.yml:/usr/share/opensearch/config/opensearch.yml
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+
+  web:
+    build: .
+    container_name: rails
+    command: .
+    volumes:
+      - .:/rails
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: mysql2://${RAILS_DB_USER_NAME}:${RAILS_DB_PASSWORD}@db/${RAILS_DATABASE_NAME}
+      ELASTICSEARCH_URL: ${OPENSEARCH_URL}
+      VITE_API_URL: ${VITE_API_URL}
+      RAILS_DB_USER_NAME: ${RAILS_DB_USER_NAME}
+      RAILS_DB_PASSWORD: ${RAILS_DB_PASSWORD}
+      RAILS_DATABASE_HOST: ${RAILS_DB_PASSWORD}
+      RAILS_DATABASE_NAME: ${RAILS_DATABASE_NAME}
+
+      DOCKER_DB_USER_NAME: ${DOCKER_DB_USER_NAME}
+      SECRET_KEY_BASE: ${DOCKER_RAILS_SECERT_KEY}
+      DOCKER_OPENSEARCH_USERNAME: ${DOCKER_OPENSEARCH_USERNAME}
+      DOCKER_OPENSEARCH_PASSWORD: ${DOCKER_OPENSEARCH_PASSWORD}
+    depends_on:
+      - db
+      - opensearch
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - web
+
+volumes:
+  db_data:
+  opensearch-data:
