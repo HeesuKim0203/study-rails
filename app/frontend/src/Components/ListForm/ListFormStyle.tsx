@@ -28,7 +28,7 @@ const Index = styled.span`
 `
 
 const TableHeader = styled.div`
-    width: 28rem;
+    width: 27rem;
     white-space: nowrap;
 `
 

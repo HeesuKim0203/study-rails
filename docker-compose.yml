@@ -22,6 +22,7 @@ services:
       OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
       OPENSEARCH_SECURITY_SSL_HTTP_ENABLED: "false"
       OPENSEARCH_PLUGINS_SECURITY_DISABLED: "true"
+      DISABLE_SECURITY_PLUGIN: "true"
       OPENSEARCH_USERNAME: ${DOCKER_OPENSEARCH_USERNAME}
       OPENSEARCH_INITIAL_ADMIN_PASSWORD: ${DOCKER_OPENSEARCH_PASSWORD}
       # Install kuromoji plugin on startup
@@ -32,6 +33,7 @@ services:
         hard: -1
     volumes:
       - opensearch-data:/usr/share/opensearch/data
+      - ./opensearch.yml:/usr/share/opensearch/config/opensearch.yml
     ports:
       - "9200:9200"
       - "9600:9600"
@@ -39,14 +41,14 @@ services:
   web:
     build: .
     container_name: rails
-    command: ./bin/rails server -b 0.0.0.0 -p 3000
+    command: .
     volumes:
       - .:/rails
     ports:
       - "3000:3000"
     environment:
       DATABASE_URL: mysql2://${RAILS_DB_USER_NAME}:${RAILS_DB_PASSWORD}@db/${RAILS_DATABASE_NAME}
-      ELASTICSEARCH_URL: http://opensearch:9200
+      ELASTICSEARCH_URL: ${OPENSEARCH_URL}
       VITE_API_URL: ${VITE_API_URL}
       RAILS_DB_USER_NAME: ${RAILS_DB_USER_NAME}
       RAILS_DB_PASSWORD: ${RAILS_DB_PASSWORD}

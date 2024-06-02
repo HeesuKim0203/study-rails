@@ -202,10 +202,6 @@ const Home = () => {
     useEffect(() => {
         localStorage.setItem('study-rail@test1', JSON.stringify(filter))
     }, [filter])
-
-    useEffect(() => {
-        if(bills.length === 0) getData()
-    }, [bills])
     
     const {
       sort,
@@ -434,6 +430,8 @@ const Home = () => {
                                                                         ...bills.slice(0, i),
                                                                         ...bills.slice(i + 1, bills.length)
                                                                     ])
+
+								    getData()
                                                                 }
                                                             }}
                                                         >

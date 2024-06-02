@@ -3,7 +3,12 @@ import { TextButton } from '../CommonStyle'
 import { Link } from 'react-router-dom'
 
 const Container = styled.div`
-    overflow-y: auto;
+    width: 100%;
+
+    @media screen and (max-width: 1420px) {
+        width: 1344px;
+        overflow-x: scroll;
+    }
 `
 
 const Wrapper = styled.div`

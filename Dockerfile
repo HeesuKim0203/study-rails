@@ -9,6 +9,7 @@ WORKDIR /rails
 
 # Set production environment
 ENV RAILS_ENV="production" \
+    NODE_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
     BUNDLE_WITHOUT="development test"
@@ -19,8 +20,9 @@ FROM base as build
 # Install packages needed to build gems and Node.js
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential git pkg-config libmariadb-dev curl && \
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
@@ -29,18 +31,6 @@ RUN bundle install && \
 
 # Copy application code
 COPY . .
-
-# Final stage for app image
-FROM base
-
-# Install packages needed for deployment
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
-
-# Copy built artifacts: gems, application, and assets
-COPY --from=build /usr/local/bundle /usr/local/bundle
-COPY --from=build /rails /rails
 
 # Ensure npm is available
 ENV PATH="/usr/local/nodejs/bin:$PATH"
@@ -58,8 +48,4 @@ USER rails
 
 # Entrypoint prepares the database and builds assets if necessary
 ENTRYPOINT ["docker-entrypoint.sh"]
-
-# Start the server by default, this can be overwritten at runtime
-EXPOSE 3000
-CMD ["./bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]
 

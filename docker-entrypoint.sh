@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Remove pre-existing server.pid for Rails.
+rm -f /rails/tmp/pids/server.pid
+
 # Load environment variables from .env file
 if [ -f .env ]; then
   export $(cat .env | xargs)
@@ -19,10 +22,10 @@ bundle exec rails db:prepare
 bundle exec rails db:migrate
 
 # Run seed
-bundle exec rails db:seed
 
 # Index the data
 bundle exec rails runner "Bill.find_each(&:index_document)"
+bundle exec rails server
 
 # Then exec the container's main process (what's set as CMD in the Dockerfile)
 exec "$@"

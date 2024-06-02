@@ -6,6 +6,11 @@ const Container = styled.div`
     .vb-listTable {
         overflow-x: auto;
     }
+
+    @media screen and (max-width: 1086px) {
+        width: calc(850px + var(--home-sideBar-width));
+        overflow-x: scroll;
+    }
 `
 
 const Wrapper = styled.div`

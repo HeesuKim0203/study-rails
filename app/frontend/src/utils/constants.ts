@@ -131,8 +131,7 @@ export const LIST_TABLE_HEADER = [
         alignRight: true,
         onClick: true,
         ordering: true,
-        sortValue: BILL_KEY.AMOUNT,
-        key: BILL_KEY.AMOUNT
+        sortValue: BILL_KEY.AMOUNT
     },
     {
         value: '社内メモ',
@@ -164,7 +163,6 @@ export const LIST_TABLE_HEADER = [
         onClick: true,
         ordering: true,
         sortValue: BILL_KEY.INVOICE_DATE,
-        key: BILL_KEY.INVOICE_DATE
     },
     {
         value: '期日',
@@ -172,7 +170,6 @@ export const LIST_TABLE_HEADER = [
         onClick: true,
         ordering: true,
         sortValue: BILL_KEY.DEPOSIT_DATE,
-        key: BILL_KEY.DEPOSIT_DATE
     },
     {
         value: '自社担当者',
@@ -239,8 +236,8 @@ export const CREATE_SUCCESS = 201
 export const FILTER_DATA = [
     {text : '全ての請求書'},
     {
-        text : '入金方法:振込', filterOption: [
-            {text: '入金方法', key: BILL_KEY.METHOD_OF_DEPOSIT, value: '振込'}
+        text : '件名:テスト', filterOption: [
+            {text: '件名', key: BILL_KEY.TITLE, value: 'テスト'}
         ],
         recordNum: 0
     },
