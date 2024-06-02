@@ -1,3 +1,18 @@
+# Description of Environment Variables
+
+RAILS_DB_USER_NAME: Username for the Rails database.
+RAILS_DB_PASSWORD: Password for the Rails database.
+RAILS_DATABASE_NAME: Name of the Rails database.
+RAILS_DATABASE_HOST: Host address for the Rails database.
+VITE_API_URL: Base URL for the Vite API.
+OPENSEARCH_URL: URL for the OpenSearch service.
+DOCKER_RAILS_SECRET_KEY: Secret key for the Dockerized Rails application.
+DOCKER_DB_USER_NAME: Username for the Docker database.
+DOCKER_OPENSEARCH_PASSWORD: Password for the Docker OpenSearch service.
+DOCKER_OPENSEARCH_USERNAME: Username for the Docker OpenSearch service.
+
+To use these variables, ensure they are included in your environment configuration file. For example, you can create a .env file in the root directory of your project with the above content.
+
 # Rails Study 
 
 Implementing a simple example site for learning Rails
