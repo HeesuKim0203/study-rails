@@ -15,6 +15,9 @@ if [ ! -d "node_modules" ]; then
   npm install
 fi
 
+# frontend Code build
+npm run build
+
 # Check if database exists
 bundle exec rails db:prepare
 
