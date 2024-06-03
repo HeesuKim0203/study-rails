@@ -4,13 +4,13 @@ module Api
       protect_from_forgery with: :null_session
 
       def index
-        @my_companies = MyCompany.all
-        render json: @my_companies
+        my_companies = MyCompany.all
+        render json: my_companies
       end
 
       def show
-        @my_company = MyCompany.find(params[:id])
-        render json: @my_company
+        my_company = MyCompany.find(params[:id])
+        render json: my_company
       end
 
       # def create
@@ -23,11 +23,11 @@ module Api
       # end
 
       def update
-        @my_company = MyCompany.find(params[:id])
-        if @my_company.update(my_company_params)
-          render json: @my_company, status: :ok
+        my_company = MyCompany.find(params[:id])
+        if my_company.update(my_company_params)
+          render json: my_company, status: :ok
         else
-          render json: @my_company.errors, status: :unprocessable_entity
+          render json: my_company.errors, status: :unprocessable_entity
         end
       end
 
