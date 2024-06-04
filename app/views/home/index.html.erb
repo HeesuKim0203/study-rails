@@ -1,9 +1,5 @@
 <%= content_tag :div, '', id: 'root', data: { mycompany: @my_companies } %>
 
-<% if Rails.env.development? %>
-    <%= vite_javascript_tag 'home.tsx' %>
-<% else %>
-    <%= vite_javascript_tag 'home.tsx' %>
-<% end %>
+<%= vite_javascript_tag 'home.tsx' %>
 
 <div id="root"></div>

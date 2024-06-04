@@ -6,7 +6,6 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    
     <%= vite_client_tag %>
     <!--
       If using a TypeScript entrypoint file:
@@ -19,6 +18,7 @@
     -->
 
     <!-- Favicon -->
+    <link rel="icon" href="<%= asset_path 'favicon.ico' %>">
     
     <%= vite_react_refresh_tag %>
   </head>

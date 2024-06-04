@@ -17,6 +17,12 @@ export default defineConfig({
       input: {
         main: path.resolve(__dirname, 'app/frontend/entrypoints/home.tsx')
       },
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          vendor: ['axios', 'moment', 'styled-components', 'react-router-dom', 'react-icons', 'web-vitals', 'xlsx']
+        }
+      }
     },
     outDir: 'public',
     emptyOutDir: true,

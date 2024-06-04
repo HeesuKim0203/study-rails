@@ -131,7 +131,8 @@ export const LIST_TABLE_HEADER = [
         alignRight: true,
         onClick: true,
         ordering: true,
-        sortValue: BILL_KEY.AMOUNT
+        sortValue: BILL_KEY.AMOUNT,
+        key: BILL_KEY.AMOUNT
     },
     {
         value: '社内メモ',

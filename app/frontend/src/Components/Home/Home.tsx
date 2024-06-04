@@ -94,10 +94,8 @@ const Home = () => {
 
     const getData = async() => {
 
-        let paramsOptions: GetBillParams = filterOptions.reduce((prev: any, {text, key, value}: FilterOptions, index) => {
-            if(value) {
-                prev[key] = value
-            }
+        let paramsOptions: GetBillParams = filterOptions.reduce((prev: any, {key, value}: FilterOptions) => {
+            if(value) prev[key] = value
             return prev
         }, {})
 
@@ -115,7 +113,7 @@ const Home = () => {
                     params: paramsOptions
                 }
             )
-            
+
             if(responseCount.status !== SUCCESS && responseBills.status !== SUCCESS) {
                 throw Error
             }
@@ -127,6 +125,7 @@ const Home = () => {
             
             // Todo : error message logic
             setPageCount(1)
+            setBills([])
 
         }finally {
             
@@ -136,14 +135,12 @@ const Home = () => {
     }
 
     const getFilterRecordNum = async (filterOptions: FilterOptions[]) => {
-        let paramsOptions: GetBillParams = filterOptions.reduce((prev: any, {text, key, value}: FilterOptions, index) => {
+        let paramsOptions: GetBillParams = filterOptions.reduce((prev: any, {key, value}: FilterOptions) => {
             if(value) {
                 prev[key] = value
             }
             return prev
         }, {})
-
-        console.log(paramsOptions)
 
         try {    
             const responseCount = await getBillsCount(
@@ -168,7 +165,7 @@ const Home = () => {
             return updatedFilters
         }else {
             updatedFilters = await Promise.all(
-                filter.filter((_, index) => index !== 0).map(async (filter, index) => {
+                filter.filter((_, index) => index !== 0).map(async (filter) => {
                     const recordNum = await getFilterRecordNum(filter.filterOption)
                     return { ...filter, recordNum }
                 })
@@ -293,7 +290,6 @@ const Home = () => {
                                                         <FilterDropDown
                                                             option={filterOption}
                                                             onOptionClick={(e) => {
-                                                                console.log(e)
                                                                 setFilterOptions([
                                                                     ...filterOptions.slice(0, index),
                                                                     e,
@@ -425,13 +421,12 @@ const Home = () => {
                                                             mr={0.5} danger small appearance='tertiary'
                                                             onClick={async () => {
                                                                 const response = row.id && await deleteBill(row.id)
-                                                                if((response as AxiosResponse)?.status === 200) {
+                                                                if((response as AxiosResponse)?.status === SUCCESS) {
                                                                     setBills([
                                                                         ...bills.slice(0, i),
                                                                         ...bills.slice(i + 1, bills.length)
                                                                     ])
-
-								    getData()
+								                                    getData()
                                                                 }
                                                             }}
                                                         >
@@ -443,7 +438,7 @@ const Home = () => {
                                                 {value: formatNumberWithCommas(row[BILL_KEY.AMOUNT]), alignRight: true },
                                                 {value: row[BILL_KEY.MEMO]},
                                                 {value: row[BILL_KEY.REMARKS]},
-                                                //Todo: JP Check
+                                                // Todo: JP Check
                                                 {value: row[BILL_KEY.METHOD_OF_DEPOSIT]},
                                                 {value: row[BILL_KEY.INVOICE_DATE]},
                                                 {value: row[BILL_KEY.DEPOSIT_DATE]},

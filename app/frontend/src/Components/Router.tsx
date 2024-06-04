@@ -1,13 +1,12 @@
-import React, { ReactNode, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { CREATE_URL, HOME_URL, INVOICES_URL, SHOW_INVOICES_URL } from '../utils/constants'
+import styled from 'styled-components'
+import { PropsForRailsData } from '../utils/type'
+
 import Home from './Home'
 import Header from './Header'
-import styled from 'styled-components'
 import SideNavigator from './SideNavigator/SideNavigator'
 import Create from './Create'
-import { Bill, MyCompany, PropsForRailsData } from '../utils/type'
-import Modal from './Modal'
 
 const Wrapper = styled.div`
     box-sizing: border-box;

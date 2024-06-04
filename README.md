@@ -123,8 +123,10 @@ rails -v
 ```
 
 ### Reference 
+[ruby](https://www.ruby-lang.org/en/documentation/)
 [rails / react](https://tech.fusic.co.jp/posts/2022-07-07-vite-rails-react/)  
 [rails document](https://guides.rubyonrails.org/)
+[opensearch ruby](https://opensearch.org/docs/latest/clients/ruby/)
 
 # Post man
 

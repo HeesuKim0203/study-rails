@@ -1,0 +1,26 @@
+{
+  "_react-l6gY0biY.js": {
+    "file": "assets/react-l6gY0biY.js",
+    "name": "react"
+  },
+  "_vendor-luQp1yv2.js": {
+    "file": "assets/vendor-luQp1yv2.js",
+    "name": "vendor",
+    "imports": [
+      "_react-l6gY0biY.js"
+    ]
+  },
+  "entrypoints/home.tsx": {
+    "file": "assets/main-BZS19zXS.js",
+    "name": "main",
+    "src": "entrypoints/home.tsx",
+    "isEntry": true,
+    "imports": [
+      "_react-l6gY0biY.js",
+      "_vendor-luQp1yv2.js"
+    ],
+    "css": [
+      "assets/main-BGzKtqLF.css"
+    ]
+  }
+}

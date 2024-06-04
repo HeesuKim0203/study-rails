@@ -1,4 +1,4 @@
-import axios, { Axios, AxiosRequestConfig } from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 import { Bill } from './utils/type'
 
 export const BASE_URL = import.meta.env.VITE_API_URL
