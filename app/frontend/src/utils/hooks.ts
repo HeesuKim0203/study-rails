@@ -24,7 +24,6 @@ export function useApiHook<T>(api: AxiosInstance, query: AxiosRequestConfig): Ap
             const { data: result } = await api(query)
             setData(result)
         } catch (err) {
-            console.log(err)
             setError("Can't request data from server.")
         } finally {
             setLoad(true)
@@ -35,8 +34,6 @@ export function useApiHook<T>(api: AxiosInstance, query: AxiosRequestConfig): Ap
 }
 
 export const useData = (data: Bill[]) => {
-
-    console.log(data)
 
     const [sortKey, setSortKey] = useState<keyof Bill>(BILL_KEY.UPDATE_AT)
     const [sortOrder, setSortOrder] = useState<Order>(ORDER.DESC)
