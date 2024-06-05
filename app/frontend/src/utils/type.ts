@@ -1,4 +1,5 @@
-import { BILL_KEY, ICON_SIZE, METHOD_OF_DEPOSIT, METHOD_OF_TAX, ORDER } from './constants'
+import { ReactNode } from 'react'
+import { BILL_KEY, ICON_SIZE, METHOD_OF_DEPOSIT, METHOD_OF_TAX, OPERATOR, ORDER } from './constants'
 
 type PropertyValueUnion<T extends object> = T[keyof T]
 
@@ -16,7 +17,23 @@ export type FilterOptions = {
     text: string
     key: keyof Bill
     value?: string
+    content?: () => any
+    additionalData?: AdditionalDataType
+    additionalQuery?: string
 }
+
+export type ListTableType = Partial<{
+    value: string
+    minWidth: number
+    onClick: boolean
+    ordering: boolean
+    sortValue: string
+    alignRight: boolean
+    content: () => any
+    key: keyof Bill
+    additionalData: AdditionalDataType
+    additionalQuery: string
+}>
 
 export type IconSize = PropertyValueUnion<typeof ICON_SIZE>
 
@@ -73,3 +90,8 @@ export type FilterDataType = {
     filterOption: FilterOptions[]
     recordNum: number
 }
+
+export type SearchNumberOperatorType = PropertyValueUnion<typeof OPERATOR>
+
+export type AdditionalDataType = 
+    | SearchNumberOperatorType

@@ -1,6 +1,6 @@
 import moment from 'moment'
 import * as XLSX from 'xlsx'
-import { Bill, ListFromType, MethodOfDepositType, MethodOfTaxType } from './type'
+import { Bill, FilterOptions, GetBillParams, ListFromType, MethodOfDepositType, MethodOfTaxType } from './type'
 import { METHOD_OF_DEPOSIT, METHOD_OF_TAX, TAX_OPTION } from './constants'
 
 export const getFileNameDate = () => {
@@ -89,3 +89,14 @@ export const isMethodOfTaxForeign = (methodOfTax: MethodOfTaxType)
     : methodOfTax is typeof METHOD_OF_TAX.FOREIGN => (
         methodOfTax === METHOD_OF_TAX.FOREIGN
 )
+
+export const styledComponentBoolToNumber = (bool : unknown): number => bool ? 1 : 0
+
+export const paramsOptionsSetting = (filterOptions: FilterOptions[]) => {
+    const paramsOptions: GetBillParams = filterOptions.reduce((prev: any, {key, value, additionalData}: FilterOptions) => {
+        if(value) prev[key] = value + ' ' + additionalData
+        return prev
+    }, {})
+
+    return paramsOptions
+}

@@ -219,15 +219,12 @@ const Create = ({
                                             mr={1} 
                                             label='入金方法'
                                             fieldId='submit_invoice_method_of_deposit'
-                                            
                                         >
                                             <RadioButton
                                                 mr={1}
                                                 value={METHOD_OF_DEPOSIT.BANK_TRANSFER}
                                                 checked={isMethodOfDepositBankTransfer(bill[BILL_KEY.METHOD_OF_DEPOSIT])}
-                                                onChange={(e) => { 
-                                                    onChange(e.target.value, BILL_KEY.METHOD_OF_DEPOSIT)
-                                                }}
+                                                onChange={(e) => onChange(e.target.value, BILL_KEY.METHOD_OF_DEPOSIT)}
                                                 name='入金方法'
                                             >
                                                 {METHOD_OF_DEPOSIT.BANK_TRANSFER}
@@ -235,9 +232,7 @@ const Create = ({
                                             <RadioButton
                                                 value={METHOD_OF_DEPOSIT.TRANSFER}
                                                 checked={bill[BILL_KEY.METHOD_OF_DEPOSIT] === METHOD_OF_DEPOSIT.TRANSFER}
-                                                onChange={(e) => {
-                                                    onChange(e.target.value, BILL_KEY.METHOD_OF_DEPOSIT)
-                                                }}
+                                                onChange={(e) => onChange(e.target.value, BILL_KEY.METHOD_OF_DEPOSIT)}
                                                 name='入金方法'
                                             >
                                                 {METHOD_OF_DEPOSIT.TRANSFER}
@@ -333,7 +328,6 @@ const Create = ({
                                 <ListForm 
                                     values={values}
                                     setValues={setValues}
-                                    // Bill particulars
                                 />
                                 <CalcResultContainer>
                                     <CalcResultArea>

@@ -1,10 +1,12 @@
+import React, { useState } from 'react'
 
 import { IoDocumentTextOutline } from 'react-icons/io5'
 import { IoCalculatorOutline } from 'react-icons/io5'
 import { LuTruck } from 'react-icons/lu'
 import { BsCart4 } from 'react-icons/bs'
 import { MdOutlineReceiptLong } from 'react-icons/md'
-import { Bill, FilterDataType, FilterOptions } from './type'
+import { Bill, FilterDataType, FilterOptions, ListTableType, SearchNumberOperatorType } from './type'
+import { FormControl, RadioButton } from '@freee_jp/vibes'
 
 // url
 export const HOME_URL = '/'
@@ -16,6 +18,13 @@ export const PURCHASE_ORDERS_URL = '/purchase_orders'
 export const RECEIPTS_URL = '/receipts'
 
 export const SHOW_INVOICES_URL = `${INVOICES_URL}/:id`
+
+// search logic
+
+export const OPERATOR = {
+    MORE_THAN: '<=',
+    LESS_THAN: '>='
+}
 
 // List form
 
@@ -132,7 +141,40 @@ export const LIST_TABLE_HEADER = [
         onClick: true,
         ordering: true,
         sortValue: BILL_KEY.AMOUNT,
-        key: BILL_KEY.AMOUNT
+        key: BILL_KEY.AMOUNT,
+        content: function Cotent() {
+            const [operator, setOperator] = useState<SearchNumberOperatorType>(OPERATOR.MORE_THAN) 
+            return {
+                node : (
+                    <FormControl
+                        label='演算' 
+                        mr={1} 
+                        mb={1}
+                        fieldId='submit_invoice_representative'
+                    >
+                        <RadioButton 
+                            name='演算'
+                            value={OPERATOR.MORE_THAN}
+                            checked={operator === OPERATOR.MORE_THAN}
+                            onChange={(e) => setOperator(e.target.value)}
+                            mr={1}
+                        >
+                            以上
+                        </RadioButton>
+                        <RadioButton
+                            name='演算'
+                            value={OPERATOR.LESS_THAN}
+                            checked={operator === OPERATOR.LESS_THAN}
+                            onChange={(e) => setOperator(e.target.value)}
+                        >
+                            以下
+                        </RadioButton >
+                    </FormControl>
+                ),
+                value: operator,
+            }
+        },
+        additionalData: undefined
     },
     {
         value: '社内メモ',
@@ -180,7 +222,7 @@ export const LIST_TABLE_HEADER = [
         sortValue: '',
         key: BILL_KEY.REPRESENTATIVE
     },
-]
+] as ListTableType[]
 
 // Order
 
@@ -205,9 +247,12 @@ export const SIDE_MENU_TITLE = 'フィルタ条件'
 export const HAEDER_DROPDOWN_LABEL = '請求書作成用CSVインポート'
 
 // Filter Options
-export const FILTER_OPTIONS = LIST_TABLE_HEADER.filter((header) => header.key).map((header, index) => ({
+export const FILTER_OPTIONS = LIST_TABLE_HEADER.filter(header => header?.key).map(header => ({
     text: header.value,
-    key: header.key
+    key: header.key,
+    content: header.content,
+    additionalData: header.additionalData,
+    additionalQuery: header.additionalQuery
 })) as FilterOptions[]
 
 // Pagination Options

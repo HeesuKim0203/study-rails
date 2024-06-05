@@ -1,7 +1,7 @@
-import React, { useState, ChangeEvent, useEffect } from 'react'
+import React, { useState, ChangeEvent, useEffect, SetStateAction, ReactNode } from 'react'
 import { IoSearch } from 'react-icons/io5'
 import { IconContext } from 'react-icons'
-import { FilterOptions } from '../../utils/type'
+import { AdditionalDataType, FilterOptions } from '../../utils/type'
 import { RiFilter3Fill } from 'react-icons/ri'
 import { GoTriangleDown } from 'react-icons/go'
 
@@ -17,6 +17,7 @@ import {
     FilterOptionControllerButton
 } from './FilterDropDownStyle'
 import { ICON_SIZE } from '../../utils/constants'
+import { styledComponentBoolToNumber } from '../../utils/util'
 
 interface DropdownProps {
     option?: FilterOptions
@@ -32,12 +33,25 @@ const Dropdown = ({
     onDelete
 }: DropdownProps) => {
 
+    let additionalData: AdditionalDataType
+    let additionalNode: ReactNode
+
+    if(option?.content) {
+        const { value, node, query } = option.content()
+        additionalData = value
+        additionalNode = node
+    }
+
     const [isOpen, setIsOpen] = useState(false)
     const [inputValue, setInputValue] = useState('')
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)
     const handleInputOption = (option: FilterOptions) => {
-        onOptionClick({...option, value:inputValue})
+        if(additionalData) {
+            onOptionClick({...option, additionalData, value:inputValue})
+        }else {
+            onOptionClick({...option, value:inputValue})
+        }
         setIsOpen(!isOpen)
     }
 
@@ -58,15 +72,16 @@ const Dropdown = ({
                     }
                 </DropdownToggle>
                 {isOpen && (
-                    <DropdownMenu options={options ? 1 : 0}>
+                    <DropdownMenu options={styledComponentBoolToNumber(options)}>
                         {
                             options && 
                                 <Icon>
                                     <IoSearch />
                                 </Icon>
                         }
+                        { additionalNode || '' }
                         <DropdownInput
-                            options={options ? 1 : 0}
+                            options={styledComponentBoolToNumber(options)}
                             type='text'
                             value={inputValue}
                             onChange={handleInputChange}

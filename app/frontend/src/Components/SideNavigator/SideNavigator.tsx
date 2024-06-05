@@ -5,6 +5,7 @@ import { AiOutlineMenuUnfold } from 'react-icons/ai'
 import { CREATE_URL, HOME_URL, ICON_SIZE, INVOICES_URL, SIDE_MENU } from '../../utils/constants'
 import { Link, useLocation } from 'react-router-dom'
 import Icon from '../Icon'
+import { styledComponentBoolToNumber } from '../../utils/util'
 
 const SideNavigator = () => {
 
@@ -22,7 +23,7 @@ const SideNavigator = () => {
     return (
         <Container>
             <Wrapper
-                iconmenu={iconmenu ? 1 : 0}
+                iconmenu={styledComponentBoolToNumber(iconmenu)}
             >
                 <Header>
                     <IconArea
