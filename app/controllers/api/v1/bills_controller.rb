@@ -65,8 +65,24 @@ module Api
 
       def search_bill(search_params)
         must_queries = search_params.map do |key, value|
-          if key == "amount"
-            { range: { key => { gte: value.to_i } } }
+          if key == 'amount'
+            if value.match?(/(<=|>=|<|>)/)
+              amount_value, operator = value.split(' ').map(&:strip)
+              case operator
+              when '>='
+                { range: { key => { gte: amount_value.to_i } } }
+              when '<='
+                { range: { key => { lte: amount_value.to_i } } }
+              end
+            end
+          elsif key == 'invoice_date' || key == 'deposit_date'
+            date_gte, date_lte = value.split('~').map(&:strip)
+            { range: { key => {
+                gte: date_gte,
+                lte: date_lte
+            } } }
+          elsif key == 'method_of_deposit'
+            { term: { key => value } }
           else
             { wildcard: { key => "*#{value}*" } }
           end

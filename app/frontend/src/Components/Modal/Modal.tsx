@@ -1,6 +1,7 @@
 import { DialogBase } from '@freee_jp/vibes'
 import React, { ReactNode } from 'react'
 import { Container } from './ModalStyle'
+import { styledComponentBoolToNumber } from '../../utils/util'
 
 type Props = {
     display: boolean
@@ -10,11 +11,10 @@ type Props = {
 
 const Modal = ({
     display,
-    onClose,
     content
 }: Props) => {
     return (
-        <Container display={display? 1 : 0}>
+        <Container display={styledComponentBoolToNumber(display)}>
             <DialogBase border='default'>
                 {content}
             </DialogBase>

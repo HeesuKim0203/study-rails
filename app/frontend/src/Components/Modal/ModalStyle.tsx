@@ -28,7 +28,7 @@ const ModalHeader = styled.div`
 `
 
 const ModalTitle = styled.h4`
-    font-size: 2rem;
+    font-size: 1.4rem;
     font-weight: 600;
     
     padding: 0 0 1rem 0;

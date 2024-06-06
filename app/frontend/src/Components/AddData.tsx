@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react'
+import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react'
 import {
     Button,
     ColumnBase,
@@ -21,7 +21,7 @@ const AddData = () => {
 
     const onChange = (
         event: ChangeEvent<HTMLInputElement>, 
-        setState: React.Dispatch<React.SetStateAction<string>>
+        setState: Dispatch<SetStateAction<string>>
     ) => setState(event.target.value)
 
     return  (

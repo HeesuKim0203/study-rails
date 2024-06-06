@@ -64,7 +64,7 @@ import {
 import { IconContext } from 'react-icons'
 import FilterDropDown from '../FilterDropDown'
 import { Link } from 'react-router-dom'
-import { formatNumberWithCommas } from '../../utils/util'
+import { formatNumberWithCommas, paramsOptionsSetting, styledComponentBoolToNumber } from '../../utils/util'
 import { deleteBill, getBillsCount, getBillsPagenation } from '../../api'
 import { useData } from '../../utils/hooks'
 import { AxiosResponse } from 'axios'
@@ -94,10 +94,7 @@ const Home = () => {
 
     const getData = async() => {
 
-        let paramsOptions: GetBillParams = filterOptions.reduce((prev: any, {key, value}: FilterOptions) => {
-            if(value) prev[key] = value
-            return prev
-        }, {})
+        let paramsOptions: GetBillParams = paramsOptionsSetting(filterOptions)
 
         paramsOptions.page = currentPage
         paramsOptions.per_page = rowOption
@@ -135,12 +132,7 @@ const Home = () => {
     }
 
     const getFilterRecordNum = async (filterOptions: FilterOptions[]) => {
-        let paramsOptions: GetBillParams = filterOptions.reduce((prev: any, {key, value}: FilterOptions) => {
-            if(value) {
-                prev[key] = value
-            }
-            return prev
-        }, {})
+        let paramsOptions: GetBillParams = paramsOptionsSetting(filterOptions)
 
         try {    
             const responseCount = await getBillsCount(
@@ -227,7 +219,6 @@ const Home = () => {
                                 iconOnly={true}
                                 IconOnlyComponent={GoTriangleDown}
                                 dropdownContents={[
-                                    // ?????
                                     {
                                         type: 'selectable',
                                         text: '請求書作成用CSVインポート',
@@ -239,7 +230,7 @@ const Home = () => {
 
                     <ContentWrapper>
                         <ContentSideMenu
-                            display={sideMenuDisplay ? 1 : 0}
+                            display={styledComponentBoolToNumber(sideMenuDisplay)}
                         >
                             <IconContext.Provider value={{size: ICON_SIZE.SMALL}} >
                                 <ContentSideMenuHeader>
@@ -260,7 +251,7 @@ const Home = () => {
                                             return (
                                                 <ContentSideMenuItem
                                                     key={index}
-                                                    display={sideMenuDisplay ? 1 : 0}
+                                                    display={styledComponentBoolToNumber(sideMenuDisplay)}
                                                     selected={index === filterSelected}
                                                     onClick={() => setFilterSelected(index)}
                                                 >
@@ -317,10 +308,10 @@ const Home = () => {
                                     </ContentHeaderFilterArea>
                                     <ContentHeaderFilterRightArea>
                                         {filterSelected === 0 ? 
-                                            <Button>
-                                                <ContentButtonFontArea
-                                                    onClick={() => setModalDisplay(!modalDisplay)}
-                                                >フィルタ条件の保存</ContentButtonFontArea>
+                                            <Button
+                                                onClick={() => setModalDisplay(!modalDisplay)}
+                                            >
+                                                <ContentButtonFontArea>フィルタ条件の保存</ContentButtonFontArea>
                                             </Button> : 
                                             <DropdownButton
                                                 ml={1}
@@ -484,7 +475,7 @@ const Home = () => {
                     content={(
                         <>
                             <ModalHeader>
-                                <ModalTitle>test</ModalTitle>
+                                <ModalTitle>フィルタ条件</ModalTitle>
                             </ModalHeader>
                             <ModalContent>
                                 <FormControl

@@ -1,11 +1,7 @@
 import styled from 'styled-components'
 
 const Container = styled.div`
-    .vb-tableListCell {
-        padding: .25rem .25rem ;
-    }
-
-    .vb-tableListHeadCell {
+    .vb-tableListCell .vb-tableListHeadCell {
         padding: .25rem .25rem ;
     }
 `

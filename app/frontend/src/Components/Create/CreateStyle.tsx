@@ -130,7 +130,6 @@ const TdName = styled.td`
 `
 const TdData = styled.td`
     text-align: left;
-    width: 10rem;
 `
 
 const TableCalcResult = styled.table`
@@ -189,7 +188,7 @@ const Footer = styled.div`
 const SubmitFiexd = styled.div`
     border-top: var(--primary-border);
     background: var(--white);
-    z-index: 999;
+    z-index: 498;
     position: fixed;
     padding: 1rem 1.5rem;
     bottom: 0;
