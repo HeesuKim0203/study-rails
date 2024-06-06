@@ -94,7 +94,8 @@ export const styledComponentBoolToNumber = (bool : unknown): number => bool ? 1 
 
 export const paramsOptionsSetting = (filterOptions: FilterOptions[]) => {
     const paramsOptions: GetBillParams = filterOptions.reduce((prev: any, {key, value, additionalData}: FilterOptions) => {
-        if(value) prev[key] = value + ' ' + additionalData
+        if(value) prev[key] = value
+        if(additionalData) prev[key] += ' ' + additionalData
         return prev
     }, {})
 

@@ -14,6 +14,7 @@ import {
     Button,
     FormActions,
     Message,
+    Note,
 } from '@freee_jp/vibes'
 import {
     Container,
@@ -53,7 +54,8 @@ import { Bill, BillValueUnionType, ListFromType, MethodOfTaxType, MyCompany } fr
 import { extractNumber, formatNumberWithCommas, getAmount, getTax, getTaxAmount, getValueAmount, isMethodOfDepositBankTransfer, isMethodOfTaxForeign } from '../../utils/util'
 import TaxCalcTd from './TaxCalcTd'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { createBill, getBill, updateBill } from '../../api'
+import { createBill, getBill, updateBill, updateMyCompany } from '../../api'
+import Modal, { ModalContent, ModalFooter, ModalHeader, ModalTitle } from '../Modal'
 
 type Props = {
     mycompany: MyCompany
@@ -73,6 +75,12 @@ const Create = ({
     const [message, setMessage] = useState('')
     const [sending, setSending] = useState(false)
     const [error, setError] = useState(false)
+
+    const [modalDisplay, setModalDisplay] = useState<boolean>(false)
+    const [myCompanyModalError, setMyCompanyModalError] = useState(false)
+    const [myCompanyMessage, setMyCompanyMessage] = useState('')
+
+    const [myCompany, setMyCompany] = useState<MyCompany>(mycompany)
 
     const [taxResult, setTaxResult] = useState(0)
     const [amount, setAmount] = useState(0)
@@ -294,28 +302,29 @@ const Create = ({
                                             direction='horizontal'
                                         >
                                             <SubTitle>帳票の表示</SubTitle>
-                                            <SectionUserInformationUpdate>
+                                            <SectionUserInformationUpdate
+                                                onClick={(e) => setModalDisplay(true)}
+                                            >
                                                 <Icon size={ICON_SIZE.SMALL} IconComponent={FaPen} />
                                                 <SectionUserInformationUpdateText>編集</SectionUserInformationUpdateText>
                                             </SectionUserInformationUpdate>
                                         </Stack>
                                         <Table>
-                                            {/* Server Data */}
                                             <Tr>
                                                 <TdName>自社名</TdName>
-                                                <TdData>事業所名(未設定)</TdData>
+                                                <TdData>{myCompany.company_name}</TdData>
                                             </Tr>
-                                            <Tr>
+                                            {/* <Tr>
                                                 <TdName>登録番号</TdName>
                                                 <TdData>未設定</TdData>
-                                            </Tr>
+                                            </Tr> */}
                                             <Tr>
                                                 <TdName>自社情報</TdName>
-                                                <TdData>未設定</TdData>
+                                                <TdData>{myCompany.company_info}</TdData>
                                             </Tr>
                                             <Tr>
                                                 <TdName>振込先</TdName>
-                                                <TdData>未設定</TdData>
+                                                <TdData>{myCompany.bank_account}</TdData>
                                             </Tr>
                                         </Table>
                                     </ColumnBase>
@@ -442,25 +451,20 @@ const Create = ({
                                 onClick={async () => {
                                     if(bill[BILL_KEY.BUSINESS_PARTNER] && bill[BILL_KEY.INVOICE_DATE]) {
                                         try {
+                                            const billData = {
+                                                ...bill,
+                                                amount: bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN ? amount + taxResult : amount,
+                                                my_company_id: mycompany.id,
+                                            }
                                             if(CREATE_URL.includes(id)) {
                                                 const response = await createBill({
-                                                    bill : {
-                                                        ...bill,
-                                                        amount: bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN ? amount + taxResult : amount,
-                                                        my_company_id: mycompany.id,
-                                                    }
+                                                    bill : billData
                                                 }, {})
-
                                                 if(response.status !== CREATE_SUCCESS) throw Error
                                             }else {
                                                 const response = await updateBill({
-                                                    bill : {
-                                                        ...bill,
-                                                        amount: bill[BILL_KEY.METHOD_OF_TAX] === METHOD_OF_TAX.FOREIGN ? amount + taxResult : amount,
-                                                        my_company_id: mycompany.id,
-                                                    }
+                                                    bill : billData
                                                 }, id, {})
-
                                                 if(response.status !== SUCCESS) throw Error
                                             }
                                             setMessage('保存しました')
@@ -490,7 +494,101 @@ const Create = ({
                     <Footer />
                 </Wrapper>
                 {message && <FloatingMessageBlock error={error} success={!error} message={message} />}
-                
+                <Modal 
+                    display={modalDisplay}
+                    onClose={() => setModalDisplay(false)}
+                    content={(
+                        <>
+                            <ModalHeader>
+                                <ModalTitle>帳票表示の編集</ModalTitle>
+                            </ModalHeader>
+                            <ModalContent>
+                                <FormControl
+                                    mr={1}
+                                    label='自社担当者'
+                                    fieldId='my_company_person'
+                                >
+                                    <TextField
+                                        width='large'
+                                        name='自社担当者'
+                                        id='my_company_person'
+                                        value={myCompany.responsible_person}
+                                        onChange={(e) => setMyCompany({ ...myCompany, responsible_person: e.target.value})}
+                                        mb={0.5}
+                                    />
+                                </FormControl>
+                                <FormControl
+                                    mr={1}
+                                    label='自社名'
+                                    fieldId='my_company_name'
+                                >
+                                    <TextField
+                                        width='small'
+                                        name='自社名'
+                                        id='my_company_name'
+                                        value={myCompany.company_name}
+                                        onChange={(e) => setMyCompany({ ...myCompany, company_name: e.target.value})}
+                                        mb={0.5}
+                                    />
+                                </FormControl>
+                                <FormControl
+                                    mt={1}
+                                    mr={1}
+                                    label='自社情報'
+                                    fieldId='my_company_information'
+                                >
+                                    <TextArea
+                                        width='small'
+                                        name='自社情報'
+                                        id='my_company_information'
+                                        value={myCompany.company_info}
+                                        onChange={(e) => setMyCompany({ ...myCompany, company_info: e.target.value})}
+                                        mb={0.5}
+                                    />
+                                </FormControl>
+                                <Note>郵便番号、住所、電話番号、メールアドレスなどを入力できます</Note>
+                                <FormControl
+                                    mt={1}
+                                    mr={1}
+                                    label='振込先'
+                                    fieldId='my_company_bank_account'
+                                >
+                                    <TextArea
+                                        width='small'
+                                        name='振込先'
+                                        id='my_company_bank_account'
+                                        value={myCompany.bank_account}
+                                        onChange={(e) => setMyCompany({ ...myCompany, bank_account: e.target.value})}
+                                        mb={0.5}
+                                    />
+                                </FormControl>
+                                <Note>郵便番号、住所、電話番号、メールアドレスなどを入力できます</Note>
+                            </ModalContent>
+                            <ModalFooter>
+                                <FormActions>
+                                    <Button
+                                        appearance='primary'
+                                        onClick={async () => {
+                                            try {
+                                                const response = await updateMyCompany({my_company: myCompany}, myCompany.id, {})
+                                                setMyCompany(response.data)
+                                            } catch (error) {
+                                                setMyCompanyMessage('入力されたデータに誤りがあります。')
+                                                setMyCompanyModalError(true)
+                                            }finally {
+                                                setModalDisplay(false)
+                                            }
+                                        }}
+                                    >OK</Button>
+                                    <Button
+                                        onClick={() => setModalDisplay(false)}
+                                    >キャンセル</Button>
+                                </FormActions>
+                            </ModalFooter>
+                            {myCompanyMessage && <FloatingMessageBlock error={myCompanyModalError} success={!myCompanyModalError} message={myCompanyMessage} />}
+                        </>
+                    )}
+                />
             </Container>
       </>
     )

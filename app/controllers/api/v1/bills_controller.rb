@@ -76,7 +76,7 @@ module Api
               end
             end
           else
-            { wildcard: { key => '*#{value}*' } }
+            { wildcard: { key => "*#{value}*" } }
           end
         end
 

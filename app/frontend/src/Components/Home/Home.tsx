@@ -308,10 +308,10 @@ const Home = () => {
                                     </ContentHeaderFilterArea>
                                     <ContentHeaderFilterRightArea>
                                         {filterSelected === 0 ? 
-                                            <Button>
-                                                <ContentButtonFontArea
-                                                    onClick={() => setModalDisplay(!modalDisplay)}
-                                                >フィルタ条件の保存</ContentButtonFontArea>
+                                            <Button
+                                                onClick={() => setModalDisplay(!modalDisplay)}
+                                            >
+                                                <ContentButtonFontArea>フィルタ条件の保存</ContentButtonFontArea>
                                             </Button> : 
                                             <DropdownButton
                                                 ml={1}
@@ -475,7 +475,7 @@ const Home = () => {
                     content={(
                         <>
                             <ModalHeader>
-                                <ModalTitle>test</ModalTitle>
+                                <ModalTitle>フィルタ条件</ModalTitle>
                             </ModalHeader>
                             <ModalContent>
                                 <FormControl

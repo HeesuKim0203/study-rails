@@ -11,7 +11,6 @@ type Props = {
 
 const Modal = ({
     display,
-    onClose,
     content
 }: Props) => {
     return (
