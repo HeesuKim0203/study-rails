@@ -20,6 +20,7 @@ export type FilterOptions = {
     content?: () => any
     additionalData?: AdditionalDataType
     additionalQuery?: string
+    deleteInput?: boolean
 }
 
 export type ListTableType = Partial<{
@@ -33,6 +34,7 @@ export type ListTableType = Partial<{
     key: keyof Bill
     additionalData: AdditionalDataType
     additionalQuery: string
+    deleteInput: boolean
 }>
 
 export type IconSize = PropertyValueUnion<typeof ICON_SIZE>

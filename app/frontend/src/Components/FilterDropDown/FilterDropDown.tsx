@@ -63,7 +63,7 @@ const Dropdown = ({
                 >
                     {options && <RiFilter3Fill />}
                     <DropdownToggleText>
-                        { option ? `${option.text} ${option.value ? ' : ' + option.value : ''}` : 'フィルタ追加'}
+                        { option ? `${option.text} ${option.value ? ' : ' + option.value : ''} ${option.additionalData ? ' : ' + option.additionalData : ''}` : 'フィルタ追加'}
                     </DropdownToggleText>
                     {options && 
                         <IconContext.Provider value={{ size: ICON_SIZE.SMALL }} >
@@ -80,12 +80,14 @@ const Dropdown = ({
                                 </Icon>
                         }
                         { additionalNode || '' }
-                        <DropdownInput
-                            options={styledComponentBoolToNumber(options)}
-                            type='text'
-                            value={inputValue}
-                            onChange={handleInputChange}
-                        ></DropdownInput>
+                        {option?.deleteInput || 
+                            <DropdownInput
+                                options={styledComponentBoolToNumber(options)}
+                                type='text'
+                                value={inputValue}
+                                onChange={handleInputChange}
+                            ></DropdownInput>
+                        }
                         {options ? options.filter((value) => 
                             value.text.includes(inputValue)
                         ).map((option, index) => (

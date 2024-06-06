@@ -95,9 +95,24 @@ export const styledComponentBoolToNumber = (bool : unknown): number => bool ? 1 
 export const paramsOptionsSetting = (filterOptions: FilterOptions[]) => {
     const paramsOptions: GetBillParams = filterOptions.reduce((prev: any, {key, value, additionalData}: FilterOptions) => {
         if(value) prev[key] = value
-        if(additionalData) prev[key] += ' ' + additionalData
+        if(additionalData) {
+            prev[key] = (prev[key] ? prev[key] + ' ' : '') + additionalData
+        }
         return prev
     }, {})
-
     return paramsOptions
+}
+
+export const getToDay = () => {
+    const today = new Date()
+
+    const year = today.getFullYear()
+
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+
+    const day = String(today.getDate()).padStart(2, '0')
+
+    const formattedDate = `${year}-${month}-${day}`
+
+    return formattedDate
 }

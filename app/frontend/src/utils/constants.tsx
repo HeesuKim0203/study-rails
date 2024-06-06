@@ -6,7 +6,8 @@ import { LuTruck } from 'react-icons/lu'
 import { BsCart4 } from 'react-icons/bs'
 import { MdOutlineReceiptLong } from 'react-icons/md'
 import { Bill, FilterDataType, FilterOptions, ListTableType, SearchNumberOperatorType } from './type'
-import { FormControl, RadioButton } from '@freee_jp/vibes'
+import { DateInput, FormControl, RadioButton } from '@freee_jp/vibes'
+import { getToDay } from './util'
 
 // url
 export const HOME_URL = '/'
@@ -22,8 +23,8 @@ export const SHOW_INVOICES_URL = `${INVOICES_URL}/:id`
 // search logic
 
 export const OPERATOR = {
-    MORE_THAN: '<=',
-    LESS_THAN: '>='
+    MORE_THAN: '>=',
+    LESS_THAN: '<='
 }
 
 // List form
@@ -174,7 +175,8 @@ export const LIST_TABLE_HEADER = [
                 value: operator,
             }
         },
-        additionalData: undefined
+        deleteInput: false,
+        additionalData: ''
     },
     {
         value: '社内メモ',
@@ -182,7 +184,7 @@ export const LIST_TABLE_HEADER = [
         onClick: false,
         ordering: false,
         sortValue: '',
-        key: BILL_KEY.MEMO
+        key: BILL_KEY.MEMO,
     },
     {
         value: '備考',
@@ -198,7 +200,41 @@ export const LIST_TABLE_HEADER = [
         onClick: false,
         ordering: false,
         sortValue: '',
-        key: BILL_KEY.METHOD_OF_DEPOSIT
+        key: BILL_KEY.METHOD_OF_DEPOSIT,
+        content: function Cotent() {
+            const [method, setMethod] = useState<SearchNumberOperatorType>(METHOD_OF_DEPOSIT.BANK_TRANSFER) 
+            return {
+                node : (
+                    <FormControl
+                        label='入金方法' 
+                        mr={1} 
+                        mb={1}
+                        fieldId='submit_invoice_representative'
+                    >
+                        <RadioButton 
+                            name='振込'
+                            value={METHOD_OF_DEPOSIT.BANK_TRANSFER}
+                            checked={method === METHOD_OF_DEPOSIT.BANK_TRANSFER}
+                            onChange={(e) => setMethod(e.target.value)}
+                            mr={1}
+                        >
+                            振込
+                        </RadioButton>
+                        <RadioButton
+                            name='振替'
+                            value={METHOD_OF_DEPOSIT.TRANSFER}
+                            checked={method === METHOD_OF_DEPOSIT.TRANSFER}
+                            onChange={(e) => setMethod(e.target.value)}
+                        >
+                            振替
+                        </RadioButton >
+                    </FormControl>
+                ),
+                value: method,
+            }
+        },
+        deleteInput: true,
+        additionalData: ''
     },
     {
         value: '請求日',
@@ -206,6 +242,38 @@ export const LIST_TABLE_HEADER = [
         onClick: true,
         ordering: true,
         sortValue: BILL_KEY.INVOICE_DATE,
+        key: BILL_KEY.INVOICE_DATE,
+        content: function Cotent() {
+            const [date1, setDate1] = useState<string>(getToDay())
+            const [date2, setDate2] = useState<string>(getToDay())
+            return {
+                node : (
+                    <>
+                        <FormControl label='日付の下限' mr={1} mb={1}>
+                            <DateInput 
+                                label='日付の下限'
+                                name='日付の下限'
+                                width='small' 
+                                value={date1}
+                                onChange={(e) => setDate1(e)}
+                            />
+                        </FormControl>
+                        <FormControl label='日付の下限' mr={1} mb={1}>
+                            <DateInput 
+                                label='日付の下限'
+                                name='日付の下限'
+                                width='small' 
+                                value={date2}
+                                onChange={(e) => setDate2(e)}
+                            />
+                        </FormControl>
+                    </>
+                ),
+                value: `${date1}~${date2}`,
+            }
+        },
+        deleteInput: true,
+        additionalData: ''
     },
     {
         value: '期日',
@@ -213,6 +281,38 @@ export const LIST_TABLE_HEADER = [
         onClick: true,
         ordering: true,
         sortValue: BILL_KEY.DEPOSIT_DATE,
+        key: BILL_KEY.DEPOSIT_DATE,
+        content: function Cotent() {
+            const [date1, setDate1] = useState<string>(getToDay())
+            const [date2, setDate2] = useState<string>(getToDay())
+            return {
+                node : (
+                    <>
+                        <FormControl label='日付の下限' mr={1} mb={1}>
+                            <DateInput 
+                                label='日付の下限'
+                                name='日付の下限'
+                                width='small' 
+                                value={date1}
+                                onChange={(e) => setDate1(e)}
+                            />
+                        </FormControl>
+                        <FormControl label='日付の下限' mr={1} mb={1}>
+                            <DateInput 
+                                label='日付の下限'
+                                name='日付の下限'
+                                width='small' 
+                                value={date2}
+                                onChange={(e) => setDate2(e)}
+                            />
+                        </FormControl>
+                    </>
+                ),
+                value: `${date1}~${date2}`,
+            }
+        },
+        deleteInput: true,
+        additionalData: ''
     },
     {
         value: '自社担当者',
@@ -252,7 +352,8 @@ export const FILTER_OPTIONS = LIST_TABLE_HEADER.filter(header => header?.key).ma
     key: header.key,
     content: header.content,
     additionalData: header.additionalData,
-    additionalQuery: header.additionalQuery
+    additionalQuery: header.additionalQuery,
+    deleteInput: header.deleteInput
 })) as FilterOptions[]
 
 // Pagination Options
